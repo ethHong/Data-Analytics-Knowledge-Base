@@ -75,9 +75,11 @@ Data Analytics Knowledge Base for MSBA and Data Expert candidates
 
 ## Structure & Flow
 
-![image.png](/Users/HongSukhyun/Downloads/14369c5f-3378-48b8-a13a-bad821ee848d_Export-7c6a6819-bd58-42b2-9e70-3b307ff181e3/MSBA 2025 Knowledge Base 19bece0d2cf580809abae7d5f4514fc8/image.png)
 
-![image.png](/Users/HongSukhyun/Downloads/14369c5f-3378-48b8-a13a-bad821ee848d_Export-7c6a6819-bd58-42b2-9e70-3b307ff181e3/MSBA 2025 Knowledge Base 19bece0d2cf580809abae7d5f4514fc8/image 1.png)
+
+![Image](https://github.com/user-attachments/assets/6168a6aa-5690-486c-a9d9-cee207960a26)
+
+![Image](https://github.com/user-attachments/assets/59f0365f-530b-4165-b39d-5200402ea6dd)
 
 ### UI Preview
 
