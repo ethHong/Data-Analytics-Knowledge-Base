@@ -1,0 +1,636 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../..">
+      
+      
+        <link rel="next" href="../test_upload_omited_variables/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+    
+    
+      
+        <title>📄 Parameter_Estimataion - MSBA Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.8608ea7d.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#what-does-is-mean-to-do-modeling" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="MSBA Knowledge Base" class="md-header__button md-logo" aria-label="MSBA Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MSBA Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              📄 Parameter_Estimataion
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="MSBA Knowledge Base" class="md-nav__button md-logo" aria-label="MSBA Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    MSBA Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Documents
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Documents
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    📄 Parameter_Estimataion
+    
+  </span>
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../test_upload_omited_variables/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    📄 test_upload_omited_variables
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../test_SQL/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    📄 test_SQL
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Regression_Evaluation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    📄 Regression_Evaluation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../test_stat_basics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    📄 test_stat_basics
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../test_Redis/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    📄 test_Redis
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../test_MongoDB/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    📄 test_MongoDB
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<p><strong>reference_docs: "Regression_Evaluation, test_stat_basics"</strong></p>
+<p>Image: A spoiler for today's topic</p>
+<p><img width="585" alt="Screenshot 2024-11-07 at 2 43 31 PM" src="https://github.com/user-attachments/assets/be4dc335-990a-4d56-b239-89c898b4081d"></p>
+<p>In the first post of <strong>DS / ML Back to the Basics</strong> series, I would like to go over what does it mean when we do the 'modeling', and how do we evaluate if the model is good, or bad. I will use 'mean estimator' to explain statistical implications, and cover Simple Linear Regression model in the follow-up post. Maybe 'mean estimation' could be seem as very basic concept, <strong>but I will focus more on the statistical implication of estimation, and standard error.</strong></p>
+<hr />
+<h1 id="what-does-is-mean-to-do-modeling">What does is mean to do 'modeling?'</h1>
+<p>When I was an undergraduate student, I learned about a variety of machine learning models that were transforming the field. I was trained to implement these models in Python and apply them to sample datasets. It felt like magic: you write code, input training data, train the model, and it predicts the result.</p>
+<p>However, after working as a full-time product manager in the IT industry for three years, I discovered that in real-world business scenarios, simply applying these models rarely works as expected.</p>
+<p>Through my experience in ML projects in an AI lab, collaborating with data scientists as a product manager, and studying statistical analysis in depth, I now understand that this happens when <strong>predictive models are used without understanding the implications behind them.</strong> Modeling is not about building a magical pipeline that produces perfect outputs just because the model is the latest and most advanced. It's about <strong><em>1) effectively predicting real-world statistical patterns, 2) using a sample dataset that ideally reflects those patterns, and 3) minimizing possible errors.</em></strong></p>
+<hr />
+<h1 id="lets-think-of-modeling-as-estimation">Let's think of modeling as 'estimation'</h1>
+<p><img width="658" alt="image" src="https://github.com/user-attachments/assets/6ca73492-36de-440d-825f-4cb0536645eb"></p>
+<p>We talked a little bit about this in the previous post - <a href="https://ethhong.github.io/statistics/datascience/2024/08/10/Reviewing-MLE-(Maximum-Liklihood-Estimator).html">MLE - Maximum Likelihood Estimator</a>. We identify certain patterns from observed phenomena. While we cannot be certain where these patterns originate or what causes them, if we can estimate the patterns accurately, it may be possible to make valid predictions about unseen data.</p>
+<h2 id="example-of-mean-prediction">Example of 'mean' prediction.</h2>
+<p>We learned a lot about sample means and population means in statistics class—even back in high school. Let's think of the sample mean in terms of "estimation." For example, let’s say we want to answer the question, "How heavy are elephants?" This might be a difficult question because individual elephants vary in weight. However, we definitely know that elephants are much heavier than dogs or cats.</p>
+<p>The best way to describe "on average, how heavy are elephants?" would be to take the mean weight of all elephants. Since it’s impossible to measure the entire population, we use a sample. Here, we can say the "sample mean" is an estimator for the "population mean"—implying that the "population mean" is the actual (or ideal) real-world pattern describing the average weight of elephants, and we are estimating it through the "sample mean."</p>
+<p>Based on what we learned in statistics classes, assuming that weight is normally distributed, we can say:</p>
+<ul>
+<li>Random variable for the weight of elephants: <span class="arithmatex">\(Y \sim N(\mu, \sigma)\)</span></li>
+<li>Sample variable follows: <span class="arithmatex">\(\bar{Y}, s_Y\)</span></li>
+</ul>
+<p>Here, <span class="arithmatex">\(\mu\)</span> is the population mean (i.e., the actual average weight of elephants as determined by some real-world pattern that we cannot observe directly), while <span class="arithmatex">\(\bar{Y}\)</span> is an estimator for what we’re interested in.</p>
+<p>So, what we have done here is to <strong>estimate the statistic of a real-world pattern using a limited sample dataset.</strong> This is what we do for every "estimation" or modeling exercise. But we still have one question— <strong><em>Can we just accept this estimator? How precise is it?</em></strong></p>
+<h2 id="evaluating-estimation">Evaluating estimation.</h2>
+<p>What should we examine to assess the precision of an estimation? Let’s think of it this way: look at the two cases below. Both cases have the same mean; however, the data in the second case is much more spread out, meaning it has a higher variance from the mean. </p>
+<hr />
+<p><img width="585" alt="Screenshot 2024-11-07 at 2 43 31 PM" src="https://github.com/user-attachments/assets/be4dc335-990a-4d56-b239-89c898b4081d"></p>
+<hr />
+<p>This implies that if the standard deviation is high, data points are more likely to be far from our estimated mean. (In a standard normal distribution, approximately 95% of data falls within 2 * std of the mean.) <strong><em>Therefore, if the standard deviation of our estimating value is low, we can say our prediction is more efficient in terms of predicting unseen future data!</em></strong></p>
+<h3 id="the-how-is-standard-deviation-of-mean-estimator-like-true-implication-of-clt">The, how is standard deviation of mean estimator like? - True implication of CLT</h3>
+<p>Let’s go back to statistics class. Now it’s time for the <strong>Central Limit Theorem</strong> to do its job. Assuming <span class="arithmatex">\(Y\)</span> is normally distributed, the Central Limit Theorem states that <span class="arithmatex">\(\bar{Y} \sim N\left(\mu, \frac{\sigma^2}{n}\right)\)</span></p>
+<p>if the sample size <span class="arithmatex">\(n\)</span> is large enough. Here, we see that the variance (or standard deviation) of our mean estimator is <strong><em>1) determined by the population variance, and 2) divided by sample size.</em></strong> What are the implications of this?</p>
+<ol>
+<li>With a larger sample size, our estimator (sample mean) will approximate to the population mean.</li>
+<li>Standard deviation (actually, standard error - I'll explain this later) will also diminish, resulting in more precise estimation.</li>
+<li>However, if the population standard deviation itself is large—meaning if <span class="arithmatex">\(\sigma\)</span> is large—there will be limitations to the precision of mean estimation. </li>
+</ol>
+<p>These implications are more apparent if we consider it this way: as our sample size approaches the population size, we are effectively sampling the entire population. Therefore, as the sample size increases, the sample mean approaches the population mean. <strong>This is why we need large amounts of "BIG" data.</strong></p>
+<p>However, this doesn’t mean our estimation will always be precise just because we use a large dataset. What if the "true pattern" of the real world has a huge variance? For example, <strong><em>what if what we’re trying to estimate is not elephant weight, but the "income of people living in California?"</em></strong> California has a large population with a wide range of incomes, so even if we take the population mean, it may not adequately represent a "pattern." Therefore, for this type of prediction problem, using a sample mean predictor would not work well, even if we take a large sample from California.</p>
+<h3 id="why-does-dividing-segment-work-better-when-estimating-statistics">Why does 'dividing segment' work better when estimating statistics?</h3>
+<p>So, what can we do in these kinds of cases? Product managers or analysts might suggest <strong>"segmenting the data."</strong> The reason this approach works is that by dividing segments, we can reduce the population variance.</p>
+<p>If we divide the "population" into different segments—e.g., by age group—it’s more likely that people within the same age group will have a similar range of income. By defining segmented populations, we can reduce the variance of the population statistic. Although the maximum sample size is reduced (since the population is now divided into segments), this segmentation allows us to make better predictions by effectively narrowing down the population variance.</p>
+<p>Let’s try this with a data example. There’s an older dataset that contains wage data along with demographic information—the <a href="https://rdrr.io/cran/ISLR/man/Wage.html">ISLR Wage dataset</a>—which we’ll analyze using R.</p>
+<pre><code class="language-R">install.packages(&quot;ISLR&quot;, repos = &quot;http://cran.us.r-project.org&quot;)
+
+library(ISLR)
+
+# Load and view Wage dataset
+data(&quot;Wage&quot;)
+head(Wage)
+</code></pre>
+<p><img width="759" alt="Screenshot 2024-11-08 at 11 10 04 PM" src="https://github.com/user-attachments/assets/a3f8bed9-186d-4a13-b61a-bc4e434a4cdb"></p>
+<p>This is how the data looks like. Let's just take data from 2009 (since this is the most recent year from this dataset), and divide age group.</p>
+<pre><code class="language-R">df &lt;- Wage[Wage$year == max(Wage[, 'year']), ]
+df$age_group &lt;- ifelse(df$age &lt; 20, &quot;Immature&quot;,
+                       ifelse(df$age &lt;= 30, &quot;Twenties&quot;,
+                              ifelse(df$age &lt;= 60, &quot;Middle aged&quot;,
+                                     &quot;Senior&quot;)))
+df &lt;- df[, c('age_group', 'wage')]
+head(df)
+</code></pre>
+<p>Now, let's compare total variance, and variaces for each age groups!</p>
+<pre><code class="language-R">hist(df$wage, main = paste(&quot;All age wage - variance:&quot;, round(var(df$wage), 2)), 
+     xlab = &quot;Wage&quot;, ylab = &quot;Frequency&quot;)
+# Immature
+immature_age = df[df$age_group == &quot;Immature&quot;, ]$wage
+hist(immature_age, main = paste(&quot;Under 20 wage - variance:&quot;, round(var(immature_age), 2)), 
+     xlab = &quot;Wage&quot;, ylab = &quot;Frequency&quot;)
+
+#Twenties
+twenties_age = df[df$age_group == &quot;Twenties&quot;, ]$wage
+hist(immature_age, main = paste(&quot;20~20 wage - variance:&quot;, round(var(twenties_age), 2)), 
+     xlab = &quot;Wage&quot;, ylab = &quot;Frequency&quot;)
+
+#Middle aged
+middle_age = df[df$age_group == &quot;Middle aged&quot;, ]$wage
+hist(middle_age, main = paste(&quot;30~59 - variance:&quot;, round(var(middle_age), 2)), 
+     xlab = &quot;Wage&quot;, ylab = &quot;Frequency&quot;)
+</code></pre>
+<p><img alt="image" src="https://github.com/user-attachments/assets/093d19c1-0441-4003-a3af-aa7894e7d676" /></p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/a10789bb-2bf6-4630-a798-2c7b2ce69567" /></p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/0021c2bf-30e7-467e-82dc-2b15144f2ed0" /></p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/58c42d6e-ed25-4619-97fe-6626e7be730d" /></p>
+<p>We can see that the variance for the total population was 1811—a relatively large value. However, by splitting age groups, we could reduce the variance significantly for the under-20 and 20s age groups. If we use the entire population for mean estimation, <span class="arithmatex">\(\sigma_Y\)</span>, the population standard deviation of wage, is <span class="arithmatex">\(\sqrt{\sigma_Y} = 42.5629\)</span>. In comparison, the standard deviation of the 20s age group segment is <span class="arithmatex">\(\sqrt{\sigma_{Y=20}} = 29.32\)</span>.</p>
+<p>In a normal distribution, 95% of data is located within <span class="arithmatex">\(\text{mean} \pm 2\sigma\)</span> (the confidence interval). Therefore, if we use the mean as the estimator, the 95% confidence interval in the first case is about 85, while in the second case, it’s much narrower—around 58.</p>
+<p>Interestingly, the middle-aged group has a much larger variance than the total population. <strong>This suggests that we selected an inappropriate segment for mean prediction.</strong> This makes sense, as the 30–59 age range is quite broad for generalizing income patterns. <strong><em>To exaggerate, both myself two years from now and Elon Musk would fall into this group!</em></strong> </p>
+<p><img width="400" alt="Screenshot 2024-11-09 at 1 00 19 AM" src="https://github.com/user-attachments/assets/70447c07-21f1-4cbf-a16b-7a49bc55016c"></p>
+<p>We may reduce the variance further by splitting this group more narrowly or by removing outliers when conducting estimation.</p>
+<h2 id="theres-still-one-more-problem-sigma-is-unkown-here-comes-the-standard-error">There's still one more problem - <span class="arithmatex">\(\sigma\)</span> is unkown. Here comes the Standard Error.</h2>
+<p>I believe many readers have heard of "Standard Error." Now it’s time to introduce what it is and why it’s important. We just discussed why the "Standard Deviation" of the value we’re trying to estimate (in our example, <span class="arithmatex">\(\bar{Y}\)</span>, which is the average weight of elephants in the world) is relevant. According to the Central Limit Theorem, we know how to determine this value: <span class="arithmatex">\(\bar{Y} \sim N\left(\mu, \frac{\sigma^2}{n}\right)\)</span>. However, the population variance, <span class="arithmatex">\(\sigma\)</span>, is an unknown value. Therefore, <strong>we use the sample standard deviation as an estimator for the population standard deviation.</strong>
+$$
+\sigma_{\bar{Y}} = \frac{\sigma}{\sqrt{n}} \approx s_{\bar{Y}}= \frac{s_{Y}}{\sqrt{n}}
+$$
+Therefore, <strong>"Standard Error"</strong> is an estimator of the "Standard Deviation of the value we are trying to estimate."</p>
+<p>Remember:</p>
+<ol>
+<li>If we have a lower standard error, it means our prediction is likely more accurate.</li>
+<li>To achieve a smaller standard error, we need a larger <strong><em>N</em></strong> (sample size), but</li>
+<li>There are limitations if the <strong>"Standard Deviation (or variance) of the population itself"</strong> is large.</li>
+</ol>
+<p>Also, since <span class="arithmatex">\( n \)</span> in the denominator of the standard error formula is square-rooted, as <span class="arithmatex">\( n \)</span> increases, the impact of reducing standard error gradually diminishes.</p>
+<h3 id="gradually-diminishing-effect-of-increasing-n">Gradually diminishing effect of increasing N</h3>
+<p>Let's try to plot this using entire Wage dataset. The following code plots how the variance of Wage changes, as the sample size increases:</p>
+<pre><code class="language-R">sample_sizes &lt;- seq(10, 2910, by = 100)
+
+variance_computation &lt;- function(s_size) {
+  temp_data &lt;- Wage[sample(nrow(Wage), s_size), ]
+  var(temp_data$wage)
+}
+
+variances &lt;- sapply(sample_sizes, variance_computation)
+
+plot(sample_sizes, variances, main = 'Variance of Wage as sample size N increases', col = &quot;blue&quot;, xlab = 'Sample size')
+lines(sample_sizes, variances, col = &quot;red&quot;, lwd = 2)
+</code></pre>
+<p><img alt="image" src="https://github.com/user-attachments/assets/b12ebebf-1bc9-4ef2-bc1d-b790a219fdfe" /></p>
+<p>We can see that initially, the variance decreases quite dramatically as we increase the sample size. However, after reaching a sample size of 500, the improvement slows down and becomes negligible. This pattern resembles:</p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/4a9a42d5-ecf8-4f3e-a96b-727a7627fcf6" /></p>
+<hr />
+<h2 id="coming-up-next-lets-look-into-simple-linear-regression-model">Coming up next: let's look into 'Simple Linear Regression' model</h2>
+<p>Now we have a better understanding of the true implications of "estimation" and "standard error." <strong>But I hear someone saying...</strong></p>
+<h3 id="its-just-taking-average-for-estimation-its-not-a-real-modeling"><strong><em>It's just taking average for estimation! It's not a REAL modeling!</em></strong></h3>
+<p><img src="https://github.com/user-attachments/assets/c899c861-268b-4794-b601-3e92dc18f36c" width="400" height="400" /></p>
+<p>However, the definition of 'modeling' is making a function, that takes input data, and output some estimation of target variable. So, mean estimator could be defined as:
+$$
+\hat{y} = f(x) = E[X] = \frac{1}{n}\sum_{i=1}^nx_i
+$$</p>
+<p>It could also be considered a type of model. <strong>BUT, I totally get what you mean.</strong> In the next post, I will use the example of <strong>Linear Regression</strong> to explore how Standard Error works in evaluating regression models and how we can properly utilize regression models for better prediction. (Remember, models are not magic boxes!)</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f1b6f286.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+    
+  </body>
+</html>

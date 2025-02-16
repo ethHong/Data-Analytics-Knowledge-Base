@@ -8,6 +8,9 @@ fastapi = "*"
 uvicorn = "*"
 neo4j = "*"
 mkdocs = "*"
+python-multipart = "*"
+watchdog = "*"
+mkdocs-material = "*"
 
 [dev-packages]
 black = "*"

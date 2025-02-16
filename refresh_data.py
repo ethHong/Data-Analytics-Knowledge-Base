@@ -19,9 +19,9 @@ def load_markdown_to_neo4j():
         result = session.run("MATCH (d:Document) RETURN d.title AS title")
         stored_titles = {record["title"] for record in result}
         current_files = {
-            filename.replace(".markdown", "")
+            filename.replace(".md", "")
             for filename in os.listdir(markdown_dir)
-            if filename.endswith(".markdown")
+            if filename.endswith(".md")
         }
 
         for title in stored_titles - current_files:  # Files removed from directory
@@ -30,11 +30,11 @@ def load_markdown_to_neo4j():
             )
 
         for filename in os.listdir(markdown_dir):
-            if filename.endswith(".markdown"):
+            if filename.endswith(".md"):
                 filepath = os.path.join(markdown_dir, filename)
                 with open(filepath, "r", encoding="utf-8") as file:
                     content = file.read()
-                    title = filename.replace(".markdown", "")
+                    title = filename.replace(".md", "")
                     # Run Neo4j query to add markdown content
                     session.run(
                         "MERGE (d:Document {title: $title}) "  # Create node if not exists
