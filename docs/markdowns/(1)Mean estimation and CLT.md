@@ -1,6 +1,8 @@
-~~~JSON
-{reference_docs: ["Standard Error"]}
-~~~
+---
+
+**Reference Docs:** [Standard Error]((3)Standard Error.md)
+
+---
 
 ## Mean estimation and CLT
 
@@ -41,15 +43,15 @@ $$
 \bar{Y} \sim N(\mu, \frac{\sigma^2}{N})
 $$
 
-* \bar{Y} is an estimator for \mu
-* If $Y \sim N(\mu, \sigma)$, sum (or mean) of $Y$ have mean of $\mu$, and $STD$ of $\frac{\sigma^2}{N}$
+* $\bar{Y}$ is an estimator for $\mu$
+* If $Y \sim N(\mu, \sigma)$, sum (or mean) of $Y$ have mean of $\mu$, and $\text{STD}$ of $\frac{\sigma^2}{N}$
 
 **Implications**
 
 If the sample size $n$ is large enough. Here, we see that the variance (or standard deviation) of our mean estimator is ***1) determined by the population variance, and 2) divided by sample size.*** 
 
 1. With a larger sample size, our estimator (sample mean) will approximate to the population mean.
-2. Standard error also diminish, resulting in more precise estimation.
+2. [Standard error]((3)Standard Error.md) also diminish, resulting in more precise estimation.
 3. However, if the population standard deviation itself is large—meaning if $\sigma$ is large—there will be limitations to the precision of mean estimation. 
 
  **This is why we need large amounts of "BIG" data.**
