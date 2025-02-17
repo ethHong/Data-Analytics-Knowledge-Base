@@ -92,5 +92,20 @@ def update_relationships():
                         )
 
 
+def remove_duplicate_nodes():
+    with driver.session() as session:
+        session.run(
+            """
+            MATCH (d:Document)
+            WITH d.title AS title, COLLECT(d) AS nodes
+            WHERE SIZE(nodes) > 1
+            UNWIND nodes[1..] AS duplicate  // Keep first node, delete rest
+            DETACH DELETE duplicate
+        """
+        )
+        print("✅ Removed duplicate nodes (same title).")
+
+
 load_markdown_to_neo4j()
+remove_duplicate_nodes()
 update_relationships()

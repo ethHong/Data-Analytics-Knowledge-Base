@@ -13,6 +13,9 @@ nav:
       and Confidence Interval.md
   - 📄 (3)Standard Error: markdowns/(3)Standard Error.md
   - 📄 (4)Linear Regression: markdowns/(4)Linear Regression.md
+  - 📄 (5)Evaluation of Linear Regression: markdowns/(5)Evaluation of Linear Regression.md
+  - 📄 (6)Multiple Linear Regression: markdowns/(6)Multiple Linear Regression.md
+  - 📄 (7)Hypothesis testing: markdowns/(7)Hypothesis testing.md
 site_name: MSBA Knowledge Base
 theme:
   name: material
