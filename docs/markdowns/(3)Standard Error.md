@@ -1,3 +1,5 @@
+**category_specifier** : "Statistics"
+
 **Reference Docs:** [Mean estimation and CLT]((1)Mean estimation and CLT.md)
 
 ---

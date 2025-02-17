@@ -228,7 +228,7 @@
             
   
   <span class="md-ellipsis">
-    Documents
+    📁Statistics
     
   </span>
   
@@ -239,7 +239,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
-            Documents
+            📁Statistics
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -345,6 +345,15 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusion-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conclusion / Takeaways
+    </span>
+  </a>
   
 </li>
       
@@ -465,6 +474,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#conclusion-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conclusion / Takeaways
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -483,12 +501,56 @@
 
   <h1>📄 (2)Prediction Interval and Confidence Interval</h1>
 
-<hr />
+<p><strong>category_specifier</strong> : "Statistics"</p>
 <p><strong>Reference Docs:</strong> <a href="../%281%29Mean%20estimation%20and%20CLT/">Mean estimation and CLT</a></p>
-<hr />
 <h2 id="prediction-interval-and-confidence-interval">Prediction Interval and Confidence Interval</h2>
+<p><strong>What is 95% prediction interval / 95% confidence interval?</strong></p>
+<p>[<img alt="Confidence and Prediction Intervals with Statsmodels - GeeksforGeeks" src="https://media.geeksforgeeks.org/wp-content/uploads/20240807160121/Confidence-and-Prediction-Intervals.png" /></p>
+<ul>
+<li><strong>95% Prediction interval:</strong> In 95% probability, <strong>our future observational data</strong> fall in prediction interval. </li>
+<li>How real data is variating from true data, because of population STD (<span class="arithmatex">\(\sigma_{Y}\)</span>)</li>
+<li><strong>95% Confidence interval:</strong> If we repeatedly sample and compute confidence intervals, <strong>95% of those intervals will contain the true population mean.</strong></li>
+<li>How our model (estimation) would be close to the true value? Impacted by sample STD (<span class="arithmatex">\(s_{Y}\)</span>)</li>
+</ul>
 <h3 id="prediction-interval">Prediction Interval</h3>
+<ul>
+<li>Assuming we know true population mean <span class="arithmatex">\(\mu\)</span> and population STD <span class="arithmatex">\(\sigma_{Y}\)</span>: </li>
+</ul>
+<div class="arithmatex">\[
+\begin{aligned}
+&amp;\mu \pm 1.96  * \sigma_{Y} \\
+&amp;\text{Where, } \hat{Y} = \text{Estimator} \\
+&amp;1.96 : \text{Critical value } (\text{ for 95 percent})
+\end{aligned}
+\]</div>
+<ul>
+<li>
+<p>This is the prediction interval for a single future observation: For 95%, data will fall in this range.</p>
+</li>
+<li>
+<p><strong>Since population <span class="arithmatex">\(\mu, \sigma_{Y}\)</span></strong> is unknown, we use:
+  $$
+  \bar{Y} \pm 1.96 * s_{Y} * \sqrt{1 + \frac{1}{n}}
+  $$</p>
+</li>
+</ul>
 <h3 id="confidence-interval">Confidence Interval</h3>
+<p>95% Confidence interval for an <strong>estimation <span class="arithmatex">\(\hat{Y}\)</span></strong> implies, if we repeat confidence interval from many sample data, 95% of them will include true value. (Narrower CI : Better precision of estimator.)</p>
+<p>For <a href="../%281%29Mean%20estimation%20and%20CLT/">Mean estimator <span class="arithmatex">\(\bar{Y}\)</span> </a>, 95% confidence interval will be:
+$$
+\begin{aligned}
+&amp;\bar{Y} \pm t^* * \frac{s_{Y}}{\sqrt{n}} \
+&amp;\text{Where, } \hat{Y} = \text{Estimator}, \
+&amp; t = \text{Critical value } (1.96 \text{ for 95 percent})
+\end{aligned}
+$$
+Because of <a href="../%281%29Mean%20estimation%20and%20CLT/">Central Limit Theorem.</a> <span class="arithmatex">\(s_\bar{Y} = frac{s_Y}{sqrt{n}}\)</span>.</p>
+<hr />
+<h2 id="conclusion-takeaways">Conclusion / Takeaways</h2>
+<ul>
+<li>Confidence interval works as a measure of how estimator (mean estimation, or fitted model) is likely to be close to true value (true mean or true line)</li>
+<li>Prediction implies uncertainty in predicting a new individual future observation - how sample data will likely to be located around true value (true model or true line)</li>
+</ul>
 
 
 

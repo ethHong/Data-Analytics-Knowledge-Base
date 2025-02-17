@@ -7,7 +7,7 @@ markdown_extensions:
     generic: true
 nav:
 - Home: index.md
-- Documents:
+- 📁Statistics:
   - 📄 (1)Mean estimation and CLT: markdowns/(1)Mean estimation and CLT.md
   - 📄 (2)Prediction Interval and Confidence Interval: markdowns/(2)Prediction Interval
       and Confidence Interval.md

@@ -36,12 +36,25 @@ def load_markdown_to_neo4j():
                 with open(filepath, "r", encoding="utf-8") as file:
                     content = file.read()
                     title = re.sub(r"[^A-Za-z\s]", "", filename.replace(".md", ""))
+
+                    category_match = re.search(
+                        r"(?:\*\*)?category_specifier(?:\*\*)?\s*:\s*['\"]?([^'\"]+)['\"]?",
+                        content,
+                    )
+
+                    category = (
+                        category_match.group(1).strip()
+                        if category_match
+                        else "Uncategorized"
+                    )
+
                     # Run Neo4j query to add markdown content
                     session.run(
                         "MERGE (d:Document {title: $title}) "  # Create node if not exists
-                        "SET d.content = $content",  # Set content property
+                        "SET d.content = $content, d.category = $category",  # Set content property
                         title=title,
                         content=content,
+                        category=category,
                     )
 
 

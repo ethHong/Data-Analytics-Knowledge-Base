@@ -1,9 +1,19 @@
 import os
 import yaml
+import re
 
 MKDOCS_CONFIG_PATH = "frontend/mkdocs.yml"
 MARKDOWN_DIR = "docs/markdowns/"  # Stay consistent with backend
 INDEX_MD_PATH = "docs/index.md"  # Ensure Home is placed here
+
+
+def extract_docs_category(content):
+    """Extract category from markdown content."""
+    category_match = re.search(
+        r"(?:\*\*)?category_specifier(?:\*\*)?\s*:\s*['\"]?([^'\"]+)['\"]?",
+        content,
+    )
+    return category_match.group(1).strip() if category_match else "Uncategorized"
 
 
 def update_mkdocs_nav():
@@ -19,18 +29,27 @@ def update_mkdocs_nav():
     markdown_files = [f for f in os.listdir(MARKDOWN_DIR) if f.endswith(".md")]
     markdown_files.sort()
 
+    # Categorize docs
+    categories = {}
+    for filename in markdown_files:
+        filepath = os.path.join(MARKDOWN_DIR, filename)
+        with open(filepath, "r", encoding="utf-8") as file:
+            content = file.read()
+            category = extract_docs_category(content)
+            if category not in categories:
+                categories[category] = []
+            categories[category].append(
+                {"📄 " + filename.replace(".md", ""): f"markdowns/{filename}"}
+            )
+
     # Update docs directory
     config["docs_dir"] = "../docs"  # Make sure it's consistent
 
     # Generate navigation correctly
-    config["nav"] = [
-        {"Home": "index.md"},
-        {
-            "Documents": [
-                {"📄 " + f.replace(".md", ""): f"markdowns/{f}"} for f in markdown_files
-            ]
-        },
-    ]
+    config["nav"] = [{"Home": "index.md"}]
+
+    for category, docs in sorted(categories.items()):
+        config["nav"].append({f"📁{category}": docs})
 
     config["extra_javascript"] = [
         "https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js",
