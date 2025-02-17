@@ -17,6 +17,7 @@ def update_mkdocs_nav():
 
     # Get all Markdown files in `docs/markdowns/`
     markdown_files = [f for f in os.listdir(MARKDOWN_DIR) if f.endswith(".md")]
+    markdown_files.sort()
 
     # Update docs directory
     config["docs_dir"] = "../docs"  # Make sure it's consistent

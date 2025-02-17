@@ -8,13 +8,11 @@ markdown_extensions:
 nav:
 - Home: index.md
 - Documents:
-  - 📄 Parameter_Estimataion: markdowns/Parameter_Estimataion.md
-  - 📄 test_upload_omited_variables: markdowns/test_upload_omited_variables.md
-  - 📄 test_SQL: markdowns/test_SQL.md
-  - 📄 Regression_Evaluation: markdowns/Regression_Evaluation.md
-  - 📄 test_stat_basics: markdowns/test_stat_basics.md
-  - 📄 test_Redis: markdowns/test_Redis.md
-  - 📄 test_MongoDB: markdowns/test_MongoDB.md
+  - 📄 (1)Mean estimation and CLT: markdowns/(1)Mean estimation and CLT.md
+  - 📄 (2)Prediction Interval and Confidence Interval: markdowns/(2)Prediction Interval
+      and Confidence Interval.md
+  - 📄 (3)Standard Error: markdowns/(3)Standard Error.md
+  - 📄 (4)Linear Regression: markdowns/(4)Linear Regression.md
 site_name: MSBA Knowledge Base
 theme:
   name: material

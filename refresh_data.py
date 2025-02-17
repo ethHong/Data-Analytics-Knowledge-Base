@@ -1,5 +1,6 @@
 from neo4j import GraphDatabase
 import os
+import re
 
 # Connect on Neo4j
 NEO4J_URI = "bolt://localhost:7687"
@@ -19,7 +20,7 @@ def load_markdown_to_neo4j():
         result = session.run("MATCH (d:Document) RETURN d.title AS title")
         stored_titles = {record["title"] for record in result}
         current_files = {
-            filename.replace(".md", "")
+            re.sub(r"[^A-Za-z\s]", "", filename.replace(".md", ""))
             for filename in os.listdir(markdown_dir)
             if filename.endswith(".md")
         }
@@ -34,7 +35,7 @@ def load_markdown_to_neo4j():
                 filepath = os.path.join(markdown_dir, filename)
                 with open(filepath, "r", encoding="utf-8") as file:
                     content = file.read()
-                    title = filename.replace(".md", "")
+                    title = re.sub(r"[^A-Za-z\s]", "", filename.replace(".md", ""))
                     # Run Neo4j query to add markdown content
                     session.run(
                         "MERGE (d:Document {title: $title}) "  # Create node if not exists
