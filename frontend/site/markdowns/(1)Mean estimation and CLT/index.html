@@ -350,6 +350,30 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#why-does-diviging-segment-improve-mean-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why does diviging segment improve mean estimation?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Why does diviging segment improve mean estimation?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#islr-wage-dataset-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      ISLR Wage dataset Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -579,6 +603,30 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#why-does-diviging-segment-improve-mean-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why does diviging segment improve mean estimation?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Why does diviging segment improve mean estimation?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#islr-wage-dataset-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      ISLR Wage dataset Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -646,6 +694,52 @@
 <li>However, if the population standard deviation itself is large—meaning if <span class="arithmatex">\(\sigma\)</span> is large—there will be limitations to the precision of mean estimation. </li>
 </ol>
 <p><strong>This is why we need large amounts of "BIG" data.</strong></p>
+<h2 id="why-does-diviging-segment-improve-mean-estimation">Why does diviging segment improve mean estimation?</h2>
+<ul>
+<li>By defining segmented populations, <strong>we can reduce the variance</strong> of the population statistic. </li>
+<li>Example: If we divide the "population" into different segments—e.g., by age group—it’s more likely that people within the same age group will have a similar range of income.</li>
+</ul>
+<h3 id="islr-wage-dataset-example"><a href="https://rdrr.io/cran/ISLR/man/Wage.html">ISLR Wage dataset</a> Example</h3>
+<pre><code class="language-R">install.packages(&quot;ISLR&quot;, repos = &quot;http://cran.us.r-project.org&quot;)
+
+library(ISLR)
+
+# Load and view Wage dataset
+data(&quot;Wage&quot;)
+head(Wage)
+
+# Divide Segment
+df &lt;- Wage[Wage$year == max(Wage[, 'year']), ]
+df$age_group &lt;- ifelse(df$age &lt; 20, &quot;Immature&quot;,
+                       ifelse(df$age &lt;= 30, &quot;Twenties&quot;,
+                              ifelse(df$age &lt;= 60, &quot;Middle aged&quot;,
+                                     &quot;Senior&quot;)))
+df &lt;- df[, c('age_group', 'wage')]
+head(df)
+
+# Visualize
+hist(df$wage, main = paste(&quot;All age wage - variance:&quot;, round(var(df$wage), 2)), 
+     xlab = &quot;Wage&quot;, ylab = &quot;Frequency&quot;)
+# Immature
+immature_age = df[df$age_group == &quot;Immature&quot;, ]$wage
+hist(immature_age, main = paste(&quot;Under 20 wage - variance:&quot;, round(var(immature_age), 2)), 
+     xlab = &quot;Wage&quot;, ylab = &quot;Frequency&quot;)
+
+#Twenties
+twenties_age = df[df$age_group == &quot;Twenties&quot;, ]$wage
+hist(immature_age, main = paste(&quot;20~20 wage - variance:&quot;, round(var(twenties_age), 2)), 
+     xlab = &quot;Wage&quot;, ylab = &quot;Frequency&quot;)
+
+#Middle aged
+middle_age = df[df$age_group == &quot;Middle aged&quot;, ]$wage
+hist(middle_age, main = paste(&quot;30~59 - variance:&quot;, round(var(middle_age), 2)), 
+     xlab = &quot;Wage&quot;, ylab = &quot;Frequency&quot;)
+</code></pre>
+<p><img width="759" alt="Screenshot 2024-11-08 at 11 10 04 PM" src="https://github.com/user-attachments/assets/a3f8bed9-186d-4a13-b61a-bc4e434a4cdb"></p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/093d19c1-0441-4003-a3af-aa7894e7d676" /></p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/a10789bb-2bf6-4630-a798-2c7b2ce69567" /></p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/0021c2bf-30e7-467e-82dc-2b15144f2ed0" /></p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/58c42d6e-ed25-4619-97fe-6626e7be730d" /></p>
 
 
 

@@ -53,3 +53,57 @@ If the sample size $n$ is large enough. Here, we see that the variance (or stand
 3. However, if the population standard deviation itself is large—meaning if $\sigma$ is large—there will be limitations to the precision of mean estimation. 
 
  **This is why we need large amounts of "BIG" data.**
+
+## Why does diviging segment improve mean estimation?
+
+* By defining segmented populations, **we can reduce the variance** of the population statistic. 
+* Example: If we divide the "population" into different segments—e.g., by age group—it’s more likely that people within the same age group will have a similar range of income.
+
+###  [ISLR Wage dataset](https://rdrr.io/cran/ISLR/man/Wage.html) Example
+
+~~~R
+install.packages("ISLR", repos = "http://cran.us.r-project.org")
+
+library(ISLR)
+
+# Load and view Wage dataset
+data("Wage")
+head(Wage)
+
+# Divide Segment
+df <- Wage[Wage$year == max(Wage[, 'year']), ]
+df$age_group <- ifelse(df$age < 20, "Immature",
+                       ifelse(df$age <= 30, "Twenties",
+                              ifelse(df$age <= 60, "Middle aged",
+                                     "Senior")))
+df <- df[, c('age_group', 'wage')]
+head(df)
+
+# Visualize
+hist(df$wage, main = paste("All age wage - variance:", round(var(df$wage), 2)), 
+     xlab = "Wage", ylab = "Frequency")
+# Immature
+immature_age = df[df$age_group == "Immature", ]$wage
+hist(immature_age, main = paste("Under 20 wage - variance:", round(var(immature_age), 2)), 
+     xlab = "Wage", ylab = "Frequency")
+
+#Twenties
+twenties_age = df[df$age_group == "Twenties", ]$wage
+hist(immature_age, main = paste("20~20 wage - variance:", round(var(twenties_age), 2)), 
+     xlab = "Wage", ylab = "Frequency")
+
+#Middle aged
+middle_age = df[df$age_group == "Middle aged", ]$wage
+hist(middle_age, main = paste("30~59 - variance:", round(var(middle_age), 2)), 
+     xlab = "Wage", ylab = "Frequency")
+~~~
+
+<img width="759" alt="Screenshot 2024-11-08 at 11 10 04 PM" src="https://github.com/user-attachments/assets/a3f8bed9-186d-4a13-b61a-bc4e434a4cdb">
+
+![image](https://github.com/user-attachments/assets/093d19c1-0441-4003-a3af-aa7894e7d676)
+
+![image](https://github.com/user-attachments/assets/a10789bb-2bf6-4630-a798-2c7b2ce69567)
+
+![image](https://github.com/user-attachments/assets/0021c2bf-30e7-467e-82dc-2b15144f2ed0)
+
+![image](https://github.com/user-attachments/assets/58c42d6e-ed25-4619-97fe-6626e7be730d)
