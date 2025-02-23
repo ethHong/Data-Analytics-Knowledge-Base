@@ -1,8 +1,20 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 import os
 from neo4j import GraphDatabase
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()  # Initialize APP
+
+# CORS middleware : avoid browser blocking request to API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "*"
+    ],  # Allow requests from any domain (use specific URLs for production)
+    allow_credentials=True,  # Allow cookies, authorization headers
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
 # Connect to neo4j
 NEO4J_URI = "bolt://localhost:7687"
@@ -75,6 +87,38 @@ async def upload_markdown(file: UploadFile = File(...)):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# API Endpoint for graph
+@app.get("/graph/")
+def get_graph_data():
+    with driver.session() as session:
+        result = session.run(
+            """
+                             MATCH (d:Document)-[r:RELATED_TO]->(other:Document)
+                             RETURN d.title AS source, d.category AS source_category,
+                             other.title AS target, other.category AS target_category
+                             """
+        )
+
+        nodes = {}
+        links = []
+
+        for record in result:
+            # Adding nodes withhout duplicates
+            nodes[record["source"]] = {
+                "id": record["source"],
+                "category": record["source_category"],
+            }
+            nodes[record["target"]] = {
+                "id": record["target"],
+                "category": record["target_category"],
+            }
+
+            links.append({"source": record["source"], "target": record["target"]})
+        node_list = list(nodes.values())
+
+        return {"nodes": node_list, "links": links}
 
 
 # Start the FastAPI server

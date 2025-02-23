@@ -4,7 +4,7 @@
 
 ---
 
-## Standard Error
+## Standard Error 
 
 * From sample statistics, $\sigma$, the population STD is unknown.
 * Standard Error is an estimation of Standard Deviation

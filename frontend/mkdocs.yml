@@ -1,12 +1,17 @@
-docs_dir: ../docs
+docs_dir: docs
+extra_css:
+- css/custom.css
 extra_javascript:
 - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js
 - https://polyfill.io/v3/polyfill.min.js?features=es6
+- https://d3js.org/d3.v7.min.js
+- js/graph.js
 markdown_extensions:
 - pymdownx.arithmatex:
     generic: true
 nav:
 - Home: index.md
+- Knowledge Graph: 'graph.html '
 - 📁Statistics:
   - 📄 (1)Mean estimation and CLT: markdowns/(1)Mean estimation and CLT.md
   - 📄 (2)Prediction Interval and Confidence Interval: markdowns/(2)Prediction Interval

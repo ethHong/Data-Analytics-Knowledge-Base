@@ -3,8 +3,8 @@ import yaml
 import re
 
 MKDOCS_CONFIG_PATH = "frontend/mkdocs.yml"
-MARKDOWN_DIR = "docs/markdowns/"  # Stay consistent with backend
-INDEX_MD_PATH = "docs/index.md"  # Ensure Home is placed here
+MARKDOWN_DIR = "frontend/docs/markdowns/"  # Stay consistent with backend
+INDEX_MD_PATH = "frontend/docs/index.md"  # Ensure Home is placed here
 
 
 def extract_docs_category(content):
@@ -43,10 +43,11 @@ def update_mkdocs_nav():
             )
 
     # Update docs directory
-    config["docs_dir"] = "../docs"  # Make sure it's consistent
+    config["docs_dir"] = "docs"  # Make sure it's consistent
 
     # Generate navigation correctly
     config["nav"] = [{"Home": "index.md"}]
+    config["nav"].append({"Knowledge Graph": "graph.html "})
 
     for category, docs in sorted(categories.items()):
         config["nav"].append({f"📁{category}": docs})
@@ -54,7 +55,11 @@ def update_mkdocs_nav():
     config["extra_javascript"] = [
         "https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js",
         "https://polyfill.io/v3/polyfill.min.js?features=es6",
+        "https://d3js.org/d3.v7.min.js",
+        "js/graph.js",
     ]
+
+    config["extra_css"] = ["css/custom.css"]
 
     config["markdown_extensions"] = [{"pymdownx.arithmatex": {"generic": True}}]
 

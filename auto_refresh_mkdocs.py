@@ -16,18 +16,18 @@ class MarkdownChangeHandler(FileSystemEventHandler):
                 "📄 Markdown files changed! Updating navigation & restarting MkDocs & refreshing DB..."
             )
 
+            # Sync with Neo4j (important for adding/removing documents)
+            os.system("pipenv run python refresh_data.py")
+
             # Update navigation for MkDocs
             os.system("pipenv run python generate_mkdocs_nav.py")
 
             # Refresh MkDocs site
             os.system("pipenv run mkdocs build -f frontend/mkdocs.yml")
 
-            # Sync with Neo4j (important for adding/removing documents)
-            os.system("pipenv run python refresh_data.py")
-
 
 if __name__ == "__main__":
-    path = "docs/markdowns/"
+    path = "frontend/docs/markdowns/"
     event_handler = MarkdownChangeHandler()
     observer = Observer()
     observer.schedule(event_handler, path, recursive=False)

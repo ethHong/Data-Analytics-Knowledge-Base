@@ -1,18 +1,10 @@
-# Welcome to MkDocs
+# Welcome to the MSBA Knowledge Base
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
-change test
+<div style = "margin-bottom: 10px;">
+<iframe src="graph.html" width="100%" height="400px" frameborder="0"></iframe>
+</div>
+## What is Knowledge-Base?
 
-## Commands
+Knowledge is composed of many small different concepts. When we know how to connect those pieces of concepts and apply them, it becomes your knowledge.
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
-
-## Project layout
-
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+Knowledge base aims to collect basic pieces of knoweldges on Data Analytics, and make it easier for anyont to search them, connect with other concepts, and apply them for higher-level application and absolve them as their own knowledge.

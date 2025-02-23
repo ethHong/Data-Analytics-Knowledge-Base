@@ -2,6 +2,7 @@ from neo4j import GraphDatabase
 import os
 import re
 
+
 # Connect on Neo4j
 NEO4J_URI = "bolt://localhost:7687"
 NEO4J_USER = "neo4j"
@@ -14,7 +15,7 @@ driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
 
 
 def load_markdown_to_neo4j():
-    markdown_dir = "docs/markdowns/"
+    markdown_dir = "frontend/docs/markdowns/"
     with driver.session() as session:
 
         result = session.run("MATCH (d:Document) RETURN d.title AS title")
