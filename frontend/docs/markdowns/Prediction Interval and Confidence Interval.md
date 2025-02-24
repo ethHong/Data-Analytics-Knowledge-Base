@@ -1,6 +1,6 @@
 **category_specifier** : "Statistics"
 
-**Reference Docs:** [Mean estimation and CLT]((1)Mean estimation and CLT.md)
+**Reference Docs:** [Mean estimation and CLT](Mean estimation and CLT.md)
 
 ## Prediction Interval and Confidence Interval
 

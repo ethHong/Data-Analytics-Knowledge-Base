@@ -20,7 +20,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   svg.call(zoom);
 
   const svgGroup = svg.append("g");
-
   const color = d3.scaleOrdinal(d3.schemeCategory10);
 
   const simulation = d3.forceSimulation(graphData.nodes)
@@ -49,9 +48,29 @@ document.addEventListener("DOMContentLoaded", async () => {
         .on("drag", dragged)
         .on("end", dragEnded)
     )
+    // ✅ Hover Interaction
+    .on("mouseover", (event, d) => {
+      d3.select(event.currentTarget)
+        .transition()
+        .duration(200)
+        .attr("r", 16); // Increase node size on hover
+      showTooltip(event, d);
+    })
+    .on("mouseout", (event) => {
+      d3.select(event.currentTarget)
+        .transition()
+        .duration(200)
+        .attr("r", 12); // Reset node size
+      hideTooltip();
+    })
+    
+    // ✅ Click Interaction for Opening Document
     .on("click", (event, d) => {
-      window.location.href = `/markdowns/${d.id.replace(/\s+/g, "_")}.md`;
-    });
+    const formattedId = d.id; // Format ID for URL
+    const docPath = `/markdowns/${formattedId}`; // Construct the document path
+    console.log(`Trying to open document: ${docPath}`); // Debug log to verify URL
+    window.location.href = docPath; // Redirect to the document
+  });
 
   const label = svgGroup.append("g")
     .selectAll("text")
@@ -91,7 +110,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     d.fy = null;
   }
 
-  // Center Graph Button Functionality
+  // ✅ Tooltip Functions
+  function showTooltip(event, d) {
+    const tooltip = document.createElement("div");
+    tooltip.id = "tooltip";
+    tooltip.innerHTML = `<strong>${d.id}</strong><br>Category: ${d.category}`;
+    tooltip.style.position = "absolute";
+    tooltip.style.left = event.pageX + 10 + "px";
+    tooltip.style.top = event.pageY + 10 + "px";
+    tooltip.style.background = "#fff";
+    tooltip.style.border = "1px solid #ddd";
+    tooltip.style.padding = "5px";
+    tooltip.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
+    tooltip.style.zIndex = 10;
+    document.body.appendChild(tooltip);
+  }
+
+  function hideTooltip() {
+    const tooltip = document.getElementById("tooltip");
+    if (tooltip) {
+      tooltip.remove();
+    }
+  }
+
+  // ✅ Center Graph Button Functionality
   const centerButton = document.createElement("button");
   centerButton.textContent = "Center Graph";
   centerButton.style.position = "absolute";
@@ -105,10 +147,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   centerButton.style.cursor = "pointer";
   document.getElementById("knowledge-graph").appendChild(centerButton);
 
-  let initialCenterTransform = null; // Save the initial centering position
+  let initialCenterTransform = null;
 
   centerButton.addEventListener("click", () => {
-    initialCenterTransform = getGraphCenterTransform();
     if (initialCenterTransform) {
       svg.transition()
         .duration(750)
@@ -116,7 +157,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // 🔄 Function to Calculate Center Transform
+  // ✅ Calculate Center Transform
   function getGraphCenterTransform() {
     const graphBounds = svgGroup.node().getBBox();
     const padding = 50;
@@ -125,7 +166,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const centerY = -graphBounds.y - graphBounds.height / 2 + height / 2;
 
     return d3.zoomIdentity
-      .translate(centerX - padding, centerY - padding)
+      .translate(centerX - padding, centerY)
       .scale(1);
   }
+
+  // Save the initial center transform
+  setTimeout(() => {
+    initialCenterTransform = getGraphCenterTransform();
+  }, 300);
 });

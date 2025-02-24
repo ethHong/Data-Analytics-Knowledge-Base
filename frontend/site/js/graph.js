@@ -1,20 +1,16 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  // Fetch graph data
   const response = await fetch("http://localhost:8000/graph/");
   const graphData = await response.json();
 
-  // Set graph dimensions
   const width = window.innerWidth * 1;
   const height = window.innerHeight * 1;
 
-  // Create SVG container
   const svg = d3.select("#knowledge-graph")
     .append("svg")
     .attr("width", width)
     .attr("height", height)
     .style("background-color", "#f5f5f5");
 
-  // Enable zoom and pan
   const zoom = d3.zoom()
     .scaleExtent([0.1, 5])
     .on("zoom", (event) => {
@@ -24,16 +20,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   svg.call(zoom);
 
   const svgGroup = svg.append("g");
-
   const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-  // Force simulation for graph layout
   const simulation = d3.forceSimulation(graphData.nodes)
     .force("link", d3.forceLink(graphData.links).id((d) => d.id).distance(150))
     .force("charge", d3.forceManyBody().strength(-300))
     .force("center", d3.forceCenter(width / 2, height / 2));
 
-  // Draw links (edges)
   const link = svgGroup.append("g")
     .selectAll("line")
     .data(graphData.links)
@@ -42,7 +35,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     .attr("stroke", "#aaa")
     .attr("stroke-width", 2);
 
-  // Draw nodes
   const node = svgGroup.append("g")
     .selectAll("circle")
     .data(graphData.nodes)
@@ -56,11 +48,30 @@ document.addEventListener("DOMContentLoaded", async () => {
         .on("drag", dragged)
         .on("end", dragEnded)
     )
+    // ✅ Hover Interaction
+    .on("mouseover", (event, d) => {
+      d3.select(event.currentTarget)
+        .transition()
+        .duration(200)
+        .attr("r", 16); // Increase node size on hover
+      showTooltip(event, d);
+    })
+    .on("mouseout", (event) => {
+      d3.select(event.currentTarget)
+        .transition()
+        .duration(200)
+        .attr("r", 12); // Reset node size
+      hideTooltip();
+    })
+    
+    // ✅ Click Interaction for Opening Document
     .on("click", (event, d) => {
-      window.location.href = `/markdowns/${d.id.replace(/\s+/g, "_")}.md`;
-    });
+    const formattedId = d.id; // Format ID for URL
+    const docPath = `/markdowns/${formattedId}`; // Construct the document path
+    console.log(`Trying to open document: ${docPath}`); // Debug log to verify URL
+    window.location.href = docPath; // Redirect to the document
+  });
 
-  // Add labels
   const label = svgGroup.append("g")
     .selectAll("text")
     .data(graphData.nodes)
@@ -70,7 +81,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     .attr("text-anchor", "middle")
     .text((d) => d.id);
 
-  // Run simulation ticks
   simulation.on("tick", () => {
     link
       .attr("x1", (d) => d.source.x)
@@ -82,7 +92,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     label.attr("x", (d) => d.x).attr("y", (d) => d.y);
   });
 
-  // Drag Functions
+  // ✅ Drag Functions
   function dragStarted(event, d) {
     if (!event.active) simulation.alphaTarget(0.3).restart();
     d.fx = d.x;
@@ -100,7 +110,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     d.fy = null;
   }
 
-  // Center Graph Button Functionality
+  // ✅ Tooltip Functions
+  function showTooltip(event, d) {
+    const tooltip = document.createElement("div");
+    tooltip.id = "tooltip";
+    tooltip.innerHTML = `<strong>${d.id}</strong><br>Category: ${d.category}`;
+    tooltip.style.position = "absolute";
+    tooltip.style.left = event.pageX + 10 + "px";
+    tooltip.style.top = event.pageY + 10 + "px";
+    tooltip.style.background = "#fff";
+    tooltip.style.border = "1px solid #ddd";
+    tooltip.style.padding = "5px";
+    tooltip.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
+    tooltip.style.zIndex = 10;
+    document.body.appendChild(tooltip);
+  }
+
+  function hideTooltip() {
+    const tooltip = document.getElementById("tooltip");
+    if (tooltip) {
+      tooltip.remove();
+    }
+  }
+
+  // ✅ Center Graph Button Functionality
   const centerButton = document.createElement("button");
   centerButton.textContent = "Center Graph";
   centerButton.style.position = "absolute";
@@ -114,12 +147,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   centerButton.style.cursor = "pointer";
   document.getElementById("knowledge-graph").appendChild(centerButton);
 
-  let initialCenterTransform = null; // Save the initial centering position
+  let initialCenterTransform = null;
 
-  // ✅ Save Initial Center Without Applying It
-  initialCenterTransform = getGraphCenterTransform();
-
-  // Center the graph only when button is clicked
   centerButton.addEventListener("click", () => {
     if (initialCenterTransform) {
       svg.transition()
@@ -128,7 +157,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // Calculate Center Transform and Add Padding
+  // ✅ Calculate Center Transform
   function getGraphCenterTransform() {
     const graphBounds = svgGroup.node().getBBox();
     const padding = 50;
@@ -137,7 +166,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const centerY = -graphBounds.y - graphBounds.height / 2 + height / 2;
 
     return d3.zoomIdentity
-      .translate(centerX - padding, centerY - padding)
+      .translate(centerX - padding, centerY)
       .scale(1);
   }
+
+  // Save the initial center transform
+  setTimeout(() => {
+    initialCenterTransform = getGraphCenterTransform();
+  }, 300);
 });

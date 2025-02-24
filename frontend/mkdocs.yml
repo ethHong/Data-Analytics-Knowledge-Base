@@ -11,16 +11,16 @@ markdown_extensions:
     generic: true
 nav:
 - Home: index.md
-- Knowledge Graph: 'graph.html '
+- Knowledge Graph: graph.html
 - 📁Statistics:
-  - 📄 (1)Mean estimation and CLT: markdowns/(1)Mean estimation and CLT.md
-  - 📄 (2)Prediction Interval and Confidence Interval: markdowns/(2)Prediction Interval
-      and Confidence Interval.md
-  - 📄 (3)Standard Error: markdowns/(3)Standard Error.md
-  - 📄 (4)Linear Regression: markdowns/(4)Linear Regression.md
-  - 📄 (5)Evaluation of Linear Regression: markdowns/(5)Evaluation of Linear Regression.md
-  - 📄 (6)Multiple Linear Regression: markdowns/(6)Multiple Linear Regression.md
-  - 📄 (7)Hypothesis testing: markdowns/(7)Hypothesis testing.md
+  - 📄 Evaluation of Linear Regression: markdowns/Evaluation of Linear Regression.md
+  - 📄 Hypothesis testing: markdowns/Hypothesis testing.md
+  - 📄 Linear Regression: markdowns/Linear Regression.md
+  - 📄 Mean estimation and CLT: markdowns/Mean estimation and CLT.md
+  - 📄 Multiple Linear Regression: markdowns/Multiple Linear Regression.md
+  - 📄 Prediction Interval and Confidence Interval: markdowns/Prediction Interval and
+      Confidence Interval.md
+  - 📄 Standard Error: markdowns/Standard Error.md
 site_name: MSBA Knowledge Base
 theme:
   name: material

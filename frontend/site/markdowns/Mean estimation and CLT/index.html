@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../%284%29Linear%20Regression/">
+        <link rel="prev" href="../Linear%20Regression/">
       
       
-        <link rel="next" href="../%286%29Multiple%20Linear%20Regression/">
+        <link rel="next" href="../Multiple%20Linear%20Regression/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>📄 (5)Evaluation of Linear Regression - MSBA Knowledge Base</title>
+        <title>📄 Mean estimation and CLT - MSBA Knowledge Base</title>
       
     
     
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#evaluation-of-linear-regression" class="md-skip">
+        <a href="#mean-estimation-and-clt" class="md-skip">
           Skip to content
         </a>
       
@@ -100,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              📄 (5)Evaluation of Linear Regression
+              📄 Mean estimation and CLT
             
           </span>
         </div>
@@ -214,7 +214,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../graph.html " class="md-nav__link">
+      <a href="../../graph.html" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -273,11 +273,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../%281%29Mean%20estimation%20and%20CLT/" class="md-nav__link">
+      <a href="../Evaluation%20of%20Linear%20Regression/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    📄 (1)Mean estimation and CLT
+    📄 Evaluation of Linear Regression
     
   </span>
   
@@ -295,11 +295,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../%282%29Prediction%20Interval%20and%20Confidence%20Interval/" class="md-nav__link">
+      <a href="../Hypothesis%20testing/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    📄 (2)Prediction Interval and Confidence Interval
+    📄 Hypothesis testing
     
   </span>
   
@@ -317,33 +317,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../%283%29Standard%20Error/" class="md-nav__link">
+      <a href="../Linear%20Regression/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    📄 (3)Standard Error
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../%284%29Linear%20Regression/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    📄 (4)Linear Regression
+    📄 Linear Regression
     
   </span>
   
@@ -372,7 +350,7 @@
           
   
   <span class="md-ellipsis">
-    📄 (5)Evaluation of Linear Regression
+    📄 Mean estimation and CLT
     
   </span>
   
@@ -384,7 +362,7 @@
         
   
   <span class="md-ellipsis">
-    📄 (5)Evaluation of Linear Regression
+    📄 Mean estimation and CLT
     
   </span>
   
@@ -405,20 +383,83 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#evaluation-of-linear-regression" class="md-nav__link">
+  <a href="#mean-estimation-and-clt" class="md-nav__link">
     <span class="md-ellipsis">
-      Evaluation of Linear Regression
+      Mean estimation and CLT
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mean estimation and CLT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#simple-mean-estimator" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simple Mean Estimator
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#prediction-with-linear-regression-model" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#population-and-sample-parameter" class="md-nav__link">
     <span class="md-ellipsis">
-      Prediction with Linear Regression Model
+      Population and sample parameter
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#accuracy-of-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Accuracy of estimation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Accuracy of estimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#central-limit-theorem" class="md-nav__link">
+    <span class="md-ellipsis">
+      Central Limit Theorem
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-does-diviging-segment-improve-mean-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why does diviging segment improve mean estimation?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Why does diviging segment improve mean estimation?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#islr-wage-dataset-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      ISLR Wage dataset Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -438,11 +479,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../%286%29Multiple%20Linear%20Regression/" class="md-nav__link">
+      <a href="../Multiple%20Linear%20Regression/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    📄 (6)Multiple Linear Regression
+    📄 Multiple Linear Regression
     
   </span>
   
@@ -460,11 +501,33 @@
   
   
     <li class="md-nav__item">
-      <a href="../%287%29Hypothesis%20testing/" class="md-nav__link">
+      <a href="../Prediction%20Interval%20and%20Confidence%20Interval/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    📄 (7)Hypothesis testing
+    📄 Prediction Interval and Confidence Interval
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Standard%20Error/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    📄 Standard Error
     
   </span>
   
@@ -507,20 +570,83 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#evaluation-of-linear-regression" class="md-nav__link">
+  <a href="#mean-estimation-and-clt" class="md-nav__link">
     <span class="md-ellipsis">
-      Evaluation of Linear Regression
+      Mean estimation and CLT
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mean estimation and CLT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#simple-mean-estimator" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simple Mean Estimator
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#prediction-with-linear-regression-model" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#population-and-sample-parameter" class="md-nav__link">
     <span class="md-ellipsis">
-      Prediction with Linear Regression Model
+      Population and sample parameter
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#accuracy-of-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Accuracy of estimation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Accuracy of estimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#central-limit-theorem" class="md-nav__link">
+    <span class="md-ellipsis">
+      Central Limit Theorem
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-does-diviging-segment-improve-mean-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why does diviging segment improve mean estimation?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Why does diviging segment improve mean estimation?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#islr-wage-dataset-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      ISLR Wage dataset Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -540,13 +666,103 @@
 
 
 
-  <h1>📄 (5)Evaluation of Linear Regression</h1>
+  <h1>📄 Mean estimation and CLT</h1>
 
 <p><strong>category_specifier</strong> : "Statistics"</p>
-<p><strong>Reference Docs:</strong> <a href="../%284%29Linear%20Regression/">Linear Regression</a>| <a href="../%281%29Mean%20estimation%20and%20CLT/">Mean estimation and CLT</a> | <a href="../%283%29Standard%20Error/">Standard Error</a> </p>
-<hr />
-<h2 id="evaluation-of-linear-regression">Evaluation of Linear Regression</h2>
-<h2 id="prediction-with-linear-regression-model">Prediction with Linear Regression Model</h2>
+<p><strong>Reference Docs:</strong> <a href="../Standard%20Error/">Standard Error</a></p>
+<h2 id="mean-estimation-and-clt">Mean estimation and CLT</h2>
+<h3 id="simple-mean-estimator">Simple Mean Estimator</h3>
+<p>Best (Reasonable) Predictor for statistics: <strong><em>Mean</em></strong></p>
+<ul>
+<li>Best predictor random variable <span class="arithmatex">\(Y_f\)</span> woul be <span class="arithmatex">\(\mu\)</span></li>
+<li>We assume normat distribution <span class="arithmatex">\(N(\mu, \sigma^2)\)</span> for simplification.</li>
+</ul>
+<h3 id="population-and-sample-parameter">Population and sample parameter</h3>
+<ul>
+<li>Population parameter: (<span class="arithmatex">\(\mu, \sigma\)</span>)</li>
+<li>Sample parameter (estimator of population data):  (<span class="arithmatex">\(\bar{Y}, s_Y\)</span>)</li>
+</ul>
+<p><strong>We are estimating population parameter through sample data</strong> <span class="arithmatex">\((\mu, \sigma) \sim (\bar{Y}, s_Y)\)</span></p>
+<ul>
+<li>Sample Mean: <span class="arithmatex">\(\bar{Y} = \frac{1}{n}\sum_{i=1}^{N}Y_i\)</span></li>
+<li>Sample <span class="arithmatex">\(STD\)</span>: <span class="arithmatex">\(s_Y = \sqrt{\frac{1}{n-1}\sum_{i=1}^{N}(Y_i - \bar{Y})^2}\)</span></li>
+</ul>
+<p><img width="585" alt="Screenshot 2024-11-07 at 2 43 31 PM" src="https://github.com/user-attachments/assets/be4dc335-990a-4d56-b239-89c898b4081d"></p>
+<p><strong>Takeaway:</strong> 'Modeling' is building a function which take sample data, gives estimator of population statistics. Even sample mean could be a model for estimation. </p>
+<h2 id="accuracy-of-estimation">Accuracy of estimation</h2>
+<ul>
+<li>
+<p>Accuracy of estimator \bar{Y} depends on <strong><span class="arithmatex">\(\sigma\)</span></strong></p>
+</li>
+<li>
+<p>Small <strong>sigma</strong> (<span class="arithmatex">\(\sigma\)</span>) lead to more homogeneous population</p>
+</li>
+</ul>
+<div class="arithmatex">\[
+\sigma \sim s_Y = \sqrt{\frac{1}{n-1}\sum_{i=1}^{N}(Y_i - \bar{Y})^2}
+\]</div>
+<h3 id="central-limit-theorem">Central Limit Theorem</h3>
+<div class="arithmatex">\[
+\bar{Y} \sim N(\mu, \frac{\sigma^2}{N})
+\]</div>
+<ul>
+<li><span class="arithmatex">\(\bar{Y}\)</span> is an estimator for <span class="arithmatex">\(\mu\)</span></li>
+<li>If <span class="arithmatex">\(Y \sim N(\mu, \sigma)\)</span>, sum (or mean) of <span class="arithmatex">\(Y\)</span> have mean of <span class="arithmatex">\(\mu\)</span>, and <span class="arithmatex">\(\text{STD}\)</span> of <span class="arithmatex">\(\frac{\sigma^2}{N}\)</span></li>
+</ul>
+<p><strong>Implications</strong></p>
+<p>If the sample size <span class="arithmatex">\(n\)</span> is large enough. Here, we see that the variance (or standard deviation) of our mean estimator is <strong><em>1) determined by the population variance, and 2) divided by sample size.</em></strong> </p>
+<ol>
+<li>With a larger sample size, our estimator (sample mean) will approximate to the population mean.</li>
+<li><a href="(3)Standard Error.md">Standard error</a> also diminish, resulting in more precise estimation.</li>
+<li>However, if the population standard deviation itself is large—meaning if <span class="arithmatex">\(\sigma\)</span> is large—there will be limitations to the precision of mean estimation. </li>
+</ol>
+<p><strong>This is why we need large amounts of "BIG" data.</strong></p>
+<h2 id="why-does-diviging-segment-improve-mean-estimation">Why does diviging segment improve mean estimation?</h2>
+<ul>
+<li>By defining segmented populations, <strong>we can reduce the variance</strong> of the population statistic. </li>
+<li>Example: If we divide the "population" into different segments—e.g., by age group—it’s more likely that people within the same age group will have a similar range of income.</li>
+</ul>
+<h3 id="islr-wage-dataset-example"><a href="https://rdrr.io/cran/ISLR/man/Wage.html">ISLR Wage dataset</a> Example</h3>
+<pre><code class="language-R">install.packages(&quot;ISLR&quot;, repos = &quot;http://cran.us.r-project.org&quot;)
+
+library(ISLR)
+
+# Load and view Wage dataset
+data(&quot;Wage&quot;)
+head(Wage)
+
+# Divide Segment
+df &lt;- Wage[Wage$year == max(Wage[, 'year']), ]
+df$age_group &lt;- ifelse(df$age &lt; 20, &quot;Immature&quot;,
+                       ifelse(df$age &lt;= 30, &quot;Twenties&quot;,
+                              ifelse(df$age &lt;= 60, &quot;Middle aged&quot;,
+                                     &quot;Senior&quot;)))
+df &lt;- df[, c('age_group', 'wage')]
+head(df)
+
+# Visualize
+hist(df$wage, main = paste(&quot;All age wage - variance:&quot;, round(var(df$wage), 2)), 
+     xlab = &quot;Wage&quot;, ylab = &quot;Frequency&quot;)
+# Immature
+immature_age = df[df$age_group == &quot;Immature&quot;, ]$wage
+hist(immature_age, main = paste(&quot;Under 20 wage - variance:&quot;, round(var(immature_age), 2)), 
+     xlab = &quot;Wage&quot;, ylab = &quot;Frequency&quot;)
+
+#Twenties
+twenties_age = df[df$age_group == &quot;Twenties&quot;, ]$wage
+hist(immature_age, main = paste(&quot;20~20 wage - variance:&quot;, round(var(twenties_age), 2)), 
+     xlab = &quot;Wage&quot;, ylab = &quot;Frequency&quot;)
+
+#Middle aged
+middle_age = df[df$age_group == &quot;Middle aged&quot;, ]$wage
+hist(middle_age, main = paste(&quot;30~59 - variance:&quot;, round(var(middle_age), 2)), 
+     xlab = &quot;Wage&quot;, ylab = &quot;Frequency&quot;)
+</code></pre>
+<p><img width="759" alt="Screenshot 2024-11-08 at 11 10 04 PM" src="https://github.com/user-attachments/assets/a3f8bed9-186d-4a13-b61a-bc4e434a4cdb"></p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/093d19c1-0441-4003-a3af-aa7894e7d676" /></p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/a10789bb-2bf6-4630-a798-2c7b2ce69567" /></p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/0021c2bf-30e7-467e-82dc-2b15144f2ed0" /></p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/58c42d6e-ed25-4619-97fe-6626e7be730d" /></p>
 
 
 

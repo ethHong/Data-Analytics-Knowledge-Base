@@ -1,6 +1,6 @@
 **category_specifier** : "Statistics"
 
-**Reference Docs:** [Standard Error]((3)Standard Error.md)
+**Reference Docs:** [Standard Error](Standard Error.md)
 
 ## Mean estimation and CLT
 
