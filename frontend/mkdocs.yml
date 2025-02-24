@@ -13,7 +13,9 @@ nav:
 - Home: index.md
 - Knowledge Graph: graph.html
 - 📁Prescriptive Modeling and Experiment:
+  - 📄 A:B Testsing: markdowns/A:B Testsing.md
   - 📄 Causal Relationship: markdowns/Causal Relationship.md
+  - 📄 Omitted Variable Bias: markdowns/Omitted Variable Bias.md
 - 📁Statistics:
   - 📄 Evaluation of Linear Regression: markdowns/Evaluation of Linear Regression.md
   - 📄 Hypothesis testing: markdowns/Hypothesis testing.md

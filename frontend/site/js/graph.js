@@ -21,11 +21,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const svgGroup = svg.append("g");
   
-  // 🎨 Assign unique colors by category
+  // 🎨 Assign unique colors by category using a more visually pleasing palette
   const categories = Array.from(new Set(graphData.nodes.map(node => node.category)));
   const color = d3.scaleOrdinal()
     .domain(categories)
-    .range(d3.schemeCategory10);
+    .range(d3.schemeObservable10);
 
   const simulation = d3.forceSimulation(graphData.nodes)
     .force("link", d3.forceLink(graphData.links).id((d) => d.id).distance(150))
@@ -46,7 +46,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     .data(graphData.nodes)
     .enter()
     .append("circle")
-    .attr("r", 12)
+    .attr("id", (d) => d.id) // Assign unique IDs
+    .attr("r", (d) => 12 + (graphData.links.filter(link => link.source.id === d.id || link.target.id === d.id).length * 2))
     .attr("fill", (d) => color(d.category))
     .call(
       d3.drag()
@@ -55,11 +56,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         .on("end", dragEnded)
     )
     .on("mouseover", (event, d) => {
-      d3.select(event.currentTarget).transition().duration(200).attr("r", 16);
+      const currentSize = parseFloat(d3.select(event.currentTarget).attr("r"));
+      d3.select(event.currentTarget).transition().duration(200).attr("r", currentSize * 1.5);
+      highlightConnections(d, true);
       showTooltip(event, d);
     })
-    .on("mouseout", (event) => {
-      d3.select(event.currentTarget).transition().duration(200).attr("r", 12);
+    .on("mouseout", (event, d) => {
+      const currentSize = parseFloat(d3.select(event.currentTarget).attr("r"));
+      d3.select(event.currentTarget).transition().duration(200).attr("r", currentSize / 1.5);
+      resetConnections();
       hideTooltip();
     })
     .on("click", (event, d) => {
@@ -102,6 +107,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!event.active) simulation.alphaTarget(0);
     d.fx = null;
     d.fy = null;
+  }
+
+  function highlightConnections(nodeData, highlight) {
+    link.attr("stroke", (d) => {
+      return d.source.id === nodeData.id || d.target.id === nodeData.id ? (highlight ? "#007bff" : "#aaa") : "#aaa";
+    }).attr("stroke-width", (d) => {
+      return d.source.id === nodeData.id || d.target.id === nodeData.id ? (highlight ? 4 : 2) : 2;
+    });
+
+    node.style("opacity", (d) => {
+      return d.id === nodeData.id || graphData.links.some(link => (link.source.id === nodeData.id && link.target.id === d.id) || (link.target.id === nodeData.id && link.source.id === d.id)) ? 1 : 0.2;
+    })
+    .transition().duration(200)
+    .attr("r", (d) => {
+      const currentSize = parseFloat(d3.select(`[id='${d.id}']`).attr("r"));
+      if (d.id === nodeData.id) return currentSize * 1.5;
+      return highlight && (graphData.links.some(link => (link.source.id === nodeData.id && link.target.id === d.id) || (link.target.id === nodeData.id && link.source.id === d.id))) ? currentSize * 1.1 : currentSize * 0.8;
+    });
+  }
+
+  function resetConnections() {
+    link.attr("stroke", "#aaa").attr("stroke-width", 2);
+    node.style("opacity", 1).transition().duration(200).attr("r", (d) => 12 + (graphData.links.filter(link => link.source.id === d.id || link.target.id === d.id).length * 2));
   }
 
   function showTooltip(event, d) {
