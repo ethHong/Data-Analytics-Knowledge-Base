@@ -12,6 +12,8 @@ markdown_extensions:
 nav:
 - Home: index.md
 - Knowledge Graph: graph.html
+- 📁Prescriptive Modeling and Experiment:
+  - 📄 Causal Relationship: markdowns/Causal Relationship.md
 - 📁Statistics:
   - 📄 Evaluation of Linear Regression: markdowns/Evaluation of Linear Regression.md
   - 📄 Hypothesis testing: markdowns/Hypothesis testing.md

@@ -20,12 +20,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   svg.call(zoom);
 
   const svgGroup = svg.append("g");
-  const color = d3.scaleOrdinal(d3.schemeCategory10);
+  
+  // 🎨 Assign unique colors by category
+  const categories = Array.from(new Set(graphData.nodes.map(node => node.category)));
+  const color = d3.scaleOrdinal()
+    .domain(categories)
+    .range(d3.schemeCategory10);
 
   const simulation = d3.forceSimulation(graphData.nodes)
     .force("link", d3.forceLink(graphData.links).id((d) => d.id).distance(150))
     .force("charge", d3.forceManyBody().strength(-300))
-    .force("center", d3.forceCenter(width / 2, height / 2));
+    .force("center", d3.forceCenter(width / 2, height / 2))
+    .force("collision", d3.forceCollide().radius(30));
 
   const link = svgGroup.append("g")
     .selectAll("line")
@@ -48,29 +54,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         .on("drag", dragged)
         .on("end", dragEnded)
     )
-    // ✅ Hover Interaction
     .on("mouseover", (event, d) => {
-      d3.select(event.currentTarget)
-        .transition()
-        .duration(200)
-        .attr("r", 16); // Increase node size on hover
+      d3.select(event.currentTarget).transition().duration(200).attr("r", 16);
       showTooltip(event, d);
     })
     .on("mouseout", (event) => {
-      d3.select(event.currentTarget)
-        .transition()
-        .duration(200)
-        .attr("r", 12); // Reset node size
+      d3.select(event.currentTarget).transition().duration(200).attr("r", 12);
       hideTooltip();
     })
-    
-    // ✅ Click Interaction for Opening Document
     .on("click", (event, d) => {
-    const formattedId = d.id; // Format ID for URL
-    const docPath = `/markdowns/${formattedId}`; // Construct the document path
-    console.log(`Trying to open document: ${docPath}`); // Debug log to verify URL
-    window.location.href = docPath; // Redirect to the document
-  });
+      const docPath = `/markdowns/${d.id}`;
+      window.location.href = docPath;
+    });
 
   const label = svgGroup.append("g")
     .selectAll("text")
@@ -92,7 +87,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     label.attr("x", (d) => d.x).attr("y", (d) => d.y);
   });
 
-  // ✅ Drag Functions
   function dragStarted(event, d) {
     if (!event.active) simulation.alphaTarget(0.3).restart();
     d.fx = d.x;
@@ -110,7 +104,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     d.fy = null;
   }
 
-  // ✅ Tooltip Functions
   function showTooltip(event, d) {
     const tooltip = document.createElement("div");
     tooltip.id = "tooltip";
@@ -128,12 +121,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function hideTooltip() {
     const tooltip = document.getElementById("tooltip");
-    if (tooltip) {
-      tooltip.remove();
-    }
+    if (tooltip) tooltip.remove();
   }
 
-  // ✅ Center Graph Button Functionality
   const centerButton = document.createElement("button");
   centerButton.textContent = "Center Graph";
   centerButton.style.position = "absolute";
@@ -147,31 +137,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   centerButton.style.cursor = "pointer";
   document.getElementById("knowledge-graph").appendChild(centerButton);
 
-  let initialCenterTransform = null;
-
   centerButton.addEventListener("click", () => {
-    if (initialCenterTransform) {
-      svg.transition()
-        .duration(750)
-        .call(zoom.transform, initialCenterTransform);
-    }
+    fitGraphToView();
   });
 
-  // ✅ Calculate Center Transform
-  function getGraphCenterTransform() {
-    const graphBounds = svgGroup.node().getBBox();
-    const padding = 50;
+  function fitGraphToView() {
+    const bounds = svgGroup.node().getBBox();
+    const fullWidth = bounds.width + 100;
+    const fullHeight = bounds.height + 100;
+    const midX = bounds.x + bounds.width / 2;
+    const midY = bounds.y + bounds.height / 2;
 
-    const centerX = -graphBounds.x - graphBounds.width / 2 + width / 2;
-    const centerY = -graphBounds.y - graphBounds.height / 2 + height / 2;
+    const scale = 0.9 / Math.max(fullWidth / width, fullHeight / height);
+    const translate = [width / 2 - scale * midX, height / 2 - scale * midY];
 
-    return d3.zoomIdentity
-      .translate(centerX - padding, centerY)
-      .scale(1);
+    svg.transition()
+      .duration(750)
+      .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
   }
 
-  // Save the initial center transform
   setTimeout(() => {
-    initialCenterTransform = getGraphCenterTransform();
+    fitGraphToView();
   }, 300);
 });
