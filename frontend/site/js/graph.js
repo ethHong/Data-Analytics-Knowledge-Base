@@ -67,10 +67,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       resetConnections();
       hideTooltip();
     })
-    .on("click", (event, d) => {
-      const docPath = `/markdowns/${d.id}`;
-      window.location.href = docPath;
-    });
+    .on("click", async (event, d) => {
+    console.log("Clicked node:", d.id);
+
+    // ✅ Send message to parent page (index.md) to open the panel
+    window.parent.postMessage({ type: "openPanel", docId: d.id }, "*");
+});
 
   const label = svgGroup.append("g")
     .selectAll("text")
@@ -183,6 +185,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       .duration(750)
       .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
   }
+
+  //Panel
+  const panel = document.getElementById("document-panel");
+  const closePanel = document.getElementById("close-panel");
+  const docContent = document.getElementById("document-content");
+  const mainContent = document.getElementById("main-content"); // Ensure main content shifts
+
+
 
   setTimeout(() => {
     fitGraphToView();

@@ -11,9 +11,8 @@ markdown_extensions:
     generic: true
 nav:
 - Home: index.md
-- Knowledge Graph: graph.html
 - 📁Prescriptive Modeling and Experiment:
-  - 📄 A:B Testsing: markdowns/A:B Testsing.md
+  - 📄 AB Testsing: markdowns/AB Testsing.md
   - 📄 Causal Relationship: markdowns/Causal Relationship.md
   - 📄 Omitted Variable Bias: markdowns/Omitted Variable Bias.md
 - 📁Statistics:

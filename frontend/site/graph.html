@@ -6,15 +6,29 @@
 
     <!-- Import D3.js Library -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-    <!-- Link to external CSS and JS using correct paths -->
+    <!-- Link to external CSS and JS -->
     <link rel="stylesheet" href="../css/custom.css">
 </head>
 
 <body>
-    <!-- Graph container -->
+    <!-- Main Content (Ensure it exists for proper layout shifting) -->
+    <div id="main-content">
+    </div>
+
+    <!-- Graph Container -->
     <div id="knowledge-graph"></div>
-    <!-- Link your external JS for graph rendering -->
+
+    <!-- Document Viewer Panel (Initially Hidden) -->
+    <!-- Document Viewer Panel -->
+    <div id="document-panel" style="display: none;">
+        <button id="close-panel">&times; Close</button>
+        <div id="document-content">Select a document to view.</div>
+    </div>
+
+
+    <!-- JavaScript for Graph -->
     <script src="../js/graph.js"></script>
 </body>
 </html>

@@ -1,10 +1,169 @@
+---
+hide:
+  - toc
+---
+
 # Welcome to the MSBA Knowledge Base
 
-<div style = "margin-bottom: 10px;">
-<iframe src="graph.html" width="100%" height="400px" frameborder="0"></iframe>
+
+<div style="margin-bottom: 10px;">
+    <iframe id="graph-frame" src="graph.html" width="100%" height="400px" frameborder="0"></iframe>
 </div>
-## What is Knowledge-Base?
 
-Knowledge is composed of many small different concepts. When we know how to connect those pieces of concepts and apply them, it becomes your knowledge.
+<!-- ✅ Document Panel -->
+<div id="document-panel" 
+    style="display: none; 
+           position: fixed; 
+           right: 0; 
+           top: 0; 
+           width: 60%;  
+           height: 100%;  
+           background: white; 
+           box-shadow: -5px 0 10px rgba(0, 0, 0, 0.2); 
+           transition: right 0.3s ease-in-out;
+           display: flex;
+           flex-direction: column;">
+    <!-- ✅ Fixed Close Button with Hover Effect -->
+    <button id="close-panel" 
+        style="position: fixed; 
+               top: 10px; 
+               right: 10px; 
+               width: 32px;
+               height: 32px;
+               background: rgba(0, 0, 0, 0.7); 
+               color: white;
+               border: none; 
+               border-radius: 50%;
+               font-size: 18px; 
+               cursor: pointer; 
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               z-index: 1000;
+               transition: transform 0.2s ease-in-out, background 0.2s ease-in-out;">
+        &times;
+    </button>
+    <!-- ✅ Scrollable Content -->
+    <div id="document-content" 
+        style="flex-grow: 1; 
+               overflow-y: auto;  
+               padding: 20px; 
+               margin-top: 40px; 
+               width: 100%;
+               max-width: none;">  
+        Select a document to view.
+    </div>
+</div>
 
-Knowledge base aims to collect basic pieces of knoweldges on Data Analytics, and make it easier for anyont to search them, connect with other concepts, and apply them for higher-level application and absolve them as their own knowledge.
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {  // ✅ Ensure DOM is Ready
+        const panel = document.getElementById("document-panel");
+        const contentContainer = document.getElementById("document-content");
+        const closeButton = document.getElementById("close-panel");
+
+        if (!panel || !contentContainer) {
+            console.error("Panel or content container not found!");
+            return;
+        }
+
+        window.addEventListener("message", (event) => {
+            if (event.data.type === "openPanel") {
+                openDocumentPanel(event.data.docId);
+            }
+        });
+
+        function openDocumentPanel(docId) {
+    console.log("Opening document panel for:", docId);
+
+    if (!docId) {
+        console.error("Invalid document ID");
+        return;
+    }
+
+    const encodedDocId = encodeURIComponent(docId.trim());
+    const docUrl = `/markdowns/${encodedDocId}/`;
+
+    console.log("Fetching document from:", docUrl);
+
+    fetch(docUrl)
+        .then(response => {
+            if (!response.ok) throw new Error("Failed to fetch document");
+            return response.text();
+        })
+        .then(htmlText => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlText, "text/html");
+
+            // 🎯 Extract ONLY the document content, REMOVE Table of Contents & Sidebar
+            const mainContent = doc.querySelector("main");
+            if (mainContent) {
+                mainContent.querySelectorAll("nav, aside, .toc, .md-nav, .md-sidebar").forEach(el => el.remove());
+                mainContent.style.width = "100%";
+                mainContent.style.maxWidth = "none";
+
+                contentContainer.innerHTML = mainContent.innerHTML;
+            } else {
+                contentContainer.innerHTML = "<p>Failed to load document content.</p>";
+            }
+
+            // ✅ Apply visibility and initial transform
+            panel.style.display = "flex";
+            panel.style.visibility = "visible";
+            panel.style.transform = "translateX(100%)";  // Off-screen state
+
+            // ✅ Trigger transition after a slight delay to allow the browser to "see" the change
+            setTimeout(() => {
+                panel.style.transition = "transform 0.2s ease-in-out";  // Ensure the transition is applied
+                panel.style.transform = "translateX(0)";  // Move panel into view
+            }, 50);  // A small delay (milliseconds)
+
+            document.body.classList.add("panel-open");
+
+            // ✅ Re-render Math expressions if MathJax exists
+            if (window.MathJax) {
+                MathJax.typesetPromise().catch(err => console.error("MathJax rendering error:", err));
+            }
+        })
+        .catch(error => {
+            console.error("Error loading document:", error);
+            contentContainer.innerHTML = "<p>Failed to load document.</p>";
+        });
+}
+
+        // 🔹 Handle closing the panel with sliding effect
+        closeButton.addEventListener("click", () => {
+            console.log("Closing panel...");
+
+            // Start sliding animation
+            
+            panel.style.transform = "translateX(100%)";
+            // Wait for transition to complete, then hide panel
+            setTimeout(() => {
+                
+                panel.style.visibility = "hidden";
+                panel.style.display = "none";
+                document.body.classList.remove("panel-open");
+            }, 300); // Match the transition duration
+        });
+
+        // ✅ Hover Effect for Close Button
+        closeButton.addEventListener("mouseover", () => {
+            closeButton.style.transform = "scale(1.2)";
+            closeButton.style.background = "rgba(0, 0, 0, 0.9)";
+        });
+        closeButton.addEventListener("mouseout", () => {
+            closeButton.style.transform = "scale(1)";
+            closeButton.style.background = "rgba(0, 0, 0, 0.7)";
+        });
+    }, 100); // ✅ Delay execution slightly
+});
+</script>
+
+<!-- ✅ Load MathJax for rendering mathematical expressions -->
+<script type="text/javascript" async
+  src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" async
+  id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+## Explore, search knowledges based on their relationship.

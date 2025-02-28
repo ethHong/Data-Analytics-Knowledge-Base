@@ -6,3 +6,35 @@
   position: relative;
   overflow: hidden;  /* No scroll */
 }
+
+/* Panel Styling */
+#document-panel {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 40%;
+    height: 100%;
+    background: white;
+    box-shadow: -5px 0 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(100%);  /* ✅ Initially hidden */
+    overflow-y: auto;
+    padding: 20px;
+    z-index: 9999;
+    display: none; /* ✅ Prevents clicking before opening */
+}
+
+#document-panel.open {
+    transform: translateX(0);
+    display: block;  /* ✅ Ensures it remains visible */
+}
+
+#close-panel {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}

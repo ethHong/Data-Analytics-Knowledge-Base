@@ -319,11 +319,11 @@
   
   
     <li class="md-nav__item">
-      <a href="markdowns/A%3AB%20Testsing/" class="md-nav__link">
+      <a href="markdowns/AB%20Testsing/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    📄 A:B Testsing
+    📄 AB Testsing
     
   </span>
   
@@ -634,12 +634,133 @@
 
 
 <h1 id="welcome-to-the-msba-knowledge-base">Welcome to the MSBA Knowledge Base</h1>
-<div style = "margin-bottom: 10px;">
-<iframe src="graph.html" width="100%" height="400px" frameborder="0"></iframe>
+<div style="margin-bottom: 10px;">
+    <iframe id="graph-frame" src="graph.html" width="100%" height="400px" frameborder="0"></iframe>
 </div>
+
+<!-- ✅ Overlay Panel (Added to MkDocs Page) -->
+
+<div id="document-panel" 
+    style="display: none; 
+           position: fixed; 
+           right: 0; 
+           top: 0; 
+           width: 60%;  
+           height: 100%;  
+           background: white; 
+           box-shadow: -5px 0 10px rgba(0, 0, 0, 0.2); 
+           transition: right 0.3s ease-in-out;
+           display: flex;
+           flex-direction: column;">
+    <!-- ✅ Fixed Close Button (Separate from scrolling content) -->
+    <button id="close-panel" 
+        style="position: absolute;  
+               top: 10px; 
+               left: 10px; 
+               background: none; 
+               border: none; 
+               font-size: 18px; 
+               cursor: pointer; 
+               z-index: 1000;">
+        &times; Close
+    </button>
+    <!-- ✅ Scrollable Content (Separate container) -->
+    <div id="document-content" 
+        style="flex-grow: 1; 
+               overflow-y: auto;  
+               padding: 20px; 
+               margin-top: 40px;">  
+        Select a document to view.
+    </div>
+</div>
+
 <h2 id="what-is-knowledge-base">What is Knowledge-Base?</h2>
 <p>Knowledge is composed of many small different concepts. When we know how to connect those pieces of concepts and apply them, it becomes your knowledge.</p>
-<p>Knowledge base aims to collect basic pieces of knoweldges on Data Analytics, and make it easier for anyont to search them, connect with other concepts, and apply them for higher-level application and absolve them as their own knowledge.</p>
+<p>Knowledge base aims to collect basic pieces of knowledge on Data Analytics, and make it easier for anyone to search them, connect with other concepts, and apply them for higher-level application and absorb them as their own knowledge.</p>
+<!-- ✅ JavaScript for Handling the Panel -->
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const panel = document.getElementById("document-panel");
+    const closeButton = document.getElementById("close-panel");
+
+    // 🔹 Handle messages from graph iframe
+    window.addEventListener("message", (event) => {
+        if (event.data.type === "openPanel") {
+            openDocumentPanel(event.data.docId);
+        }
+    });
+
+    function openDocumentPanel(docId) {
+    console.log("Opening document panel for:", docId);
+    const contentContainer = document.getElementById("document-content");
+
+    if (!panel || !contentContainer) {
+        console.error("Panel or content container not found!");
+        return;
+    }
+
+    const encodedDocId = encodeURIComponent(docId.trim());
+    const docUrl = `/markdowns/${encodedDocId}/`;
+
+    console.log("Fetching document from:", docUrl);
+
+    fetch(docUrl)
+        .then(response => {
+            if (!response.ok) throw new Error("Failed to fetch document");
+            return response.text();
+        })
+        .then(htmlText => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlText, "text/html");
+
+            // 🎯 Extract ONLY the document & ToC, HIDE LNB
+            const mainContent = doc.querySelector("main"); 
+            const toc = doc.querySelector("nav[aria-label='Table of contents']"); 
+            const sidebar = doc.querySelector("nav.md-nav"); 
+
+            if (sidebar) sidebar.remove(); // ❌ Remove LNB
+            if (toc) toc.classList.add("panel-toc"); // ✅ Keep ToC (For Fix 2)
+
+            let contentHTML = "";
+            if (mainContent) contentHTML += mainContent.innerHTML;
+            if (toc) contentHTML += toc.outerHTML;
+
+            contentContainer.innerHTML = contentHTML || "<p>Failed to load document content.</p>";
+
+            // ✅ Force full width after LNB removal
+            contentContainer.style.maxWidth = "100%";
+            contentContainer.style.margin = "auto";
+
+            // ✅ Show the panel
+            panel.style.display = "block";
+            setTimeout(() => panel.classList.add("open"), 10);
+            document.body.classList.add("panel-open");
+        })
+        .catch(error => {
+            console.error("Error loading document:", error);
+            contentContainer.innerHTML = "<p>Failed to load document.</p>";
+        });
+}
+
+
+
+
+    // 🔹 Handle closing the panel
+    closeButton.addEventListener("click", () => {
+        console.log("Closing panel...");
+        panel.classList.remove("open");
+        setTimeout(() => {
+            panel.style.display = "none";
+            document.body.classList.remove("panel-open");
+        }, 300);
+    });
+});
+
+document.getElementById("document-content").addEventListener("wheel", (event) => {
+    event.stopPropagation(); // ✅ Prevents scrolling from affecting parent page
+}, { passive: false });
+</script>
 
 
 

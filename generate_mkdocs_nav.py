@@ -75,7 +75,7 @@ def update_mkdocs_nav():
 
     # Generate navigation correctly
     config["nav"] = [{"Home": "index.md"}]
-    config["nav"].append({"Knowledge Graph": "graph.html"})  # Removed extra whitespace
+    # config["nav"].append({"Knowledge Graph": "graph.html"})  # Removed extra whitespace
 
     for category, docs in sorted(categories.items()):
         config["nav"].append(
