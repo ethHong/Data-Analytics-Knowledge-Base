@@ -1,7 +1,9 @@
 # Data-Analytics-Knowledge-Base
 Data Analytics Knowledge Base for MSBA and Data Expert candidates
 
-<img width="1374" alt="Image" src="https://github.com/user-attachments/assets/5747d564-7a35-4977-b3fb-098296f0d186" />
+<img width="1403" alt="Image" src="https://github.com/user-attachments/assets/ac37e044-1e93-43f9-9fd5-6e9a1584ed14" />
+
+<img width="1405" alt="Image" src="https://github.com/user-attachments/assets/e6d88097-2c13-4da1-a9ff-2d9d965a6d9e" />
 
 # Product Plans
 
