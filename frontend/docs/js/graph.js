@@ -72,6 +72,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // ✅ Send message to parent page (index.md) to open the panel
     window.parent.postMessage({ type: "openPanel", docId: d.id }, "*");
+    
 });
 
   const label = svgGroup.append("g")

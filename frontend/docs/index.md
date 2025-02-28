@@ -10,6 +10,24 @@ hide:
     <iframe id="graph-frame" src="graph.html" width="100%" height="400px" frameborder="0"></iframe>
 </div>
 
+<!-- ✅ Graph Panel -->
+<div id="graph-panel" 
+    style="position: fixed; 
+           left: 0;
+           top: 0; 
+           width: 40%;  
+           height: 100%;  
+           background: white; 
+           box-shadow: 5px 0 10px rgba(0, 0, 0, 0.2); 
+           transition: left 0.3s ease-in-out;
+           display: flex;
+           flex-direction: column;
+           visibility: hidden;
+           z-index: 9999;
+           overflow: hidden;">
+    <iframe id="graph-frame" src="graph.html" width="100%" height="100%" frameborder="0"></iframe>
+</div>
+
 <!-- ✅ Document Panel -->
 <div id="document-panel" 
     style="display: none; 
@@ -73,91 +91,113 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
+        const graphPanel = document.getElementById("graph-panel"); // ✅ Define graph panel
+
         function openDocumentPanel(docId) {
-    console.log("Opening document panel for:", docId);
+            console.log("Opening document panel for:", docId);
 
-    if (!docId) {
-        console.error("Invalid document ID");
-        return;
-    }
-
-    const encodedDocId = encodeURIComponent(docId.trim());
-    const docUrl = `/markdowns/${encodedDocId}/`;
-
-    console.log("Fetching document from:", docUrl);
-
-    fetch(docUrl)
-        .then(response => {
-            if (!response.ok) throw new Error("Failed to fetch document");
-            return response.text();
-        })
-        .then(htmlText => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlText, "text/html");
-
-            // 🎯 Extract ONLY the document content, REMOVE Table of Contents & Sidebar
-            const mainContent = doc.querySelector("main");
-            if (mainContent) {
-                mainContent.querySelectorAll("nav, aside, .toc, .md-nav, .md-sidebar").forEach(el => el.remove());
-                mainContent.style.width = "100%";
-                mainContent.style.maxWidth = "none";
-
-                contentContainer.innerHTML = mainContent.innerHTML;
-            } else {
-                contentContainer.innerHTML = "<p>Failed to load document content.</p>";
+            if (!docId) {
+                console.error("Invalid document ID");
+                return;
             }
 
-            // ✅ Apply visibility and initial transform
-            panel.style.display = "flex";
-            panel.style.visibility = "visible";
-            panel.style.transform = "translateX(100%)";  // Off-screen state
+            const encodedDocId = encodeURIComponent(docId.trim());
+            const docUrl = `/markdowns/${encodedDocId}/`;
 
-            // ✅ Trigger transition after a slight delay to allow the browser to "see" the change
-            setTimeout(() => {
-                panel.style.transition = "transform 0.2s ease-in-out";  // Ensure the transition is applied
-                panel.style.transform = "translateX(0)";  // Move panel into view
-            }, 50);  // A small delay (milliseconds)
+            console.log("Fetching document from:", docUrl);
 
-            document.body.classList.add("panel-open");
+            fetch(docUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error("Failed to fetch document");
+                    return response.text();
+                })
+                .then(htmlText => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlText, "text/html");
 
-            // ✅ Re-render Math expressions if MathJax exists
-            if (window.MathJax) {
-                MathJax.typesetPromise().catch(err => console.error("MathJax rendering error:", err));
-            }
-        })
-        .catch(error => {
-            console.error("Error loading document:", error);
-            contentContainer.innerHTML = "<p>Failed to load document.</p>";
+                    // 🎯 Extract ONLY the document content, REMOVE Table of Contents & Sidebar
+                    const mainContent = doc.querySelector("main");
+                    if (mainContent) {
+                        mainContent.querySelectorAll("nav, aside, .toc, .md-nav, .md-sidebar").forEach(el => el.remove());
+                        mainContent.style.width = "100%";
+                        mainContent.style.maxWidth = "none";
+
+                        contentContainer.innerHTML = mainContent.innerHTML;
+                    } else {
+                        contentContainer.innerHTML = "<p>Failed to load document content.</p>";
+                    }
+
+                    // ✅ Apply visibility and initial transform
+                    panel.style.display = "flex";
+                    panel.style.visibility = "visible";
+                    panel.style.transform = "translateX(100%)";  // Off-screen state
+
+                    if (graphPanel) {
+                        graphPanel.style.display = "flex"; // ✅ Show graph panel
+                        graphPanel.style.visibility = "visible";
+                        graphPanel.style.transform = "translateX(-100%)"; // ✅ Move off-screen first
+
+                        setTimeout(() => {
+                            graphPanel.style.transition = "transform 0.15s ease-in-out";
+                            graphPanel.style.transform = "translateX(0)"; // ✅ Slide into view
+                        }, 50);
+                    }
+
+        
+                    // ✅ Trigger transition after a slight delay to allow the browser to "see" the change
+                    setTimeout(() => {
+                        panel.style.transition = "transform 0.15s ease-in-out";  // Ensure the transition is applied
+                        panel.style.transform = "translateX(0)";  // Move panel into view
+                    }, 50);  // A small delay (milliseconds)
+
+                    document.body.classList.add("panel-open");
+
+                    // ✅ Re-render Math expressions if MathJax exists
+                    if (window.MathJax) {
+                        MathJax.typesetPromise().catch(err => console.error("MathJax rendering error:", err));
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading document:", error);
+                    contentContainer.innerHTML = "<p>Failed to load document.</p>";
+                });
+        }
+
+                // 🔹 Handle closing the panel with sliding effect
+                closeButton.addEventListener("click", () => {
+                    console.log("Closing panel...");
+
+                    // Start sliding animation
+                    
+                    panel.style.transform = "translateX(100%)";
+                    if (graphPanel) {
+                        graphPanel.style.transform = "translateX(-100%)"; // ✅ Slide graph panel out
+                        setTimeout(() => {
+                            graphPanel.style.visibility = "hidden";
+                            graphPanel.style.display = "none";
+                        }, 300); // ✅ Hide after transition
+                    }
+
+                    // Wait for transition to complete, then hide panel
+                    setTimeout(() => {
+                        
+                        panel.style.visibility = "hidden";
+                        panel.style.display = "none";
+                        document.body.classList.remove("panel-open");
+                    }, 300); // Match the transition duration
+                });
+
+                // ✅ Hover Effect for Close Button
+                closeButton.addEventListener("mouseover", () => {
+                    closeButton.style.transform = "scale(1.2)";
+                    closeButton.style.background = "rgba(0, 0, 0, 0.9)";
+                });
+                closeButton.addEventListener("mouseout", () => {
+                    closeButton.style.transform = "scale(1)";
+                    closeButton.style.background = "rgba(0, 0, 0, 0.7)";
+                });
+            }, 100); // ✅ Delay execution slightly
         });
-}
-
-        // 🔹 Handle closing the panel with sliding effect
-        closeButton.addEventListener("click", () => {
-            console.log("Closing panel...");
-
-            // Start sliding animation
-            
-            panel.style.transform = "translateX(100%)";
-            // Wait for transition to complete, then hide panel
-            setTimeout(() => {
-                
-                panel.style.visibility = "hidden";
-                panel.style.display = "none";
-                document.body.classList.remove("panel-open");
-            }, 300); // Match the transition duration
-        });
-
-        // ✅ Hover Effect for Close Button
-        closeButton.addEventListener("mouseover", () => {
-            closeButton.style.transform = "scale(1.2)";
-            closeButton.style.background = "rgba(0, 0, 0, 0.9)";
-        });
-        closeButton.addEventListener("mouseout", () => {
-            closeButton.style.transform = "scale(1)";
-            closeButton.style.background = "rgba(0, 0, 0, 0.7)";
-        });
-    }, 100); // ✅ Delay execution slightly
-});
 </script>
 
 <!-- ✅ Load MathJax for rendering mathematical expressions -->
