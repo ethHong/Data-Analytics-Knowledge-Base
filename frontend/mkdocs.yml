@@ -12,8 +12,9 @@ markdown_extensions:
 nav:
 - Home: index.md
 - 📁Prescriptive Modeling and Experiment:
-  - 📄 AB Testsing: markdowns/AB Testsing.md
+  - 📄 AB Testing: markdowns/AB Testing.md
   - 📄 Causal Relationship: markdowns/Causal Relationship.md
+  - 📄 Difference in Difference: markdowns/Difference in Difference.md
   - 📄 Omitted Variable Bias: markdowns/Omitted Variable Bias.md
 - 📁Statistics:
   - 📄 Evaluation of Linear Regression: markdowns/Evaluation of Linear Regression.md

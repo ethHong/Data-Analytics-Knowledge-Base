@@ -10,7 +10,7 @@
       
       
       
-        <link rel="next" href="markdowns/AB%20Testsing/">
+        <link rel="next" href="markdowns/AB%20Testing/">
       
       
       <link rel="icon" href="assets/images/favicon.png">
@@ -300,11 +300,11 @@
   
   
     <li class="md-nav__item">
-      <a href="markdowns/AB%20Testsing/" class="md-nav__link">
+      <a href="markdowns/AB%20Testing/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    📄 AB Testsing
+    📄 AB Testing
     
   </span>
   
@@ -327,6 +327,28 @@
   
   <span class="md-ellipsis">
     📄 Causal Relationship
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="markdowns/Difference%20in%20Difference/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    📄 Difference in Difference
     
   </span>
   
@@ -736,6 +758,38 @@ document.addEventListener("DOMContentLoaded", () => {
                         mainContent.style.maxWidth = "none";
 
                         contentContainer.innerHTML = mainContent.innerHTML;
+
+                        // ✅ Adjust only internal links to match MkDocs structure
+                        contentContainer.querySelectorAll("a").forEach(link => {
+                            let originalHref = link.getAttribute("href");
+
+                            // ✅ Skip external links and anchor links
+                            if (!originalHref || originalHref.startsWith("http") || originalHref.startsWith("#")) {
+                                return;
+                            }
+
+                            console.log("Fixing internal link:", originalHref);
+
+                            // ✅ Decode to prevent double encoding
+                            originalHref = decodeURIComponent(originalHref.trim());
+
+                            // ✅ Remove leading "../" or "./" to prevent incorrect paths
+                            originalHref = originalHref.replace(/^(\.\.\/|\.\/)+/, "");
+
+                            // ✅ Ensure correct MkDocs URL format
+                            const correctedHref = `/markdowns/${encodeURIComponent(originalHref)}/`;
+
+                            link.setAttribute("href", correctedHref);
+
+                            // ✅ Ensure clicking opens inside the document panel instead of navigating
+                            link.addEventListener("click", (event) => {
+                                event.preventDefault(); // Stop full-page navigation
+                                openDocumentPanel(originalHref, true);  // ✅ Open inside panel
+                            });
+                        });
+
+
+
                     } else {
                         contentContainer.innerHTML = "<p>Failed to load document content.</p>";
                     }
