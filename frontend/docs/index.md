@@ -123,6 +123,38 @@ document.addEventListener("DOMContentLoaded", () => {
                         mainContent.style.maxWidth = "none";
 
                         contentContainer.innerHTML = mainContent.innerHTML;
+                        
+                        // ✅ Adjust only internal links to match MkDocs structure
+                        contentContainer.querySelectorAll("a").forEach(link => {
+                            let originalHref = link.getAttribute("href");
+
+                            // ✅ Skip external links and anchor links
+                            if (!originalHref || originalHref.startsWith("http") || originalHref.startsWith("#")) {
+                                return;
+                            }
+
+                            console.log("Fixing internal link:", originalHref);
+
+                            // ✅ Decode to prevent double encoding
+                            originalHref = decodeURIComponent(originalHref.trim());
+
+                            // ✅ Remove leading "../" or "./" to prevent incorrect paths
+                            originalHref = originalHref.replace(/^(\.\.\/|\.\/)+/, "");
+
+                            // ✅ Ensure correct MkDocs URL format
+                            const correctedHref = `/markdowns/${encodeURIComponent(originalHref)}/`;
+
+                            link.setAttribute("href", correctedHref);
+
+                            // ✅ Ensure clicking opens inside the document panel instead of navigating
+                            link.addEventListener("click", (event) => {
+                                event.preventDefault(); // Stop full-page navigation
+                                openDocumentPanel(originalHref, true);  // ✅ Open inside panel
+                            });
+                        });
+
+
+
                     } else {
                         contentContainer.innerHTML = "<p>Failed to load document content.</p>";
                     }

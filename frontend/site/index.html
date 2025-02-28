@@ -10,7 +10,7 @@
       
       
       
-        <link rel="next" href="graph.html">
+        <link rel="next" href="markdowns/AB%20Testsing/">
       
       
       <link rel="icon" href="assets/images/favicon.png">
@@ -164,6 +164,8 @@
           
             
               
+                
+              
               <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
@@ -239,9 +241,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-is-knowledge-base" class="md-nav__link">
+  <a href="#explore-search-knowledges-based-on-their-relationship" class="md-nav__link">
     <span class="md-ellipsis">
-      What is Knowledge-Base?
+      Explore, search knowledges based on their relationship.
     </span>
   </a>
   
@@ -261,27 +263,6 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="graph.html" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Knowledge Graph
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
     
     
     
@@ -290,10 +271,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -305,8 +286,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             📁Prescriptive Modeling and Experiment
           </label>
@@ -399,10 +380,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -414,8 +395,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             📁Statistics
           </label>
@@ -590,7 +571,9 @@
             
             
               
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" hidden>
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
@@ -609,9 +592,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-is-knowledge-base" class="md-nav__link">
+  <a href="#explore-search-knowledges-based-on-their-relationship" class="md-nav__link">
     <span class="md-ellipsis">
-      What is Knowledge-Base?
+      Explore, search knowledges based on their relationship.
     </span>
   </a>
   
@@ -630,6 +613,8 @@
               <article class="md-content__inner md-typeset">
                 
                   
+  
+
 
 
 
@@ -638,8 +623,25 @@
     <iframe id="graph-frame" src="graph.html" width="100%" height="400px" frameborder="0"></iframe>
 </div>
 
-<!-- ✅ Overlay Panel (Added to MkDocs Page) -->
+<!-- ✅ Graph Panel -->
+<div id="graph-panel" 
+    style="position: fixed; 
+           left: 0;
+           top: 0; 
+           width: 40%;  
+           height: 100%;  
+           background: white; 
+           box-shadow: 5px 0 10px rgba(0, 0, 0, 0.2); 
+           transition: left 0.3s ease-in-out;
+           display: flex;
+           flex-direction: column;
+           visibility: hidden;
+           z-index: 9999;
+           overflow: hidden;">
+    <iframe id="graph-frame" src="graph.html" width="100%" height="100%" frameborder="0"></iframe>
+</div>
 
+<!-- ✅ Document Panel -->
 <div id="document-panel" 
     style="display: none; 
            position: fixed; 
@@ -652,116 +654,172 @@
            transition: right 0.3s ease-in-out;
            display: flex;
            flex-direction: column;">
-    <!-- ✅ Fixed Close Button (Separate from scrolling content) -->
+    <!-- ✅ Fixed Close Button with Hover Effect -->
     <button id="close-panel" 
-        style="position: absolute;  
+        style="position: fixed; 
                top: 10px; 
-               left: 10px; 
-               background: none; 
+               right: 10px; 
+               width: 32px;
+               height: 32px;
+               background: rgba(0, 0, 0, 0.7); 
+               color: white;
                border: none; 
+               border-radius: 50%;
                font-size: 18px; 
                cursor: pointer; 
-               z-index: 1000;">
-        &times; Close
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               z-index: 1000;
+               transition: transform 0.2s ease-in-out, background 0.2s ease-in-out;">
+        &times;
     </button>
-    <!-- ✅ Scrollable Content (Separate container) -->
+    <!-- ✅ Scrollable Content -->
     <div id="document-content" 
         style="flex-grow: 1; 
                overflow-y: auto;  
                padding: 20px; 
-               margin-top: 40px;">  
+               margin-top: 40px; 
+               width: 100%;
+               max-width: none;">  
         Select a document to view.
     </div>
 </div>
 
-<h2 id="what-is-knowledge-base">What is Knowledge-Base?</h2>
-<p>Knowledge is composed of many small different concepts. When we know how to connect those pieces of concepts and apply them, it becomes your knowledge.</p>
-<p>Knowledge base aims to collect basic pieces of knowledge on Data Analytics, and make it easier for anyone to search them, connect with other concepts, and apply them for higher-level application and absorb them as their own knowledge.</p>
-<!-- ✅ JavaScript for Handling the Panel -->
-
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    const panel = document.getElementById("document-panel");
-    const closeButton = document.getElementById("close-panel");
+    setTimeout(() => {  // ✅ Ensure DOM is Ready
+        const panel = document.getElementById("document-panel");
+        const contentContainer = document.getElementById("document-content");
+        const closeButton = document.getElementById("close-panel");
 
-    // 🔹 Handle messages from graph iframe
-    window.addEventListener("message", (event) => {
-        if (event.data.type === "openPanel") {
-            openDocumentPanel(event.data.docId);
+        if (!panel || !contentContainer) {
+            console.error("Panel or content container not found!");
+            return;
         }
-    });
 
-    function openDocumentPanel(docId) {
-    console.log("Opening document panel for:", docId);
-    const contentContainer = document.getElementById("document-content");
-
-    if (!panel || !contentContainer) {
-        console.error("Panel or content container not found!");
-        return;
-    }
-
-    const encodedDocId = encodeURIComponent(docId.trim());
-    const docUrl = `/markdowns/${encodedDocId}/`;
-
-    console.log("Fetching document from:", docUrl);
-
-    fetch(docUrl)
-        .then(response => {
-            if (!response.ok) throw new Error("Failed to fetch document");
-            return response.text();
-        })
-        .then(htmlText => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlText, "text/html");
-
-            // 🎯 Extract ONLY the document & ToC, HIDE LNB
-            const mainContent = doc.querySelector("main"); 
-            const toc = doc.querySelector("nav[aria-label='Table of contents']"); 
-            const sidebar = doc.querySelector("nav.md-nav"); 
-
-            if (sidebar) sidebar.remove(); // ❌ Remove LNB
-            if (toc) toc.classList.add("panel-toc"); // ✅ Keep ToC (For Fix 2)
-
-            let contentHTML = "";
-            if (mainContent) contentHTML += mainContent.innerHTML;
-            if (toc) contentHTML += toc.outerHTML;
-
-            contentContainer.innerHTML = contentHTML || "<p>Failed to load document content.</p>";
-
-            // ✅ Force full width after LNB removal
-            contentContainer.style.maxWidth = "100%";
-            contentContainer.style.margin = "auto";
-
-            // ✅ Show the panel
-            panel.style.display = "block";
-            setTimeout(() => panel.classList.add("open"), 10);
-            document.body.classList.add("panel-open");
-        })
-        .catch(error => {
-            console.error("Error loading document:", error);
-            contentContainer.innerHTML = "<p>Failed to load document.</p>";
+        window.addEventListener("message", (event) => {
+            if (event.data.type === "openPanel") {
+                openDocumentPanel(event.data.docId);
+            }
         });
-}
+
+        const graphPanel = document.getElementById("graph-panel"); // ✅ Define graph panel
+
+        function openDocumentPanel(docId) {
+            console.log("Opening document panel for:", docId);
+
+            if (!docId) {
+                console.error("Invalid document ID");
+                return;
+            }
+
+            const encodedDocId = encodeURIComponent(docId.trim());
+            const docUrl = `/markdowns/${encodedDocId}/`;
+
+            console.log("Fetching document from:", docUrl);
+
+            fetch(docUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error("Failed to fetch document");
+                    return response.text();
+                })
+                .then(htmlText => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlText, "text/html");
+
+                    // 🎯 Extract ONLY the document content, REMOVE Table of Contents & Sidebar
+                    const mainContent = doc.querySelector("main");
+                    if (mainContent) {
+                        mainContent.querySelectorAll("nav, aside, .toc, .md-nav, .md-sidebar").forEach(el => el.remove());
+                        mainContent.style.width = "100%";
+                        mainContent.style.maxWidth = "none";
+
+                        contentContainer.innerHTML = mainContent.innerHTML;
+                    } else {
+                        contentContainer.innerHTML = "<p>Failed to load document content.</p>";
+                    }
+
+                    // ✅ Apply visibility and initial transform
+                    panel.style.display = "flex";
+                    panel.style.visibility = "visible";
+                    panel.style.transform = "translateX(100%)";  // Off-screen state
+
+                    if (graphPanel) {
+                        graphPanel.style.display = "flex"; // ✅ Show graph panel
+                        graphPanel.style.visibility = "visible";
+                        graphPanel.style.transform = "translateX(-100%)"; // ✅ Move off-screen first
+
+                        setTimeout(() => {
+                            graphPanel.style.transition = "transform 0.15s ease-in-out";
+                            graphPanel.style.transform = "translateX(0)"; // ✅ Slide into view
+                        }, 50);
+                    }
 
 
+                    // ✅ Trigger transition after a slight delay to allow the browser to "see" the change
+                    setTimeout(() => {
+                        panel.style.transition = "transform 0.15s ease-in-out";  // Ensure the transition is applied
+                        panel.style.transform = "translateX(0)";  // Move panel into view
+                    }, 50);  // A small delay (milliseconds)
 
+                    document.body.classList.add("panel-open");
 
-    // 🔹 Handle closing the panel
-    closeButton.addEventListener("click", () => {
-        console.log("Closing panel...");
-        panel.classList.remove("open");
-        setTimeout(() => {
-            panel.style.display = "none";
-            document.body.classList.remove("panel-open");
-        }, 300);
-    });
-});
+                    // ✅ Re-render Math expressions if MathJax exists
+                    if (window.MathJax) {
+                        MathJax.typesetPromise().catch(err => console.error("MathJax rendering error:", err));
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading document:", error);
+                    contentContainer.innerHTML = "<p>Failed to load document.</p>";
+                });
+        }
 
-document.getElementById("document-content").addEventListener("wheel", (event) => {
-    event.stopPropagation(); // ✅ Prevents scrolling from affecting parent page
-}, { passive: false });
+                // 🔹 Handle closing the panel with sliding effect
+                closeButton.addEventListener("click", () => {
+                    console.log("Closing panel...");
+
+                    // Start sliding animation
+
+                    panel.style.transform = "translateX(100%)";
+                    if (graphPanel) {
+                        graphPanel.style.transform = "translateX(-100%)"; // ✅ Slide graph panel out
+                        setTimeout(() => {
+                            graphPanel.style.visibility = "hidden";
+                            graphPanel.style.display = "none";
+                        }, 300); // ✅ Hide after transition
+                    }
+
+                    // Wait for transition to complete, then hide panel
+                    setTimeout(() => {
+
+                        panel.style.visibility = "hidden";
+                        panel.style.display = "none";
+                        document.body.classList.remove("panel-open");
+                    }, 300); // Match the transition duration
+                });
+
+                // ✅ Hover Effect for Close Button
+                closeButton.addEventListener("mouseover", () => {
+                    closeButton.style.transform = "scale(1.2)";
+                    closeButton.style.background = "rgba(0, 0, 0, 0.9)";
+                });
+                closeButton.addEventListener("mouseout", () => {
+                    closeButton.style.transform = "scale(1)";
+                    closeButton.style.background = "rgba(0, 0, 0, 0.7)";
+                });
+            }, 100); // ✅ Delay execution slightly
+        });
 </script>
 
+<!-- ✅ Load MathJax for rendering mathematical expressions -->
+<script type="text/javascript" async
+  src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" async
+  id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<h2 id="explore-search-knowledges-based-on-their-relationship">Explore, search knowledges based on their relationship.</h2>
 
 
 
@@ -769,7 +827,13 @@ document.getElementById("document-content").addEventListener("wheel", (event) =>
 
 
 
+  
+  
 
+
+
+
+  
 
 
 
