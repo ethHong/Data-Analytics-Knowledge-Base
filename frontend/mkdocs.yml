@@ -11,6 +11,8 @@ markdown_extensions:
     generic: true
 nav:
 - Home: index.md
+- 📁Concept, Methodology:
+  - 📄 Frisch Waugh Theorem: markdowns/Frisch Waugh Theorem.md
 - 📁Prescriptive Modeling and Experiment:
   - 📄 AB Testing: markdowns/AB Testing.md
   - 📄 Causal Relationship: markdowns/Causal Relationship.md
