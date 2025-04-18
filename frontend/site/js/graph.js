@@ -28,10 +28,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     .range(d3.schemeObservable10);
 
   const simulation = d3.forceSimulation(graphData.nodes)
-    .force("link", d3.forceLink(graphData.links).id((d) => d.id).distance(150))
-    .force("charge", d3.forceManyBody().strength(-300))
+    .force("link", d3.forceLink(graphData.links).id((d) => d.id).distance(250))
+    .force("charge", d3.forceManyBody().strength(-500))
     .force("center", d3.forceCenter(width / 2, height / 2))
-    .force("collision", d3.forceCollide().radius(30));
+    .force("collision", d3.forceCollide().radius(50));
 
   const link = svgGroup.append("g")
     .selectAll("line")
@@ -68,12 +68,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       hideTooltip();
     })
     .on("click", async (event, d) => {
-    console.log("Clicked node:", d.id);
+      console.log("Clicked node:", d.id);
 
-    // ✅ Send message to parent page (index.md) to open the panel
-    window.parent.postMessage({ type: "openPanel", docId: d.id }, "*");
-    
-});
+      // ✅ Send message to parent page (index.md) to open the panel
+      window.parent.postMessage({ type: "openPanel", docId: d.id }, "*");
+      
+    });
 
   const label = svgGroup.append("g")
     .selectAll("text")
@@ -192,7 +192,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const closePanel = document.getElementById("close-panel");
   const docContent = document.getElementById("document-content");
   const mainContent = document.getElementById("main-content"); // Ensure main content shifts
-
 
 
   setTimeout(() => {

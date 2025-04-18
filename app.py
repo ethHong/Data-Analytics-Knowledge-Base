@@ -93,31 +93,40 @@ async def upload_markdown(file: UploadFile = File(...)):
 @app.get("/graph/")
 def get_graph_data():
     with driver.session() as session:
-        result = session.run(
+        # First get all nodes
+        nodes_result = session.run(
             """
-                             MATCH (d:Document)-[r:RELATED_TO]->(other:Document)
-                             RETURN d.title AS source, d.category AS source_category,
-                             other.title AS target, other.category AS target_category
-                             """
+            MATCH (d:Document)
+            RETURN d.title AS title, d.category AS category
+            """
+        )
+        
+        # Then get all relationships
+        links_result = session.run(
+            """
+            MATCH (d:Document)-[r:RELATED_TO]->(other:Document)
+            RETURN d.title AS source, d.category AS source_category,
+                   other.title AS target, other.category AS target_category
+            """
         )
 
+        # Create nodes dictionary
         nodes = {}
+        for record in nodes_result:
+            nodes[record["title"]] = {
+                "id": record["title"],
+                "category": record["category"],
+            }
+
+        # Create links list
         links = []
+        for record in links_result:
+            links.append({
+                "source": record["source"],
+                "target": record["target"]
+            })
 
-        for record in result:
-            # Adding nodes withhout duplicates
-            nodes[record["source"]] = {
-                "id": record["source"],
-                "category": record["source_category"],
-            }
-            nodes[record["target"]] = {
-                "id": record["target"],
-                "category": record["target_category"],
-            }
-
-            links.append({"source": record["source"], "target": record["target"]})
         node_list = list(nodes.values())
-
         return {"nodes": node_list, "links": links}
 
 
