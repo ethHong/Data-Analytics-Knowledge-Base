@@ -1,4 +1,4 @@
-# Bass Model Framework
+# Bass Model for Demand Prediction
 
 **category_specifier** : "Marketing Analytics"
 

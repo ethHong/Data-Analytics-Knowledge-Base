@@ -85,6 +85,19 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // Document history management
+        let documentHistory = [];
+        let currentHistoryIndex = -1;
+
+        // Handle browser back/forward
+        window.addEventListener('popstate', (event) => {
+            if (event.state && event.state.docId) {
+                openDocumentPanel(event.state.docId, false);
+            } else {
+                closeDocumentPanel();
+            }
+        });
+
         window.addEventListener("message", (event) => {
             if (event.data.type === "openPanel") {
                 openDocumentPanel(event.data.docId);
@@ -93,12 +106,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const graphPanel = document.getElementById("graph-panel"); // ✅ Define graph panel
 
-        function openDocumentPanel(docId) {
+        function openDocumentPanel(docId, addToHistory = true) {
             console.log("Opening document panel for:", docId);
 
             if (!docId) {
                 console.error("Invalid document ID");
                 return;
+            }
+
+            // Update history if needed
+            if (addToHistory) {
+                // Remove any forward history
+                documentHistory = documentHistory.slice(0, currentHistoryIndex + 1);
+                documentHistory.push(docId);
+                currentHistoryIndex = documentHistory.length - 1;
+                
+                // Update URL without triggering navigation
+                const url = new URL(window.location);
+                url.searchParams.set('doc', docId);
+                window.history.pushState({ docId }, '', url);
             }
 
             const encodedDocId = encodeURIComponent(docId.trim());
@@ -195,41 +221,55 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
         }
 
-                // 🔹 Handle closing the panel with sliding effect
-                closeButton.addEventListener("click", () => {
-                    console.log("Closing panel...");
+        function closeDocumentPanel() {
+            console.log("Closing panel...");
 
-                    // Start sliding animation
-                    
-                    panel.style.transform = "translateX(100%)";
-                    if (graphPanel) {
-                        graphPanel.style.transform = "translateX(-100%)"; // ✅ Slide graph panel out
-                        setTimeout(() => {
-                            graphPanel.style.visibility = "hidden";
-                            graphPanel.style.display = "none";
-                        }, 300); // ✅ Hide after transition
-                    }
+            // Start sliding animation
+            panel.style.transform = "translateX(100%)";
+            if (graphPanel) {
+                graphPanel.style.transform = "translateX(-100%)"; // ✅ Slide graph panel out
+                setTimeout(() => {
+                    graphPanel.style.visibility = "hidden";
+                    graphPanel.style.display = "none";
+                }, 300); // ✅ Hide after transition
+            }
 
-                    // Wait for transition to complete, then hide panel
-                    setTimeout(() => {
-                        
-                        panel.style.visibility = "hidden";
-                        panel.style.display = "none";
-                        document.body.classList.remove("panel-open");
-                    }, 300); // Match the transition duration
-                });
+            // Wait for transition to complete, then hide panel
+            setTimeout(() => {
+                panel.style.visibility = "hidden";
+                panel.style.display = "none";
+                document.body.classList.remove("panel-open");
+                
+                // Update URL to remove document parameter
+                const url = new URL(window.location);
+                url.searchParams.delete('doc');
+                window.history.replaceState(null, '', url);
+            }, 300); // Match the transition duration
+        }
 
-                // ✅ Hover Effect for Close Button
-                closeButton.addEventListener("mouseover", () => {
-                    closeButton.style.transform = "scale(1.2)";
-                    closeButton.style.background = "rgba(0, 0, 0, 0.9)";
-                });
-                closeButton.addEventListener("mouseout", () => {
-                    closeButton.style.transform = "scale(1)";
-                    closeButton.style.background = "rgba(0, 0, 0, 0.7)";
-                });
-            }, 100); // ✅ Delay execution slightly
+        // 🔹 Handle closing the panel with sliding effect
+        closeButton.addEventListener("click", () => {
+            closeDocumentPanel();
         });
+
+        // ✅ Hover Effect for Close Button
+        closeButton.addEventListener("mouseover", () => {
+            closeButton.style.transform = "scale(1.2)";
+            closeButton.style.background = "rgba(0, 0, 0, 0.9)";
+        });
+        closeButton.addEventListener("mouseout", () => {
+            closeButton.style.transform = "scale(1)";
+            closeButton.style.background = "rgba(0, 0, 0, 0.7)";
+        });
+
+        // Check for initial document in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialDoc = urlParams.get('doc');
+        if (initialDoc) {
+            openDocumentPanel(initialDoc, false);
+        }
+    }, 100); // ✅ Delay execution slightly
+});
 </script>
 
 <!-- ✅ Load MathJax for rendering mathematical expressions -->
