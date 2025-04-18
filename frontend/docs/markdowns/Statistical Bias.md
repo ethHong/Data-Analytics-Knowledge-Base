@@ -2,7 +2,7 @@
 
 **category_specifier** : "Statistics"
 
-**Reference Docs:** [Endogeneity and Exogeneity](Endogeneity and Exogeneity.md)|[Omitted Variable Bias (OVB)](Omitted Variable Bias (OVB).md)
+**Reference Docs:** [Endogeneity and Exogeneity](Endogeneity and Exogeneity.md) | [Omitted Variable Bias](Omitted Variable Bias.md)
 
 ## **Motivation**
 
