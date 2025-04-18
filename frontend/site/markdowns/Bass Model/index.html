@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../Linear%20Regression%20and%20Coefficient/">
+        <link rel="prev" href="../Using%20Control%20Variables/">
       
       
-        <link rel="next" href="../Statistical%20Bias/">
+        <link rel="next" href="../Hypothesis%20Testing/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>📄 Standard Error - MSBA Knowledge Base</title>
+        <title>📄 Bass Model - MSBA Knowledge Base</title>
       
     
     
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#standard-error" class="md-skip">
+        <a href="#bass-model-framework" class="md-skip">
           Skip to content
         </a>
       
@@ -100,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              📄 Standard Error
+              📄 Bass Model
             
           </span>
         </div>
@@ -430,17 +430,19 @@
       
   
   
+    
   
   
+  
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
@@ -455,7 +457,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             📁Marketing Analytics
@@ -466,10 +468,31 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../Bass%20Model/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    📄 Bass Model
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -479,6 +502,167 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#motivation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Motivation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      Framework
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Framework">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Settings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bass-model-is-motivated-by-hazard-rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      Bass model is motivated by 'Hazard Rate'
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#further-formulation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Further Formulation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-we-know-p-q-m-we-can-predict-the-demand-curve" class="md-nav__link">
+    <span class="md-ellipsis">
+      When we know p, q, M, we can predict the demand curve
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="When we know p, q, M, we can predict the demand curve">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      Takeaways
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Takeaways">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interpretation-of-the-curve" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interpretation of the curve
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#more-about-p-q" class="md-nav__link">
+    <span class="md-ellipsis">
+      More about \(p, q\)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-main-utilization-of-the-curve-for-marketing-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      4 Main utilization of the curve for marketing decisions
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-estimate-values-of-p-q-m" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to estimate values of \(p, q, M\)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caution-do-not-get-m-from-the-regression-acquire-from-external-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      Caution: Do not get \(M\) from the regression - acquire from external source
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Caution: Do not get \(M\) from the regression - acquire from external source">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#important-takeaway" class="md-nav__link">
+    <span class="md-ellipsis">
+      Important takeaway
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -495,19 +679,17 @@
       
   
   
-    
   
   
-  
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
           <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
@@ -522,7 +704,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             📁Statistics
@@ -577,31 +759,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    📄 Standard Error
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../Standard%20Error/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -611,68 +772,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#context" class="md-nav__link">
-    <span class="md-ellipsis">
-      Context
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#definition" class="md-nav__link">
-    <span class="md-ellipsis">
-      Definition
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#application" class="md-nav__link">
-    <span class="md-ellipsis">
-      Application
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Application">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ab-test-estimate-the-true-treatment-effect-using-standard-error-of-coefficient" class="md-nav__link">
-    <span class="md-ellipsis">
-      A/B Test: Estimate the true treatment effect using standard error of coefficient
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -734,37 +833,136 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#context" class="md-nav__link">
+  <a href="#motivation" class="md-nav__link">
     <span class="md-ellipsis">
-      Context
+      Motivation
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#definition" class="md-nav__link">
+  <a href="#framework" class="md-nav__link">
     <span class="md-ellipsis">
-      Definition
+      Framework
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#application" class="md-nav__link">
-    <span class="md-ellipsis">
-      Application
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Application">
+    <nav class="md-nav" aria-label="Framework">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ab-test-estimate-the-true-treatment-effect-using-standard-error-of-coefficient" class="md-nav__link">
+  <a href="#settings" class="md-nav__link">
     <span class="md-ellipsis">
-      A/B Test: Estimate the true treatment effect using standard error of coefficient
+      Settings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bass-model-is-motivated-by-hazard-rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      Bass model is motivated by 'Hazard Rate'
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#further-formulation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Further Formulation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-we-know-p-q-m-we-can-predict-the-demand-curve" class="md-nav__link">
+    <span class="md-ellipsis">
+      When we know p, q, M, we can predict the demand curve
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="When we know p, q, M, we can predict the demand curve">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      Takeaways
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Takeaways">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interpretation-of-the-curve" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interpretation of the curve
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#more-about-p-q" class="md-nav__link">
+    <span class="md-ellipsis">
+      More about \(p, q\)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-main-utilization-of-the-curve-for-marketing-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      4 Main utilization of the curve for marketing decisions
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-estimate-values-of-p-q-m" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to estimate values of \(p, q, M\)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caution-do-not-get-m-from-the-regression-acquire-from-external-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      Caution: Do not get \(M\) from the regression - acquire from external source
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Caution: Do not get \(M\) from the regression - acquire from external source">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#important-takeaway" class="md-nav__link">
+    <span class="md-ellipsis">
+      Important takeaway
     </span>
   </a>
   
@@ -791,50 +989,107 @@
 
 
 
-<h1 id="standard-error">Standard Error</h1>
-<p><strong>category_specifier</strong> : "Statistics"</p>
-<p><strong>Reference Docs:</strong> <a href="../Hypothesis%20Testing/">Hypothesis Testing</a>|<a href="../Using%20Control%20Variables/">Using Control Variables</a></p>
-<h2 id="context"><strong>Context</strong></h2>
+<h1 id="bass-model-framework">Bass Model Framework</h1>
+<p><strong>category_specifier</strong> : "Marketing Analytics"</p>
+<p><strong>Reference Docs:</strong> <a href="../Linear%20Regression%20and%20Coefficient/">Linear Regression and Coefficient</a></p>
+<h2 id="motivation"><strong>Motivation</strong></h2>
+<p><img alt="Bass_model" src="../../images/bass_model.png" /></p>
+<p>(Image source: Wikipedia)</p>
 <ul>
-<li>In A/B test, we want to improve the precision of the estimator for treatment effect (coefficient of the treatment variable)</li>
+<li>Demand over time (new adopted users) usually Increase → Peak → decrease (since number of population is limited)</li>
+<li><strong><em>How can we estimate market demand of product, with given data?</em></strong></li>
+<li>Objective: Assessing future demand, when will it peak and fall.</li>
 </ul>
-<p>→ Understand what affects the precision</p>
+<h2 id="framework"><strong>Framework</strong></h2>
+<h3 id="settings"><strong>Settings</strong></h3>
+<div class="arithmatex">\[ M: \text{Market Size} \]</div>
+<div class="arithmatex">\[ N(t): \text{Number of new customers at time t}  \]</div>
+<div class="arithmatex">\[ A(t) = \sum_{i=1}^{t-1}N(i): \text{Accumulative `already customers' prior to time t }  \]</div>
+<div class="arithmatex">\[ R(T) = M - A(t): \text{Remaining customers at t} \]</div>
+<div class="arithmatex">\[ p : \text{Coefficient of innovation} \]</div>
+<div class="arithmatex">\[ q: \text{Coefficient of imitation} \]</div>
+<h3 id="bass-model-is-motivated-by-hazard-rate"><strong>Bass model is motivated by 'Hazard Rate'</strong></h3>
 <ul>
-<li>
-<p>Standard Error is useful in understanding how reliable our sample statistic is as an estimator of the population parameter</p>
+<li>Hazard rate: <strong><em>Probability of event occurring ‘given that’ the event not already occurred:</em></strong>
+  $$ H(t) = \frac{N(t)}{R(t)}$$, where $$</li>
+<li>In marketing context: Probability of becoming a customer, given that they are not customer yet.</li>
+<li>Bass model assume this is equal to:
+  $$H(t)  = p + q \frac{A(t)}{M} $$</li>
+<li><strong>Interpretation</strong> : Innovation (customers make decision to use new product by themselves) + imitation (Imitate others' activity as product spread out) * ratio of already customers in the market. </li>
+</ul>
+<h3 id="further-formulation">Further Formulation</h3>
+<div class="arithmatex">\[ H(t) = \frac{N(t)}{R(t)}= p + q \frac{A(t)}{M} \]</div>
+<ul>
+<li>Here, we can drive:</li>
+</ul>
+<div class="arithmatex">\[
+N(t) = H(t) \times R(t) \\
+= [p + q \frac{A(t)}{M}] \times R(t) \\
+= Mp + (q-p)A(t) - \frac{q}{M}[A(t)]^2
+\]</div>
+<h2 id="when-we-know-p-q-m-we-can-predict-the-demand-curve"><strong>When we know p, q, M, we can predict the demand curve</strong></h2>
+<ul>
+<li>In this model, if we know variables <span class="arithmatex">\(M, p, q\)</span>:</li>
+<li><span class="arithmatex">\(A(1) = 0, R(1) = M\)</span> → Get the Initial value at time <span class="arithmatex">\(t\)</span></li>
+<li>Get <span class="arithmatex">\(H(t) = p + q \frac{A(t)}{M}\)</span></li>
+<li>Get <span class="arithmatex">\(N(t) = H(t) * R(t)\)</span><ul>
+<li><span class="arithmatex">\(N(1) = H(1) * R(1)\)</span></li>
+</ul>
 </li>
-<li>
-<p>Used to construct a confidence interval, which provides margin of error in our estimator</p>
+<li>Get <span class="arithmatex">\(A(t+1)\)</span><ul>
+<li>Iterate over time series <span class="arithmatex">\(t\)</span> to get future demand curve: <span class="arithmatex">\(A(2) = N(1) + A(1) = N(1)...\)</span></li>
+</ul>
 </li>
-<li>Used in the <a href="https://www.notion.so/Hypothesis-Testing-1bebcb043bfc80a3902ae9ace3013f36?pvs=21">Hypothesis Testing</a></li>
 </ul>
-<h2 id="definition"><strong>Definition</strong></h2>
+<h3 id="takeaways"><strong>Takeaways</strong></h3>
+<p><img alt="p_q_curve" src="../../images/p_q_curve.png" /></p>
+<h4 id="interpretation-of-the-curve"><strong>Interpretation of the curve</strong></h4>
 <ul>
-<li>Standard error measures standard deviation of the sampling distribution of a statistic (such as mean)</li>
-<li>It explains the accuracy of a sample statistic in representing the population parameter</li>
-<li>Lower standard error → More precise sample statistic</li>
+<li>Usually, <span class="arithmatex">\(p &lt; q\)</span> (imitation effect is larger)</li>
+<li>Most people are reluctant to adopt new things. They want validation until others buy, and test products. (conservative)</li>
+<li>There are 2 exceptional categories on this:</li>
+<li>Value itself is evident (e.g. : Electricity over traditional lights)</li>
+<li>Risk itself is so small (low cost): App download.</li>
+<li><strong>Most common shape of the curve : Increase → Peak → Decrease</strong></li>
 </ul>
-<p><strong>Example:</strong> Standard Error of the Mean (SEM)</p>
-<div class="arithmatex">\[ SEM = \frac{s}{\sqrt{n}} \]</div>
+<h4 id="more-about-p-q"><strong>More about <span class="arithmatex">\(p, q\)</span></strong></h4>
 <ul>
-<li>Measures the standard deviation of sample means around the true population mean</li>
-<li>Relies on the two factors: 1) Sample Size 2) Sample Standard Deviation</li>
+<li><span class="arithmatex">\(p\)</span> effects on earlier phase, <span class="arithmatex">\(q\)</span> effects on later phase.</li>
+<li>Larger p: Peak of the curve become earlier (faster)</li>
+<li>Larger q: Reach to the peak faster (slope) and peak be higher</li>
+<li>They both impact slope (Speed of adoption)</li>
 </ul>
-<h2 id="application"><strong>Application</strong></h2>
-<h3 id="ab-test-estimate-the-true-treatment-effect-using-standard-error-of-coefficient">A/B Test: Estimate the true treatment effect using standard error of coefficient</h3>
-<p>Standard Error of the Regression Coefficient</p>
-<div class="arithmatex">\[ \widehat{SE}(\hat{\beta}_1) = \sqrt{\frac{s^2}{\sum_{i=1}^n (x_i - \bar{x})^2}} = \sqrt{\frac{s^2}{(N-1)s_x^2}} \]</div>
-<ul>
-<li>Measures the variability of the estimated regression coefficients if we were to repeatedly sample and run regressions</li>
-<li>It explains how close the estimated treatment effect (reflected in the regression coefficient) is to the true treatment effect</li>
-<li>Relies on the three factors:</li>
-<li>To improve the precision of the coefficient estimator, we control these factors<ol>
-<li><span class="arithmatex">\(N\)</span> : Sample Size</li>
-<li><span class="arithmatex">\(s_x^2\)</span> : Variability in X</li>
-<li><span class="arithmatex">\(s^2\)</span> : Variance of regression residual</li>
+<h4 id="4-main-utilization-of-the-curve-for-marketing-decisions"><strong>4 Main utilization of the curve for marketing decisions</strong></h4>
+<ol>
+<li>How ‘high’ the curve peak will be</li>
+<li>How ‘shallow’ the curve is (Derivative. How fast growing it is)</li>
+<li>If curve is predicted to be shallow, outsourcing will be more effective.</li>
+<li>If the product is in Earlier / Later part of the curve (Innovator VS Imitators)</li>
+<li>If the curve is in early stage, target innovators. If not, target imitators.</li>
+<li>When will the curve end. (Prepare for the next generation product)</li>
 </ol>
-</li>
+<p>→ Decisions should be mostly made based on <span class="arithmatex">\(R\)</span> (potential customers in market), not <span class="arithmatex">\(M\)</span> (entire population in the market.)</p>
+<h2 id="how-to-estimate-values-of-p-q-m"><strong>How to estimate values of <span class="arithmatex">\(p, q, M\)</span></strong></h2>
+<p><strong>In bass model, p, q, M are unknown, and we need to predict those values</strong></p>
+<div class="arithmatex">\[ N(t) = Mp + (q-p) * A(t) - \frac{q}{M}[A(t)]^2 \]</div>
+<ul>
+<li>The formulation above could be written as <a href="../Linear%20Regression%20and%20Coefficient/">Linear Regression</a> of variable <span class="arithmatex">\(A(t)\)</span>.</li>
+<li>Regress <span class="arithmatex">\(N(t) ~ A(t)\)</span>: <span class="arithmatex">\(N(t) = a + bA(t) + cA(t)^2\)</span>, by replacing <span class="arithmatex">\(a = Mp, b = (q-p), c = -\frac{q}{M}\)</span></li>
+<li>After getting a, b, c, we can reorganize:</li>
+<li><span class="arithmatex">\(p = \frac{\sqrt{b^2-4ac}-b}{2}\)</span></li>
+<li><span class="arithmatex">\(q = \frac{\sqrt{b^2-4ac}+b}{2}\)</span></li>
+<li><span class="arithmatex">\(M = -q/c\)</span></li>
+<li>After having <span class="arithmatex">\(p, q, M\)</span> value, extrapolate future values, as explained in previous section.</li>
 </ul>
+<h2 id="caution-do-not-get-m-from-the-regression-acquire-from-external-source"><strong>Caution: Do not get <span class="arithmatex">\(M\)</span> from the regression - acquire from external source</strong></h2>
+<ul>
+<li>Bass model is very sensitive to errors: predicted curve will vary a lot given the data is impacted by variability.</li>
+<li><span class="arithmatex">\(M\)</span> is especially impacted a lot - <span class="arithmatex">\(p, q\)</span> are not impacted as much as <span class="arithmatex">\(M\)</span>.</li>
+<li>Therefore, total market size <span class="arithmatex">\(M\)</span> should better be estimated through external source - one example is using chain ratio method to estimate total market size.</li>
+</ul>
+<h3 id="important-takeaway"><strong>Important takeaway</strong></h3>
+<p>When <span class="arithmatex">\(M\)</span> is sourced from outside, it becomes a <strong><em>fixed number</em></strong>. Therefore, the equation if not linear anymore, so there is no closed for solution. </p>
+<p>Therefore, <span class="arithmatex">\(p, q\)</span> value should be estimated using nonlinear regression techniques, with Python packages like <strong><em>Gradient based optimization method.</em></strong> </p>
 
 
 
