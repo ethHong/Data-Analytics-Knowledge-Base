@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../AB%20Testing%20Framework%20With%20Regression/">
+        <link rel="prev" href="../Hypothesis%20Testing/">
       
       
-        <link rel="next" href="../Endogeneity%20and%20Exogeneity/">
+        <link rel="next" href="../Standard%20Error/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>📄 Difference in Difference - MSBA Knowledge Base</title>
+        <title>📄 Linear Regression and Coefficient - MSBA Knowledge Base</title>
       
     
     
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#difference-in-difference" class="md-skip">
+        <a href="#linear-regression-and-coefficient" class="md-skip">
           Skip to content
         </a>
       
@@ -100,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              📄 Difference in Difference
+              📄 Linear Regression and Coefficient
             
           </span>
         </div>
@@ -211,19 +211,17 @@
       
   
   
-    
   
   
-  
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
@@ -238,7 +236,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             📁Causal Inference
@@ -271,31 +269,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    📄 Difference in Difference
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../Difference%20in%20Difference/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -305,98 +282,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#motivation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Motivation
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#when-does-diff-in-diff-apply" class="md-nav__link">
-    <span class="md-ellipsis">
-      When Does Diff-in-Diff Apply?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-is-diff-in-diff" class="md-nav__link">
-    <span class="md-ellipsis">
-      What is Diff-in-Diff?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-it-matters" class="md-nav__link">
-    <span class="md-ellipsis">
-      Why It Matters
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-to-apply-or-extend-diff-in-diff" class="md-nav__link">
-    <span class="md-ellipsis">
-      How to Apply or Extend Diff-in-Diff
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      Examples
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-assumptions" class="md-nav__link">
-    <span class="md-ellipsis">
-      Key Assumptions
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-equations" class="md-nav__link">
-    <span class="md-ellipsis">
-      Key Equations
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -545,17 +430,19 @@
       
   
   
+    
   
   
+  
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
@@ -570,7 +457,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             📁Statistics
@@ -603,10 +490,31 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../Linear%20Regression%20and%20Coefficient/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    📄 Linear Regression and Coefficient
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -616,6 +524,35 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contents
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -699,72 +636,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#motivation" class="md-nav__link">
+  <a href="#contents" class="md-nav__link">
     <span class="md-ellipsis">
-      Motivation
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#when-does-diff-in-diff-apply" class="md-nav__link">
-    <span class="md-ellipsis">
-      When Does Diff-in-Diff Apply?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-is-diff-in-diff" class="md-nav__link">
-    <span class="md-ellipsis">
-      What is Diff-in-Diff?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-it-matters" class="md-nav__link">
-    <span class="md-ellipsis">
-      Why It Matters
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-to-apply-or-extend-diff-in-diff" class="md-nav__link">
-    <span class="md-ellipsis">
-      How to Apply or Extend Diff-in-Diff
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      Examples
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-assumptions" class="md-nav__link">
-    <span class="md-ellipsis">
-      Key Assumptions
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-equations" class="md-nav__link">
-    <span class="md-ellipsis">
-      Key Equations
+      Contents
     </span>
   </a>
   
@@ -786,61 +660,11 @@
 
 
 
-<h1 id="difference-in-difference">Difference in Difference</h1>
-<p><strong>category_specifier</strong> : "Causal Inference"</p>
-<p>**Reference Docs: <a href="../Fixed%20Effect/">Fixed Effect</a></p>
-<h2 id="motivation"><strong>Motivation</strong></h2>
-<p><strong>💡How can we estimate causal effects when we don’t have an experiment?</strong>
-<strong>What if both treated and control groups are changing over time?</strong></p>
-<h2 id="when-does-diff-in-diff-apply"><strong>When Does Diff-in-Diff Apply?</strong></h2>
-<ul>
-<li>When there is a <strong>policy, treatment, or event</strong> that occurs at a <strong>specific time</strong>, affecting only some units.</li>
-<li>You observe <strong>two groups</strong> (treated vs. control) <strong>before and after</strong> the intervention.</li>
-<li>You suspect <strong>both groups would have followed similar trends</strong> if the treatment had not occurred.</li>
-</ul>
-<h2 id="what-is-diff-in-diff"><strong>What is Diff-in-Diff?</strong></h2>
-<p><strong>Difference-in-Differences</strong> is a quasi-experimental method that estimates <strong>causal effects</strong> by measuring how outcomes change over time between a <strong>treated group</strong> and a <strong>control group</strong>.</p>
-<p>The method accounts for both <strong>time-invariant differences</strong> between groups and <strong>common trends</strong> that affect both groups, thereby isolating the treatment's impact.</p>
-<div class="arithmatex">\[ \text{DiD Estimate} = (Y_{\text{treated, after}} - Y_{\text{treated, before}}) - (Y_{\text{control, after}} - Y_{\text{control, before}}) \]</div>
-<p><img alt="diff_n_diff" src="../../images/diff_n_diff.png" /></p>
-<h2 id="why-it-matters"><strong>Why It Matters</strong></h2>
-<p>Diff-in-Diff is a powerful method to make <strong>credible causal claims without randomization</strong>. It allows us to account for:</p>
-<ul>
-<li><strong>Baseline differences</strong> between treated and control groups</li>
-<li><strong>Time trends</strong> that affect both groups equally</li>
-</ul>
-<p>This technique is widely used in policy analysis, economics, and business to evaluate the <strong>real impact of changes</strong> in the absence of experiments.</p>
-<h2 id="how-to-apply-or-extend-diff-in-diff"><strong>How to Apply or Extend Diff-in-Diff</strong></h2>
-<p>Here are several ways to implement and strengthen DiD analysis:</p>
-<ul>
-<li><strong>Parallel Trends Check</strong>: Visualize pre-treatment trends to justify the core assumption.</li>
-<li><strong>DiD Regression Model</strong>: Estimate with interaction terms in a regression:</li>
-</ul>
-<div class="arithmatex">\[ Y_{it} = \alpha + \beta_1 \cdot \text{Treated}_i + \beta_2 \cdot \text{Post}_t + \beta_3 \cdot (\text{Treated}_i \times \text{Post}_t) + \epsilon_{it} \]</div>
-<ul>
-<li><span class="arithmatex">\(\beta_3\)</span>  is the <strong>DiD estimator</strong></li>
-<li><strong>Two-Way Fixed Effects</strong>: Control for unit and time fixed effects in panel settings.</li>
-<li><strong>Event Study Designs</strong>: Examine dynamic treatment effects over multiple periods.</li>
-<li><strong>Placebo Tests</strong>: Apply DiD on fake treatment dates or untreated units to test robustness.</li>
-</ul>
-<h2 id="examples"><strong>Examples</strong></h2>
-<ul>
-<li><strong>Soda tax introduced</strong> in one city → compare beverage sales before and after with a nearby city.</li>
-<li><strong>Company stops advertising</strong> on one platform → compare click-through rates (CTR) over time with another platform.</li>
-<li><strong>State raises minimum wage</strong> → compare employment changes with a neighboring state that didn’t.</li>
-</ul>
-<h2 id="key-assumptions"><strong>Key Assumptions</strong></h2>
-<ul>
-<li><strong>Parallel Trends</strong>: In the absence of treatment, the treated and control groups would have followed similar outcome trends.</li>
-<li><strong>No Spillovers</strong>: The treatment does not affect the control group.</li>
-<li><strong>No Other Confounding Events</strong>: Nothing else happened at the same time that only affected the treated group.</li>
-</ul>
-<h2 id="key-equations"><strong>Key Equations</strong></h2>
-<p><strong>DiD Regression Model</strong>:</p>
-<div class="arithmatex">\[ Y_{it} = \alpha + \beta_1 \cdot \text{Treated}_i + \beta_2 \cdot \text{Post}_t + \beta_3 (\text{Treated}_i \times \text{Post}_t) + \epsilon_{it} \]</div>
-<ul>
-<li><span class="arithmatex">\(\beta_3\)</span> gives the <strong>causal effect</strong> of the treatment.</li>
-</ul>
+<h1 id="linear-regression-and-coefficient">Linear Regression and Coefficient</h1>
+<p><strong>category_specifier</strong> : "Statistics"</p>
+<p><strong>Reference Docs:</strong> <a href="../Hypothesis%20Testing/">Hypothesis Testing</a> | <a href="../Using%20Control%20Variables/">Using Control Variables</a> | <a href="Prediction using Linear Regression">Prediction using Linear Regression</a></p>
+<hr />
+<h2 id="contents">Contents</h2>
 
 
 

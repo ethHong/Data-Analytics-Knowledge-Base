@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../AB%20Testing%20Framework%20With%20Regression/">
+        <link rel="prev" href="../Omitted%20Variable%20Bias/">
       
       
-        <link rel="next" href="../Endogeneity%20and%20Exogeneity/">
+        <link rel="next" href="../Hypothesis%20Testing/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>📄 Difference in Difference - MSBA Knowledge Base</title>
+        <title>📄 Using Control Variables - MSBA Knowledge Base</title>
       
     
     
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#difference-in-difference" class="md-skip">
+        <a href="#using-control-variables" class="md-skip">
           Skip to content
         </a>
       
@@ -100,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              📄 Difference in Difference
+              📄 Using Control Variables
             
           </span>
         </div>
@@ -271,31 +271,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    📄 Difference in Difference
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../Difference%20in%20Difference/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -305,98 +284,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#motivation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Motivation
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#when-does-diff-in-diff-apply" class="md-nav__link">
-    <span class="md-ellipsis">
-      When Does Diff-in-Diff Apply?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-is-diff-in-diff" class="md-nav__link">
-    <span class="md-ellipsis">
-      What is Diff-in-Diff?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-it-matters" class="md-nav__link">
-    <span class="md-ellipsis">
-      Why It Matters
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-to-apply-or-extend-diff-in-diff" class="md-nav__link">
-    <span class="md-ellipsis">
-      How to Apply or Extend Diff-in-Diff
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      Examples
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-assumptions" class="md-nav__link">
-    <span class="md-ellipsis">
-      Key Assumptions
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-equations" class="md-nav__link">
-    <span class="md-ellipsis">
-      Key Equations
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -516,10 +403,31 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../Using%20Control%20Variables/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    📄 Using Control Variables
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -529,6 +437,140 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#motivation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Motivation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Motivation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#in-randomized-ab-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      In randomized AB test
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#in-observational-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      In observational data
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      Framework
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Framework">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#if-you-have-run-random-ab-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      If you have run random A/B test
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="If you have run random A/B test">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Settings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      Takeaways
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#if-you-only-have-observational-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      If you only have observational data
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="If you only have observational data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#settings_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Settings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#takeaways_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Takeaways
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -705,68 +747,110 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#when-does-diff-in-diff-apply" class="md-nav__link">
+    <nav class="md-nav" aria-label="Motivation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#in-randomized-ab-test" class="md-nav__link">
     <span class="md-ellipsis">
-      When Does Diff-in-Diff Apply?
+      In randomized AB test
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#what-is-diff-in-diff" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#in-observational-data" class="md-nav__link">
     <span class="md-ellipsis">
-      What is Diff-in-Diff?
+      In observational data
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#why-it-matters" class="md-nav__link">
-    <span class="md-ellipsis">
-      Why It Matters
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-to-apply-or-extend-diff-in-diff" class="md-nav__link">
+  <a href="#framework" class="md-nav__link">
     <span class="md-ellipsis">
-      How to Apply or Extend Diff-in-Diff
+      Framework
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Framework">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#if-you-have-run-random-ab-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      If you have run random A/B test
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="If you have run random A/B test">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Settings
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#examples" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#takeaways" class="md-nav__link">
     <span class="md-ellipsis">
-      Examples
+      Takeaways
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#key-assumptions" class="md-nav__link">
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#if-you-only-have-observational-data" class="md-nav__link">
     <span class="md-ellipsis">
-      Key Assumptions
+      If you only have observational data
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="If you only have observational data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#settings_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Settings
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#key-equations" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#takeaways_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Key Equations
+      Takeaways
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -786,60 +870,67 @@
 
 
 
-<h1 id="difference-in-difference">Difference in Difference</h1>
+<h1 id="using-control-variables">Using Control Variables</h1>
 <p><strong>category_specifier</strong> : "Causal Inference"</p>
-<p>**Reference Docs: <a href="../Fixed%20Effect/">Fixed Effect</a></p>
+<p><strong>Reference Docs:</strong> <a href="../Frisch%20Waugh%20Theorem/">Frisch Waugh Theorem</a> | <a href="../AB%20Testing%20Framework%20With%20Regression/">AB Testing Framework With Regression</a> | <a href="../Omitted%20Variable%20Bias/">Omitted Variable Bias</a> | <a href="../Standard%20Error/">Standard Error</a> | <a href="../Linear%20Regression%20and%20Coefficient/">Linear Regression and Coefficient</a></p>
 <h2 id="motivation"><strong>Motivation</strong></h2>
-<p><strong>💡How can we estimate causal effects when we don’t have an experiment?</strong>
-<strong>What if both treated and control groups are changing over time?</strong></p>
-<h2 id="when-does-diff-in-diff-apply"><strong>When Does Diff-in-Diff Apply?</strong></h2>
+<p><img alt="control_variables_summary" src="../../images/control_variables_summary.png" /></p>
+<h3 id="in-randomized-ab-test"><strong>In randomized AB test</strong></h3>
+<p>💡<strong>What should we do if, significance is low for A/B test?</strong></p>
 <ul>
-<li>When there is a <strong>policy, treatment, or event</strong> that occurs at a <strong>specific time</strong>, affecting only some units.</li>
-<li>You observe <strong>two groups</strong> (treated vs. control) <strong>before and after</strong> the intervention.</li>
-<li>You suspect <strong>both groups would have followed similar trends</strong> if the treatment had not occurred.</li>
+<li>Adding control variable is one of three ways to help improving precision of AB Testing Framework With Regression (Lowering SE of regression coefficient estimate <span class="arithmatex">\(\beta\)</span>)</li>
+<li>Choosing 50:50 for probability of control, treatment to maximize <span class="arithmatex">\(Var(X)\)</span></li>
+<li>Choosing right sample size to lower Standard Error</li>
+<li><strong>Adding control variables in AB test</strong></li>
 </ul>
-<h2 id="what-is-diff-in-diff"><strong>What is Diff-in-Diff?</strong></h2>
-<p><strong>Difference-in-Differences</strong> is a quasi-experimental method that estimates <strong>causal effects</strong> by measuring how outcomes change over time between a <strong>treated group</strong> and a <strong>control group</strong>.</p>
-<p>The method accounts for both <strong>time-invariant differences</strong> between groups and <strong>common trends</strong> that affect both groups, thereby isolating the treatment's impact.</p>
-<div class="arithmatex">\[ \text{DiD Estimate} = (Y_{\text{treated, after}} - Y_{\text{treated, before}}) - (Y_{\text{control, after}} - Y_{\text{control, before}}) \]</div>
-<p><img alt="diff_n_diff" src="../../images/diff_n_diff.png" /></p>
-<h2 id="why-it-matters"><strong>Why It Matters</strong></h2>
-<p>Diff-in-Diff is a powerful method to make <strong>credible causal claims without randomization</strong>. It allows us to account for:</p>
+<h3 id="in-observational-data"><strong>In observational data</strong></h3>
 <ul>
-<li><strong>Baseline differences</strong> between treated and control groups</li>
-<li><strong>Time trends</strong> that affect both groups equally</li>
+<li>If you don’t, or can’t run random experiment, you cannot make causal interpretation in observational data</li>
+<li>How can we make <strong><em>the best</em></strong> causal claim from observational data, if you cannot run experiment? </li>
+<li>Adding control variables can <strong><em>isolate random variation</em></strong>, and remove <strong>‘non random’ part</strong> of each variable. This can control some extent of <a href="../Endogeneity%20and%20Exogeneity/">engogeneity</a>.</li>
+<li>Adding control variable can help controlling <a href="../Omitted%20Variable%20Bias/">Omitted Variable Bias</a></li>
 </ul>
-<p>This technique is widely used in policy analysis, economics, and business to evaluate the <strong>real impact of changes</strong> in the absence of experiments.</p>
-<h2 id="how-to-apply-or-extend-diff-in-diff"><strong>How to Apply or Extend Diff-in-Diff</strong></h2>
-<p>Here are several ways to implement and strengthen DiD analysis:</p>
+<h2 id="framework"><strong>Framework</strong></h2>
+<h3 id="if-you-have-run-random-ab-test"><strong>If you have run random A/B test</strong></h3>
+<h4 id="settings"><strong>Settings</strong></h4>
 <ul>
-<li><strong>Parallel Trends Check</strong>: Visualize pre-treatment trends to justify the core assumption.</li>
-<li><strong>DiD Regression Model</strong>: Estimate with interaction terms in a regression:</li>
+<li>Consider univariate <a href="../AB%20Testing%20Framework%20With%20Regression/">regression for a A/B test</a></li>
 </ul>
-<div class="arithmatex">\[ Y_{it} = \alpha + \beta_1 \cdot \text{Treated}_i + \beta_2 \cdot \text{Post}_t + \beta_3 \cdot (\text{Treated}_i \times \text{Post}_t) + \epsilon_{it} \]</div>
+<div class="arithmatex">\[ Target = \beta_0 + \beta_1 * treatment + e \]</div>
 <ul>
-<li><span class="arithmatex">\(\beta_3\)</span>  is the <strong>DiD estimator</strong></li>
-<li><strong>Two-Way Fixed Effects</strong>: Control for unit and time fixed effects in panel settings.</li>
-<li><strong>Event Study Designs</strong>: Examine dynamic treatment effects over multiple periods.</li>
-<li><strong>Placebo Tests</strong>: Apply DiD on fake treatment dates or untreated units to test robustness.</li>
+<li>Then, consider multivariate regression for the same A/B test.</li>
 </ul>
-<h2 id="examples"><strong>Examples</strong></h2>
+<div class="arithmatex">\[ Target = \gamma_0 + \gamma_1 * treatment + \gamma_2X_2 + \gamma_3X_3 + ... + u \]</div>
 <ul>
-<li><strong>Soda tax introduced</strong> in one city → compare beverage sales before and after with a nearby city.</li>
-<li><strong>Company stops advertising</strong> on one platform → compare click-through rates (CTR) over time with another platform.</li>
-<li><strong>State raises minimum wage</strong> → compare employment changes with a neighboring state that didn’t.</li>
+<li><span class="arithmatex">\(Target\)</span> could be target variable as <strong>sales,</strong> while <span class="arithmatex">\(X_2, X_3 ...\)</span> could be all other available variables (data we have: e.g. )</li>
 </ul>
-<h2 id="key-assumptions"><strong>Key Assumptions</strong></h2>
+<h4 id="takeaways"><strong>Takeaways</strong></h4>
 <ul>
-<li><strong>Parallel Trends</strong>: In the absence of treatment, the treated and control groups would have followed similar outcome trends.</li>
-<li><strong>No Spillovers</strong>: The treatment does not affect the control group.</li>
-<li><strong>No Other Confounding Events</strong>: Nothing else happened at the same time that only affected the treated group.</li>
+<li>Here, <span class="arithmatex">\(Var(\beta_1) \geq Var(\gamma_1)\)</span> always holds, <strong><em>which means adding up control variable can reduce error (improve precision) of the A/B test coefficients.</em></strong></li>
+<li>CAUTION: For randomized AB test, we are not adding control variables for <a href="../Omitted%20Variable%20Bias/">Omitted Variable Bias</a>  - there is no OVB if we have randomized AB test.</li>
 </ul>
-<h2 id="key-equations"><strong>Key Equations</strong></h2>
-<p><strong>DiD Regression Model</strong>:</p>
-<div class="arithmatex">\[ Y_{it} = \alpha + \beta_1 \cdot \text{Treated}_i + \beta_2 \cdot \text{Post}_t + \beta_3 (\text{Treated}_i \times \text{Post}_t) + \epsilon_{it} \]</div>
+<h3 id="if-you-only-have-observational-data"><strong>If you only have observational data</strong></h3>
+<h4 id="settings_1"><strong>Settings</strong></h4>
+<div class="arithmatex">\[ y =\beta_0 + \beta_1 * treatment+ e \]</div>
 <ul>
-<li><span class="arithmatex">\(\beta_3\)</span> gives the <strong>causal effect</strong> of the treatment.</li>
+<li>You don’t have AB test results, but only observational data which is likely to have <a href="../Omitted%20Variable%20Bias/">Omitted Variable Bias</a>), because assignment of treatment is not random for each of the variables.</li>
+<li>Here, <span class="arithmatex">\(\beta_1\)</span> represents effect of the treatment, while <span class="arithmatex">\(e\)</span> contains all the variation not explained by the treatment.</li>
+</ul>
+<div class="arithmatex">\[ y =\beta_0' + \beta_1' * treatment  + \beta_2X_2 +e' \]</div>
+<ul>
+<li>By adding omitted variable <span class="arithmatex">\(X_2\)</span> as control, <span class="arithmatex">\(\beta_1'\)</span> will be <strong>less biased,</strong></li>
+</ul>
+<p>removing bias caused by relationship between treatment and <span class="arithmatex">\(X_2.\)</span></p>
+<ul>
+<li>Since <span class="arithmatex">\(OVB = \beta_2 * \frac{Cov(treatment, X_2)}{Var(X_2)}\)</span> (<a href="../Omitted%20Variable%20Bias/">Omitted Variable Bias</a>)), if <span class="arithmatex">\(Cov(treatment, X_2)\)</span> is not 0, <span class="arithmatex">\(\beta_1'\)</span> will change.</li>
+<li>Since treatment is not randomly assigned regarding <span class="arithmatex">\(X_2\)</span>, <span class="arithmatex">\(Cov(treatment, X_2)\)</span> is not likely to be 0</li>
+</ul>
+<h4 id="takeaways_1"><strong>Takeaways</strong></h4>
+<ul>
+<li><span class="arithmatex">\(\tilde{X_1}\)</span> represents the portion of <span class="arithmatex">\(X_1\)</span>(treatment) that is not correlated with other variables.</li>
+<li>This allows us to estimate the <strong>true random treatment effect</strong> more accurately.</li>
+<li>By <strong>adding a control variable</strong>, we isolate the <strong>random effect of</strong> <span class="arithmatex">\(X_1\)</span>removing confounding influences.</li>
+<li>Specifically, controlling for <span class="arithmatex">\(X_2\)</span> ensures that the variation in <span class="arithmatex">\(X_1\)</span> used for estimation is <strong>uncorrelated with</strong>  <span class="arithmatex">\(X_2\)</span> , leading to an <strong>unbiased estimate of the treatment effect</strong>.</li>
 </ul>
 
 

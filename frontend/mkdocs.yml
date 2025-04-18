@@ -11,22 +11,20 @@ markdown_extensions:
     generic: true
 nav:
 - Home: index.md
-- 📁Concept, Methodology:
-  - 📄 Frisch Waugh Theorem: markdowns/Frisch Waugh Theorem.md
-- 📁Prescriptive Modeling and Experiment:
-  - 📄 AB Testing: markdowns/AB Testing.md
-  - 📄 Causal Relationship: markdowns/Causal Relationship.md
+- 📁Causal Inference:
+  - 📄 AB Testing Framework With Regression: markdowns/AB Testing Framework With Regression.md
   - 📄 Difference in Difference: markdowns/Difference in Difference.md
+  - 📄 Endogeneity and Exogeneity: markdowns/Endogeneity and Exogeneity.md
+  - 📄 Fixed Effect: markdowns/Fixed Effect.md
+  - 📄 Frisch Waugh Theorem: markdowns/Frisch Waugh Theorem.md
+  - 📄 Instrument Variable: markdowns/Instrument Variable.md
   - 📄 Omitted Variable Bias: markdowns/Omitted Variable Bias.md
+  - 📄 Using Control Variables: markdowns/Using Control Variables.md
 - 📁Statistics:
-  - 📄 Evaluation of Linear Regression: markdowns/Evaluation of Linear Regression.md
-  - 📄 Hypothesis testing: markdowns/Hypothesis testing.md
-  - 📄 Linear Regression: markdowns/Linear Regression.md
-  - 📄 Mean estimation and CLT: markdowns/Mean estimation and CLT.md
-  - 📄 Multiple Linear Regression: markdowns/Multiple Linear Regression.md
-  - 📄 Prediction Interval and Confidence Interval: markdowns/Prediction Interval and
-      Confidence Interval.md
+  - 📄 Hypothesis Testing: markdowns/Hypothesis Testing.md
+  - 📄 Linear Regression and Coefficient: markdowns/Linear Regression and Coefficient.md
   - 📄 Standard Error: markdowns/Standard Error.md
+  - 📄 Statistical Bias: markdowns/Statistical Bias.md
 site_name: MSBA Knowledge Base
 theme:
   name: material

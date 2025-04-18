@@ -1,14 +1,14 @@
-# Frisch-Waugh Theorem
+# Frisch Waugh Theorem
 
-**category_specifier**:  "Concept, Methodology"
+**category_specifier**:  "Causal Inference"
 
-Related Knowledge DB Docs Management: Using control variables (https://www.notion.so/Using-control-variables-1bebcb043bfc80f8a627cfce697b73dc?pvs=21), Omitted Variable Bias (OVB) (https://www.notion.so/Omitted-Variable-Bias-OVB-1bebcb043bfc80b6aecad458ccb6c637?pvs=21)
+**Reference Docs:** [Using Control Variables](Using Control Variables.md)|[Omitted Variable Bias (OVB)](Omitted Variable Bias.md)
 
-# Motivation
+## **Motivation**
 
-- When there is OVB ([Omitted Variable Bias (OVB)](https://www.notion.so/Omitted-Variable-Bias-OVB-1bebcb043bfc80b6aecad458ccb6c637?pvs=21)) in linear model for an experiment (or observational data for treatment effect, and want to get ***unbiased estimator of this treatment effect, withouth regressing with entire variabled.***
+- When there is OVB ([Omitted Variable Bias (OVB)](Omitted Variable Bias.md)) in linear model for an experiment (or observational data for treatment effect, and want to get ***unbiased estimator of this treatment effect, withouth regressing with entire variabled.***
 
-# Framework
+## **Framework**
 
 ![FW Summary](../images/FW_summary.png)
 

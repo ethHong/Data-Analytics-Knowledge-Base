@@ -1,28 +1,45 @@
+# Standard Error
+
 **category_specifier** : "Statistics"
 
-**Reference Docs:** [Mean estimation and CLT](Mean estimation and CLT.md) | [Prediction Interval and Confidence Interval](Prediction Interval and Confidence Interval.md)
+**Reference Docs:** [Hypothesis Testing](Hypothesis Testing.md)|[Using Control Variables](Using Control Variables.md)
 
----
+## **Context**
 
-## Standard Error 
+- In A/B test, we want to improve the precision of the estimator for treatment effect (coefficient of the treatment variable)
 
-* From sample statistics, $\sigma$, the population STD is unknown.
-* Standard Error is an estimation of Standard Deviation
-* Small Standard Error implies estimation is likey to be more accurate.
+  → Understand what affects the precision
 
-## Standard Error of Mean Estimator $\bar{Y}$
+- Standard Error is useful in understanding how reliable our sample statistic is as an estimator of the population parameter
 
-$$
-\sigma_{\bar{Y}} = \frac{\sigma}{\sqrt{n}} \approx s_{\bar{Y}}= \frac{s_{Y}}{\sqrt{n}}
-$$
+  - Used to construct a confidence interval, which provides margin of error in our estimator
+  - Used in the [Hypothesis Testing](https://www.notion.so/Hypothesis-Testing-1bebcb043bfc80a3902ae9ace3013f36?pvs=21)
 
-### Takeaways
+## **Definition**
 
-1. If we have a lower standard error, it means our prediction is likely more accurate.
-2. To achieve a smaller standard error, we need a larger ***N*** (sample size), but
-3. There are limitations if the **"Standard Deviation (or variance) of the population itself"** is large.
+- Standard error measures standard deviation of the sampling distribution of a statistic (such as mean)
+- It explains the accuracy of a sample statistic in representing the population parameter
+  - Lower standard error → More precise sample statistic
 
-Smaller standard error implies more narrow [confidence interval]((2)Prediction Interval and Confidence Interval.md)
+**Example:** Standard Error of the Mean (SEM)
 
+$$ SEM = \frac{s}{\sqrt{n}} $$
 
+- Measures the standard deviation of sample means around the true population mean
+- Relies on the two factors: 1) Sample Size 2) Sample Standard Deviation
 
+## **Application**
+
+### A/B Test: Estimate the true treatment effect using standard error of coefficient
+
+Standard Error of the Regression Coefficient
+
+$$ \widehat{SE}(\hat{\beta}_1) = \sqrt{\frac{s^2}{\sum_{i=1}^n (x_i - \bar{x})^2}} = \sqrt{\frac{s^2}{(N-1)s_x^2}} $$
+
+- Measures the variability of the estimated regression coefficients if we were to repeatedly sample and run regressions
+- It explains how close the estimated treatment effect (reflected in the regression coefficient) is to the true treatment effect
+- Relies on the three factors:
+  - To improve the precision of the coefficient estimator, we control these factors
+    1. $N$ : Sample Size
+    2. $s_x^2$ : Variability in X
+    3. $s^2$ : Variance of regression residual
