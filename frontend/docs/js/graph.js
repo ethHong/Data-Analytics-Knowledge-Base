@@ -2,14 +2,32 @@ document.addEventListener("DOMContentLoaded", async () => {
   const response = await fetch("http://localhost:8000/graph/");
   const graphData = await response.json();
 
-  const width = window.innerWidth * 1;
-  const height = window.innerHeight * 1;
+  // Get the full viewport dimensions
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  // Create a container for the graph that fills the available space
+  const graphContainer = document.getElementById("knowledge-graph");
+  graphContainer.style.position = "absolute";
+  graphContainer.style.top = "0";
+  graphContainer.style.left = "0";
+  graphContainer.style.width = "100%";
+  graphContainer.style.height = "100%";
+  graphContainer.style.zIndex = "0"; // Place graph behind content
+
+  // Ensure the main content floats above the graph
+  const mainContentElement = document.getElementById("main-content");
+  if (mainContentElement) {
+    mainContentElement.style.position = "relative";
+    mainContentElement.style.zIndex = "1"; // Place content above graph
+    mainContentElement.style.backgroundColor = "transparent"; // Make background transparent
+  }
 
   const svg = d3.select("#knowledge-graph")
     .append("svg")
     .attr("width", width)
     .attr("height", height)
-    .style("background-color", "#f5f5f5");
+    .style("background-color", "transparent"); // Make background transparent
 
   const zoom = d3.zoom()
     .scaleExtent([0.1, 5])
@@ -28,10 +46,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     .range(d3.schemeObservable10);
 
   const simulation = d3.forceSimulation(graphData.nodes)
-    .force("link", d3.forceLink(graphData.links).id((d) => d.id).distance(250))
-    .force("charge", d3.forceManyBody().strength(-500))
+    .force("link", d3.forceLink(graphData.links).id((d) => d.id).distance(150))
+    .force("charge", d3.forceManyBody().strength(-300))
     .force("center", d3.forceCenter(width / 2, height / 2))
-    .force("collision", d3.forceCollide().radius(50));
+    .force("collision", d3.forceCollide().radius(30));
 
   const link = svgGroup.append("g")
     .selectAll("line")
@@ -166,6 +184,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   centerButton.style.border = "none";
   centerButton.style.borderRadius = "5px";
   centerButton.style.cursor = "pointer";
+  centerButton.style.zIndex = "2"; // Ensure button is above graph
   document.getElementById("knowledge-graph").appendChild(centerButton);
 
   centerButton.addEventListener("click", () => {
