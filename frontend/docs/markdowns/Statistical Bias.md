@@ -6,7 +6,7 @@
 
 ## **Motivation**
 
-- Am I **missing variables** that affect both X and Y? (OVB)
+- Am I **missing variables** that affect both X and Y? (Omitted Variable Bias)
 - Am I **measuring my variables accurately**? (Measurement Error)
 - Is my sample **representative** of the population? (Selection Bias)
 - Is treatment **assigned based on factors that also affect the outcome**? ([Endogeneity](Endogeneity and Exogeneity.md)) 
