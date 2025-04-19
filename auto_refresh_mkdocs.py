@@ -80,6 +80,7 @@ class ContentWatcher:
         print("⚡ Starting sync with Neo4j...")
 
         try:
+            os.system("pipenv run python frontend/copy_markdowns.py")
             os.system("pipenv run python refresh_data.py")
             os.system("pipenv run python generate_mkdocs_nav.py")
             os.system("pipenv run mkdocs build -f frontend/mkdocs.yml")
@@ -94,7 +95,7 @@ class ContentWatcher:
 
 # ✅ Main block
 if __name__ == "__main__":
-    path = "frontend/docs/markdowns/"
+    path = "frontend/content/markdowns/"
     watcher = ContentWatcher(path)
 
     print("👀 Watching for Markdown file changes... Auto-syncing with Neo4j & MkDocs!")
