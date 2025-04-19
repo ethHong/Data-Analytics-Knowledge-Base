@@ -29,13 +29,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     .attr("height", height)
     .style("background-color", "transparent"); // Make background transparent
 
+  // Add touch event handling
   const zoom = d3.zoom()
     .scaleExtent([0.1, 5])
     .on("zoom", (event) => {
       svgGroup.attr("transform", event.transform);
     });
 
-  svg.call(zoom);
+  // Enable both mouse and touch zoom
+  svg.call(zoom)
+    .on("touchstart", function(event) {
+      event.preventDefault();
+    })
+    .on("touchmove", function(event) {
+      event.preventDefault();
+    });
 
   const svgGroup = svg.append("g");
   
@@ -45,11 +53,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     .domain(categories)
     .range(d3.schemeObservable10);
 
+  // Adjust force simulation parameters for mobile
+  const isMobile = window.innerWidth < 768;
   const simulation = d3.forceSimulation(graphData.nodes)
-    .force("link", d3.forceLink(graphData.links).id((d) => d.id).distance(150))
-    .force("charge", d3.forceManyBody().strength(-300))
+    .force("link", d3.forceLink(graphData.links).id((d) => d.id).distance(isMobile ? 100 : 150))
+    .force("charge", d3.forceManyBody().strength(isMobile ? -200 : -300))
     .force("center", d3.forceCenter(width / 2, height / 2))
-    .force("collision", d3.forceCollide().radius(30));
+    .force("collision", d3.forceCollide().radius(isMobile ? 20 : 30));
 
   const link = svgGroup.append("g")
     .selectAll("line")
@@ -57,15 +67,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     .enter()
     .append("line")
     .attr("stroke", "#aaa")
-    .attr("stroke-width", 2);
+    .attr("stroke-width", isMobile ? 1.5 : 2);
 
   const node = svgGroup.append("g")
     .selectAll("circle")
     .data(graphData.nodes)
     .enter()
     .append("circle")
-    .attr("id", (d) => d.id) // Assign unique IDs
-    .attr("r", (d) => 12 + (graphData.links.filter(link => link.source.id === d.id || link.target.id === d.id).length * 2))
+    .attr("id", (d) => d.id)
+    .attr("r", (d) => (isMobile ? 8 : 12) + (graphData.links.filter(link => link.source.id === d.id || link.target.id === d.id).length * (isMobile ? 1.5 : 2)))
     .attr("fill", (d) => color(d.category))
     .call(
       d3.drag()
@@ -73,24 +83,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         .on("drag", dragged)
         .on("end", dragEnded)
     )
-    .on("mouseover", (event, d) => {
+    .on("mouseover touchstart", (event, d) => {
+      event.preventDefault();
       const currentSize = parseFloat(d3.select(event.currentTarget).attr("r"));
       d3.select(event.currentTarget).transition().duration(200).attr("r", currentSize * 1.5);
       highlightConnections(d, true);
       showTooltip(event, d);
     })
-    .on("mouseout", (event, d) => {
+    .on("mouseout touchend", (event, d) => {
+      event.preventDefault();
       const currentSize = parseFloat(d3.select(event.currentTarget).attr("r"));
       d3.select(event.currentTarget).transition().duration(200).attr("r", currentSize / 1.5);
       resetConnections();
       hideTooltip();
     })
-    .on("click", async (event, d) => {
+    .on("click touchend", async (event, d) => {
+      event.preventDefault();
       console.log("Clicked node:", d.id);
-
-      // ✅ Send message to parent page (index.md) to open the panel
       window.parent.postMessage({ type: "openPanel", docId: d.id }, "*");
-      
     });
 
   const label = svgGroup.append("g")
@@ -98,8 +108,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     .data(graphData.nodes)
     .enter()
     .append("text")
-    .attr("dy", -15)
+    .attr("dy", isMobile ? -12 : -15)
     .attr("text-anchor", "middle")
+    .attr("font-size", isMobile ? "10px" : "12px")
     .text((d) => d.id);
 
   simulation.on("tick", () => {
@@ -134,7 +145,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     link.attr("stroke", (d) => {
       return d.source.id === nodeData.id || d.target.id === nodeData.id ? (highlight ? "#007bff" : "#aaa") : "#aaa";
     }).attr("stroke-width", (d) => {
-      return d.source.id === nodeData.id || d.target.id === nodeData.id ? (highlight ? 4 : 2) : 2;
+      return d.source.id === nodeData.id || d.target.id === nodeData.id ? (highlight ? (isMobile ? 3 : 4) : (isMobile ? 1.5 : 2)) : (isMobile ? 1.5 : 2);
     });
 
     node.style("opacity", (d) => {
@@ -149,8 +160,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function resetConnections() {
-    link.attr("stroke", "#aaa").attr("stroke-width", 2);
-    node.style("opacity", 1).transition().duration(200).attr("r", (d) => 12 + (graphData.links.filter(link => link.source.id === d.id || link.target.id === d.id).length * 2));
+    link.attr("stroke", "#aaa").attr("stroke-width", isMobile ? 1.5 : 2);
+    node.style("opacity", 1).transition().duration(200).attr("r", (d) => (isMobile ? 8 : 12) + (graphData.links.filter(link => link.source.id === d.id || link.target.id === d.id).length * (isMobile ? 1.5 : 2)));
   }
 
   function showTooltip(event, d) {
@@ -165,6 +176,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     tooltip.style.padding = "5px";
     tooltip.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
     tooltip.style.zIndex = 10;
+    tooltip.style.fontSize = isMobile ? "12px" : "14px";
     document.body.appendChild(tooltip);
   }
 
@@ -173,18 +185,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (tooltip) tooltip.remove();
   }
 
+  // Add responsive center button
   const centerButton = document.createElement("button");
   centerButton.textContent = "Center Graph";
   centerButton.style.position = "absolute";
   centerButton.style.top = "10px";
   centerButton.style.right = "10px";
-  centerButton.style.padding = "10px";
+  centerButton.style.padding = isMobile ? "8px" : "10px";
   centerButton.style.backgroundColor = "#007bff";
   centerButton.style.color = "white";
   centerButton.style.border = "none";
   centerButton.style.borderRadius = "5px";
   centerButton.style.cursor = "pointer";
-  centerButton.style.zIndex = "2"; // Ensure button is above graph
+  centerButton.style.zIndex = "2";
+  centerButton.style.fontSize = isMobile ? "12px" : "14px";
   document.getElementById("knowledge-graph").appendChild(centerButton);
 
   centerButton.addEventListener("click", () => {
@@ -206,12 +220,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
   }
 
-  //Panel
-  const panel = document.getElementById("document-panel");
-  const closePanel = document.getElementById("close-panel");
-  const docContent = document.getElementById("document-content");
-  const mainContent = document.getElementById("main-content"); // Ensure main content shifts
-
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    const newWidth = window.innerWidth;
+    const newHeight = window.innerHeight;
+    svg.attr("width", newWidth).attr("height", newHeight);
+    fitGraphToView();
+  });
 
   setTimeout(() => {
     fitGraphToView();
