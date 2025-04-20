@@ -683,7 +683,7 @@ async function saveContributions() {
     const selectedDocs = Array.from(document.querySelectorAll('#contributionDocumentList input[type="checkbox"]:checked'))
         .map(checkbox => ({
             title: checkbox.value,
-            path: `docs/${checkbox.value.toLowerCase().replace(/ /g, '-')}.md`
+            path: `markdowns/${checkbox.value}.md`
         }));
 
     console.log('Saving contributions:', {
@@ -692,7 +692,8 @@ async function saveContributions() {
     });
 
     try {
-        const response = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}/contributions`, {
+        // First, save to API
+        const apiResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}/contributions`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -703,10 +704,38 @@ async function saveContributions() {
             })
         });
 
-        if (!response.ok) {
-            const errorData = await response.text();
+        if (!apiResponse.ok) {
+            const errorData = await apiResponse.text();
             console.error('API error response:', errorData);
-            throw new Error(`Failed to save contributions: ${errorData}`);
+            throw new Error(`Failed to save contributions to API: ${errorData}`);
+        }
+
+        // Then, update local JSON file
+        const jsonResponse = await fetch('../../data/contributors.json');
+        if (!jsonResponse.ok) {
+            throw new Error('Failed to fetch local contributors.json');
+        }
+        const jsonData = await jsonResponse.json();
+        
+        // Find and update the contributor's contributions
+        const contributorIndex = jsonData.contributors.findIndex(c => c.id === contributorId);
+        if (contributorIndex === -1) {
+            throw new Error('Contributor not found in local JSON file');
+        }
+        
+        jsonData.contributors[contributorIndex].contributions = selectedDocs;
+        
+        // Save updated JSON back to file
+        const saveResponse = await fetch('../../data/contributors.json', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonData, null, 2)
+        });
+
+        if (!saveResponse.ok) {
+            throw new Error('Failed to save to local JSON file');
         }
 
         // Close modal and refresh contributions
@@ -714,7 +743,7 @@ async function saveContributions() {
         await loadContributorContributions(contributorId);
         
         // Show success message
-        alert('Contributions updated successfully!');
+        alert('Contributions updated successfully in both API and local file!');
     } catch (error) {
         console.error('Error saving contributions:', error);
         alert(error.message);
