@@ -111,7 +111,7 @@ $$ t = \frac{\beta_1}{s_{\beta_1}} $$
 
   - Increase sample size $N$
   - Guarantee variation of the sample data $X$ ($Var(X)$)
-  - Take more control variables ([Using control variables](Using control variables.md) ) / features into regression, to reduce variance of $e$ ( $s^2$ )
+  - Take more control variables ([Using control variables](Using Control Variables.md) ) / features into regression, to reduce variance of $e$ ( $s^2$ )
 
 ### **Comparison of two group’s statistical value (TBD)**
 

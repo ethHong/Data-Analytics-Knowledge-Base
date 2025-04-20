@@ -2,7 +2,7 @@
 
 **category_specifier** : "Causal Inference"
 
-**Reference Docs:** [Statistical Bias](Statistical Bias.md) | [Endogeneity and Exogeneity](Endogeneity and Exogeneity.md) | [Frisch Waugh Theorem](Frisch Waugh Theorem.md) | [Instrument Variable](Instrument Variable.md) | [Hypothesis Testing](Hypothesis Testing.md) | [Using control variables](Using control variables.)
+**Reference Docs:** [Statistical Bias](Statistical Bias.md) | [Endogeneity and Exogeneity](Endogeneity and Exogeneity.md) | [Frisch Waugh Theorem](Frisch Waugh Theorem.md) | [Instrument Variable](Instrument Variable.md) | [Hypothesis Testing](Hypothesis Testing.md) | [Using control variables](Using Control Variables.md)
 
 ## **Motivation**
 
@@ -32,8 +32,8 @@ OVB compromises our ability to identify true cause-and-effect relationships. Whe
 Here are four ways to address omitted variable bias:
 
 - **Add [Controls](Using Control Variables.md):** Include omitted variables in the regression.
-- **[Fixed Effects](Fixed Effects.md):** Control for time-invariant or entity-invariant factors using panel data.
-- **[Instrumental Variables](Instrument Variables.md):** Use variables that affect X but not the error term.
+- **[Fixed Effects](Fixed Effect.md):** Control for time-invariant or entity-invariant factors using panel data.
+- **[Instrumental Variables](Instrument Variable.md):** Use variables that affect X but not the error term.
 - **Randomized Trials:** Use A/B tests to ensure treatment independence.
 
 Combining these methods often works best to make variables more exogenous.
