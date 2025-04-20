@@ -77,9 +77,20 @@ function updateContributorDisplay(contributorId, contributions) {
         return;
     }
 
-    const contributionsList = contributions.map(doc => 
-        `<li><a href="../${doc.path}">${doc.title}</a></li>`
-    ).join('');
+    const contributionsList = contributions.map(doc => {
+        // Format the path to match the working link format
+        // Remove .md extension and ensure it ends with a slash if it's a directory
+        let formattedPath = doc.path;
+        if (formattedPath.endsWith('.md')) {
+            formattedPath = formattedPath.substring(0, formattedPath.length - 3);
+        }
+        // If it's not already a directory path, make it one
+        if (!formattedPath.endsWith('/')) {
+            formattedPath = formattedPath + '/';
+        }
+        
+        return `<li><a href="../${formattedPath}">${doc.title}</a></li>`;
+    }).join('');
     
     contributionsEl.innerHTML = contributionsList;
 }
