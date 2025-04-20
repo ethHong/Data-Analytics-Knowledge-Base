@@ -127,6 +127,12 @@
 .contributions-list a:hover {
     text-decoration: underline;
 }
+
+.no-contributions {
+    color: #666;
+    font-style: italic;
+    padding: 8px 0;
+}
 </style>
 
 <script>
@@ -169,11 +175,11 @@ function displayContributors(contributors) {
                         Contributions
                     </summary>
                     <ul class="contributions-list">
-                        ${contributor.contributions && contributor.contributions.length > 0 
-                            ? contributor.contributions.map(doc => 
+                        ${(!contributor.contributions || contributor.contributions.length === 0) 
+                            ? '<li class="no-contributions">No contributions yet</li>'
+                            : contributor.contributions.map(doc => 
                                 `<li><a href="../../markdowns/${encodeURIComponent(doc.title)}/">${doc.title}</a></li>`
                             ).join('')
-                            : '<li>No contributions yet</li>'
                         }
                     </ul>
                 </details>
