@@ -1,8 +1,8 @@
 # Omitted Variable Bias
 
-**category_specifier** : "Causal Inference"
+**category_specifier** : "Statistics"
 
-**Reference Docs:** [Statistical Bias](Statistical Bias.md) | [Endogeneity and Exogeneity](Endogeneity and Exogeneity.md) | [Frisch Waugh Theorem](Frisch Waugh Theorem.md) | [Instrument Variable](Instrument Variable.md) | [Hypothesis Testing](Hypothesis Testing.md) | [Using control variables](Using Control Variables.md)
+**Reference Docs:** [Statistical Bias](Statistical Bias.md) | [Endogeneity and Exogeneity](Endogeneity and Exogeneity.md) | [Frisch Waugh Theorem](Frisch Waugh Theorem.md) | [Instrument Variable](Instrument Variable.md) | [Hypothesis Testing](Hypothesis testing.md) | [Using control variables](Using Control Variables.md)
 
 ## **Motivation**
 
