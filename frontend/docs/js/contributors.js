@@ -247,7 +247,7 @@ async function saveContributions() {
     const success = await updateContributorData(currentContributor, selectedDocs);
     
     if (success) {
-        // Update the display
+        // Update the display immediately with the new selections
         updateContributorDisplay(currentContributor, selectedDocs);
         closeContributionModal();
     } else {
