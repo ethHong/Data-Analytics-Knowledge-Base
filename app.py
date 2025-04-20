@@ -51,7 +51,7 @@ def get_documents_for_management():
         for record in result:
             doc = {
                 "title": record["title"],
-                "path": f"docs/{record['title'].lower().replace(' ', '-')}.md",
+                "path": f"docs/{record['title']}.md",
                 "category": (
                     record["category"] if record["category"] else "Uncategorized"
                 ),
@@ -183,33 +183,45 @@ class ContributionUpdate(BaseModel):
     contributions: List[Document]
 
 
-# Update the path to contributors.json - use one consistent location
-CONTRIBUTORS_FILE = os.path.join("frontend", "docs", "data", "contributors.json")
-
-# Ensure the data directory exists
-os.makedirs(os.path.dirname(CONTRIBUTORS_FILE), exist_ok=True)
-
-
-def read_contributors():
-    """Helper function to read contributors data"""
-    try:
-        with open(CONTRIBUTORS_FILE, "r") as f:
-            return json.load(f)
-    except Exception as e:
-        print(f"Error reading contributors: {e}")
-        return {"contributors": []}
+# Update the path to contributors.json - use absolute path with debug info
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CONTRIBUTORS_FILE = os.path.join(
+    BASE_DIR, "frontend", "docs", "data", "contributors.json"
+)
+print(f"Base directory: {BASE_DIR}")
+print(f"Contributors file path: {CONTRIBUTORS_FILE}")
 
 
 def write_contributors(data):
     """Helper function to write contributors data"""
     try:
+        print(f"Attempting to write to: {CONTRIBUTORS_FILE}")
+        print(f"Directory exists: {os.path.exists(os.path.dirname(CONTRIBUTORS_FILE))}")
+        print(f"File exists: {os.path.exists(CONTRIBUTORS_FILE)}")
+
         os.makedirs(os.path.dirname(CONTRIBUTORS_FILE), exist_ok=True)
         with open(CONTRIBUTORS_FILE, "w") as f:
             json.dump(data, f, indent=4)
+            print(f"Successfully wrote data to {CONTRIBUTORS_FILE}")
         return True
     except Exception as e:
-        print(f"Error writing contributors: {e}")
+        print(f"Error writing contributors: {str(e)}")
+        print(f"Current working directory: {os.getcwd()}")
         return False
+
+
+def read_contributors():
+    """Helper function to read contributors data"""
+    try:
+        print(f"Attempting to read from: {CONTRIBUTORS_FILE}")
+        with open(CONTRIBUTORS_FILE, "r") as f:
+            data = json.load(f)
+            print(f"Successfully read data from {CONTRIBUTORS_FILE}")
+            return data
+    except Exception as e:
+        print(f"Error reading contributors: {str(e)}")
+        print(f"Current working directory: {os.getcwd()}")
+        return {"contributors": []}
 
 
 # Get all contributors

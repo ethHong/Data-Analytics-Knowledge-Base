@@ -4,18 +4,324 @@
   <!-- Contributors will be loaded dynamically -->
 </div>
 
+<style>
+.contributors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.profile-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.profile-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.profile-header {
+    padding: 20px;
+    text-align: center;
+    background: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+}
+
+.profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profile-info {
+    padding: 20px;
+}
+
+.profile-info h3 {
+    margin: 0 0 10px;
+    color: #333;
+}
+
+.organization {
+    color: #666;
+    margin: 0 0 15px;
+    font-size: 0.9em;
+}
+
+.contributions {
+    margin: 15px 0;
+}
+
+.contributions summary {
+    cursor: pointer;
+    padding: 8px 0;
+}
+
+.contributions-list {
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.contributions-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.contributions-list li:last-child {
+    border-bottom: none;
+}
+
+.contributions-list a {
+    color: #1a73e8;
+    text-decoration: none;
+}
+
+.contributions-list a:hover {
+    text-decoration: underline;
+}
+
+.add-contributor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    cursor: pointer;
+    background: #f8f9fa;
+    border: 2px dashed #ddd;
+}
+
+.add-contributor:hover {
+    border-color: #1a73e8;
+    background: #f0f7fe;
+}
+
+.add-icon {
+    color: #1a73e8;
+    margin-bottom: 10px;
+}
+
+.add-text h3 {
+    margin: 0;
+    color: #1a73e8;
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    color: #1a73e8;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s;
+    margin: 5px 0;
+    width: 100%;
+    justify-content: center;
+}
+
+.button:hover {
+    background: #f8f9fa;
+    border-color: #1a73e8;
+}
+
+.button.primary {
+    background: #1a73e8;
+    border-color: #1557b0;
+    color: white;
+}
+
+.button.primary:hover {
+    background: #1557b0;
+}
+
+.button.danger {
+    color: #dc3545;
+}
+
+.button.danger:hover {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
+
+/* Modal styles from documents.md */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    margin: 50px auto;
+    padding: 0;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5em;
+    color: #333;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal-body {
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 16px 20px;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 4px;
+    color: #666;
+    font-size: 12px;
+}
+
+.document-list {
+    margin-top: 20px;
+}
+
+.document-item {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    background: white;
+}
+
+.document-item:hover {
+    border-color: #1a73e8;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-container {
+    margin-bottom: 20px;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+</style>
+
 <script>
+// Add these variables at the top of the script section
+let allDocuments = [];
+let selectedContributions = new Set();
+
 // Function to fetch and display contributors
 async function loadContributors() {
     try {
-        const response = await fetch('../../data/contributors.json');
-        if (!response.ok) {
-            throw new Error('Failed to fetch contributors data');
+        // Try to fetch from API first
+        const apiResponse = await fetch('http://34.82.192.6:8000/api/contributors');
+        if (apiResponse.ok) {
+            const data = await apiResponse.json();
+            displayContributors(data.contributors || []);
+            return;
         }
-        const data = await response.json();
-        displayContributors(data.contributors);
+        
+        // If API fails, fall back to local JSON
+        console.log('API unavailable, falling back to local JSON');
+        const jsonResponse = await fetch('../../data/contributors.json');
+        if (!jsonResponse.ok) {
+            throw new Error('Failed to fetch contributors data from both API and local JSON');
+        }
+        const data = await jsonResponse.json();
+        displayContributors(data.contributors || []);
     } catch (error) {
         console.error('Error loading contributors:', error);
+        const grid = document.querySelector('.contributors-grid');
+        if (grid) {
+            grid.innerHTML = `
+                <div class="error-message">
+                    <p>Error loading contributors: ${error.message}</p>
+                    <button class="button primary" onclick="loadContributors()">Try Again</button>
+                </div>
+            `;
+        }
     }
 }
 
@@ -45,7 +351,7 @@ function displayContributors(contributors) {
                         </svg>
                         Contributions
                     </summary>
-                    <ul></ul>
+                    <ul class="contributions-list"></ul>
                 </details>
                 <button class="button" onclick="openContributorModal('${contributor.id}')">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -109,22 +415,19 @@ async function loadContributorContributions(contributorId) {
 
 // Function to update contributor contributions display
 function updateContributorContributions(contributorId, contributions) {
-    const contributionsEl = document.querySelector(`[data-contributor-id="${contributorId}"] .contributions ul`);
+    const contributionsEl = document.querySelector(`[data-contributor-id="${contributorId}"] .contributions-list`);
     if (!contributionsEl) return;
 
+    if (!contributions || contributions.length === 0) {
+        contributionsEl.innerHTML = '<li>No contributions yet</li>';
+        return;
+    }
+
     const contributionsList = contributions.map(doc => {
-        let formattedPath = doc.path;
-        if (formattedPath.endsWith('.md')) {
-            formattedPath = formattedPath.substring(0, formattedPath.length - 3);
-        }
-        if (!formattedPath.endsWith('/')) {
-            formattedPath = formattedPath + '/';
-        }
-        
-        return `<li><a href="../../${formattedPath}">${doc.title}</a></li>`;
+        return `<li><a href="../../markdowns/${encodeURIComponent(doc.title)}/">${doc.title}</a></li>`;
     }).join('');
     
-    contributionsEl.innerHTML = contributionsList || '<li>No contributions yet</li>';
+    contributionsEl.innerHTML = contributionsList;
 }
 
 // Function to toggle contributions visibility
@@ -253,182 +556,168 @@ async function deleteContributor(contributorId) {
     }
 }
 
-// Function to save contributions
-async function saveContributions() {
-    const modal = document.getElementById('contributionModal');
-    const contributorId = modal.dataset.contributorId;
-    const selectedDocs = Array.from(document.querySelectorAll('#contributionModal .document-list input[type="checkbox"]:checked'))
-        .map(checkbox => {
-            const [path, title] = checkbox.value.split('|');
-            return {
-                path: path,
-                title: title
-            };
-        });
-
-    try {
-        // First, update the API
-        const apiResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}/contributions`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ contributions: selectedDocs })
-        });
-
-        if (!apiResponse.ok) {
-            throw new Error('Failed to save contributions to API');
-        }
-
-        // Then, update the local JSON file
-        const jsonResponse = await fetch('../../data/contributors.json');
-        if (!jsonResponse.ok) {
-            throw new Error('Failed to fetch contributors.json');
-        }
-        
-        const data = await jsonResponse.json();
-        const contributorIndex = data.contributors.findIndex(c => c.id === contributorId);
-        
-        if (contributorIndex === -1) {
-            throw new Error('Contributor not found in JSON file');
-        }
-
-        // Update the contributions in the JSON data
-        data.contributors[contributorIndex].contributions = selectedDocs;
-
-        // Save the updated JSON file
-        const saveResponse = await fetch('../../data/contributors.json', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data, null, 2)
-        });
-
-        if (!saveResponse.ok) {
-            throw new Error('Failed to save contributors.json');
-        }
-
-        // Close modal and refresh contributions
-        closeModal('contributionModal');
-        loadContributorContributions(contributorId);
-        
-        // Show success message
-        alert('Contributions updated successfully!');
-    } catch (error) {
-        console.error('Error saving contributions:', error);
-        alert('Failed to save contributions: ' + error.message);
-    }
-}
-
-// Function to fetch documents from the API endpoint
-async function fetchDocuments() {
-    console.log('Fetching documents...');
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/documents`);
-        if (!response.ok) {
-            throw new Error('Failed to fetch documents');
-        }
-        const data = await response.json();
-        console.log('Fetched documents:', data);
-        // Transform the data to include both title and path
-        allDocuments = data.documents.map(doc => ({
-            title: doc,
-            path: `docs/${doc.toLowerCase().replace(/ /g, '-')}.md`
-        }));
-        return allDocuments;
-    } catch (error) {
-        console.error('Error fetching documents:', error);
-        return null;
-    }
-}
-
-// Function to display documents in the document list
-function displayDocuments(documents) {
-    console.log('Displaying documents:', documents);
-    const documentList = document.querySelector('#contributionModal .document-list');
-    if (!documentList) {
-        console.error('No document list found in modal');
-        return;
-    }
-
-    if (!documents || documents.length === 0) {
-        documentList.innerHTML = '<div class="no-documents">No documents found. Try refreshing the list.</div>';
-        return;
-    }
-
-    const documentItems = documents.map(doc => `
-        <div class="document-item">
-            <label>
-                <input type="checkbox" 
-                       value="${doc.path}" 
-                       ${selectedDocuments.has(doc.path) ? 'checked' : ''}>
-                <span class="document-title">${doc.title}</span>
-                <span class="document-path">${doc.path}</span>
-            </label>
-        </div>
-    `).join('');
-
-    documentList.innerHTML = documentItems;
-}
-
-// Function to filter documents
-function filterDocuments() {
-    const searchInput = document.getElementById('modalDocumentSearch');
+// Add these functions before the openContributionModal function
+function filterContributionDocuments() {
+    const searchInput = document.getElementById('contributionSearch');
     if (!searchInput) return;
     
     const searchTerm = searchInput.value.toLowerCase();
     const filteredDocs = allDocuments.filter(doc => 
-        doc.title.toLowerCase().includes(searchTerm) || 
-        doc.path.toLowerCase().includes(searchTerm)
+        doc.title.toLowerCase().includes(searchTerm)
     );
     
-    displayDocuments(filteredDocs);
+    displayContributionDocuments(filteredDocs);
 }
 
-// Function to handle refresh button click
-async function handleRefresh() {
-    console.log('Refresh button clicked');
-    const documents = await fetchDocuments();
-    if (documents) {
-        displayDocuments(documents);
+function handleContributionSelection(event) {
+    const title = event.target.value;
+    if (event.target.checked) {
+        selectedContributions.add(title);
+    } else {
+        selectedContributions.delete(title);
     }
 }
 
-// Function to open contribution modal
+// Update the openContributionModal function
 async function openContributionModal(contributorId) {
     const modal = document.getElementById('contributionModal');
     modal.dataset.contributorId = contributorId;
     
     try {
-        // Fetch documents first if not already loaded
-        if (!allDocuments || allDocuments.length === 0) {
-            const documents = await fetchDocuments();
-            if (!documents) {
-                throw new Error('Failed to fetch documents');
+        // Fetch documents
+        const apiUrl = 'http://34.82.192.6:8000/api/documents';
+        console.log('Fetching documents from:', apiUrl);
+        
+        const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
             }
-            allDocuments = documents;
+        });
+        
+        console.log('Documents response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch documents');
         }
         
-        // Get current contributor data
-        const response = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`);
-        if (!response.ok) {
+        const data = await response.json();
+        console.log('Documents data:', data);
+        
+        if (!data || !Array.isArray(data.documents)) {
+            throw new Error('Invalid data format received from API');
+        }
+        
+        // Store all documents globally
+        allDocuments = data.documents;
+        
+        // Get current contributor data to know which documents are selected
+        const contributorResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`);
+        if (!contributorResponse.ok) {
             throw new Error('Failed to fetch contributor data');
         }
-        const contributor = await response.json();
-        currentContributor = contributor;
+        const contributor = await contributorResponse.json();
         
-        // Set selected documents
-        selectedDocuments = new Set((contributor.contributions || []).map(doc => doc.path));
+        // Reset and set selected documents
+        selectedContributions.clear();
+        if (contributor.contributions) {
+            contributor.contributions.forEach(doc => selectedContributions.add(doc.title));
+        }
         
         // Display documents with selections
-        displayDocuments(allDocuments);
+        displayContributionDocuments(allDocuments);
         
         // Show the modal
         modal.style.display = 'block';
     } catch (error) {
         console.error('Error opening contribution modal:', error);
         alert('Failed to load documents. Please try again.');
+    }
+}
+
+// Update the displayContributionDocuments function
+function displayContributionDocuments(documents) {
+    const documentList = document.getElementById('contributionDocumentList');
+    if (!documentList) {
+        console.error('Document list container not found');
+        return;
+    }
+
+    if (!documents || documents.length === 0) {
+        documentList.innerHTML = '<div class="no-documents">No documents found.</div>';
+        return;
+    }
+
+    const html = documents
+        .sort((a, b) => a.title.localeCompare(b.title))
+        .map(doc => `
+            <div class="document-item">
+                <label class="checkbox-container">
+                    <input type="checkbox" 
+                           value="${doc.title}" 
+                           ${selectedContributions.has(doc.title) ? 'checked' : ''}
+                           onchange="handleContributionSelection(event)">
+                    <div class="document-info">
+                        <span class="document-title">${doc.title}</span>
+                    </div>
+                </label>
+            </div>
+        `).join('');
+
+    documentList.innerHTML = html;
+    console.log('Documents displayed:', documents.length);
+}
+
+// Function to save contributions
+async function saveContributions() {
+    const modal = document.getElementById('contributionModal');
+    const contributorId = modal.dataset.contributorId;
+    
+    if (!contributorId) {
+        console.error('No contributor ID found');
+        alert('Error: Could not identify the contributor');
+        return;
+    }
+
+    // Get selected documents
+    const selectedDocs = Array.from(document.querySelectorAll('#contributionDocumentList input[type="checkbox"]:checked'))
+        .map(checkbox => ({
+            title: checkbox.value,
+            path: `docs/${checkbox.value.toLowerCase().replace(/ /g, '-')}.md`
+        }));
+
+    console.log('Saving contributions:', {
+        contributorId,
+        selectedDocs
+    });
+
+    try {
+        const response = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}/contributions`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                contributions: selectedDocs
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.text();
+            console.error('API error response:', errorData);
+            throw new Error(`Failed to save contributions: ${errorData}`);
+        }
+
+        // Close modal and refresh contributions
+        closeModal('contributionModal');
+        await loadContributorContributions(contributorId);
+        
+        // Show success message
+        alert('Contributions updated successfully!');
+    } catch (error) {
+        console.error('Error saving contributions:', error);
+        alert(error.message);
     }
 }
 
@@ -461,9 +750,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         <div class="modal-body">
             <div class="search-container">
-                <input type="text" id="modalDocumentSearch" placeholder="Search documents..." onkeyup="filterDocuments()">
+                <input type="text" id="contributionSearch" placeholder="Search documents..." onkeyup="filterContributionDocuments()">
             </div>
-            <div class="document-list"></div>
+            <div id="contributionDocumentList" class="document-list">
+                <!-- Documents will be loaded here -->
+            </div>
         </div>
         <div class="modal-footer">
             <button class="button" onclick="closeModal('contributionModal')">Cancel</button>
@@ -505,4 +796,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             </form>
         </div>
     </div>
-</div> 
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@babel/polyfill@7.12.1/dist/polyfill.min.js"></script> 

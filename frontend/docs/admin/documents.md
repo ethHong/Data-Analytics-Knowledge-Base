@@ -1,29 +1,53 @@
 # Document Management
 
+<script src="https://cdn.jsdelivr.net/npm/@babel/polyfill@7.12.1/dist/polyfill.min.js"></script>
+
 <div class="admin-section">
-  <div class="search-container">
-    <input type="text" id="documentSearch" placeholder="Search documents..." onkeyup="filterDocuments()">
-    <button type="button" class="refresh-button" onclick="handleRefresh()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M23 4v6h-6"></path>
-        <path d="M1 20v-6h6"></path>
-        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-      </svg>
-      Refresh
-    </button>
-  </div>
-  <div id="documentList" class="document-list">
-    <!-- Documents will be loaded here -->
-  </div>
+    <div class="search-container">
+        <input type="text" id="documentSearch" placeholder="Search documents..." onkeyup="filterDocuments()">
+        <button type="button" class="refresh-button" onclick="handleRefresh()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 4v6h-6"></path>
+                <path d="M1 20v-6h6"></path>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            Refresh
+        </button>
+    </div>
+    <div id="documentList" class="document-list">
+        <!-- Documents will be loaded here -->
+    </div>
+</div>
+
+<!-- Contribution Modal Template -->
+<div id="contributionModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Contributions</h2>
+            <button class="close-button" onclick="closeModal('contributionModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="search-container">
+                <input type="text" id="contributionSearch" placeholder="Search documents..." onkeyup="filterContributionDocuments()">
+            </div>
+            <div id="contributionDocumentList" class="document-list scrollable">
+                <!-- Documents with checkboxes will be loaded here -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="button secondary" onclick="closeModal('contributionModal')">Cancel</button>
+            <button class="button primary" onclick="saveContributions()">Save Changes</button>
+        </div>
+    </div>
 </div>
 
 <script>
 let allDocuments = [];
+let selectedContributions = new Set();
 
 async function fetchDocuments() {
     try {
-        // Use relative URL instead of hardcoded IP
-        const apiUrl = '/api/documents';
+        const apiUrl = 'http://34.82.192.6:8000/api/documents';
         console.log('Fetching documents from:', apiUrl);
         
         const response = await fetch(apiUrl, {
@@ -91,6 +115,38 @@ function displayDocuments(documents) {
         return;
     }
 
+    const html = documents
+        .sort((a, b) => a.title.localeCompare(b.title))
+        .map(doc => `
+            <div class="document-item">
+                <div class="document-info">
+                    <span class="document-title">${doc.title}</span>
+                    <span class="document-path">${doc.path}</span>
+                </div>
+                <div class="document-actions">
+                    <button class="button" onclick="viewDocument('${doc.title}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        View
+                    </button>
+                </div>
+            </div>
+        `).join('');
+
+    documentList.innerHTML = html;
+}
+
+function displayContributionDocuments(documents) {
+    const documentList = document.getElementById('contributionDocumentList');
+    if (!documentList) return;
+
+    if (!documents || documents.length === 0) {
+        documentList.innerHTML = '<div class="no-documents">No documents found.</div>';
+        return;
+    }
+
     // Group documents by category
     const categories = {};
     documents.forEach(doc => {
@@ -100,34 +156,56 @@ function displayDocuments(documents) {
         categories[doc.category].push(doc);
     });
 
-    // Generate HTML for each category
+    // Generate HTML for each category with checkboxes
     const html = Object.entries(categories)
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([category, docs]) => `
             <div class="category-section">
                 <h3 class="category-title">${category}</h3>
-                ${docs.sort((a, b) => a.title.localeCompare(b.title))
-                    .map(doc => `
-                        <div class="document-item">
-                            <div class="document-info">
-                                <span class="document-title">${doc.title}</span>
-                                <span class="document-path">${doc.path}</span>
+                <div class="document-items">
+                    ${docs.sort((a, b) => a.title.localeCompare(b.title))
+                        .map(doc => `
+                            <div class="document-item">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" 
+                                           value="${doc.path}" 
+                                           ${selectedContributions.has(doc.path) ? 'checked' : ''}
+                                           onchange="handleContributionSelection(event)">
+                                    <div class="document-info">
+                                        <span class="document-title">${doc.title}</span>
+                                        <span class="document-path">${doc.path}</span>
+                                    </div>
+                                </label>
                             </div>
-                            <div class="document-actions">
-                                <button class="button" onclick="viewDocument('${doc.path}')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                        <circle cx="12" cy="12" r="3"/>
-                                    </svg>
-                                    View
-                                </button>
-                            </div>
-                        </div>
-                    `).join('')}
+                        `).join('')}
+                </div>
             </div>
         `).join('');
 
     documentList.innerHTML = html;
+}
+
+function handleContributionSelection(event) {
+    const path = event.target.value;
+    if (event.target.checked) {
+        selectedContributions.add(path);
+    } else {
+        selectedContributions.delete(path);
+    }
+}
+
+function filterContributionDocuments() {
+    const searchInput = document.getElementById('contributionSearch');
+    if (!searchInput) return;
+    
+    const searchTerm = searchInput.value.toLowerCase();
+    const filteredDocs = allDocuments.filter(doc => 
+        doc.title.toLowerCase().includes(searchTerm) || 
+        doc.path.toLowerCase().includes(searchTerm) ||
+        doc.category.toLowerCase().includes(searchTerm)
+    );
+    
+    displayContributionDocuments(filteredDocs);
 }
 
 function filterDocuments() {
@@ -137,8 +215,7 @@ function filterDocuments() {
     const searchTerm = searchInput.value.toLowerCase();
     const filteredDocs = allDocuments.filter(doc => 
         doc.title.toLowerCase().includes(searchTerm) || 
-        doc.path.toLowerCase().includes(searchTerm) ||
-        doc.category.toLowerCase().includes(searchTerm)
+        doc.path.toLowerCase().includes(searchTerm)
     );
     
     displayDocuments(filteredDocs);
@@ -149,10 +226,12 @@ function handleRefresh() {
     fetchDocuments();
 }
 
-function viewDocument(path) {
-    // Remove 'docs/' prefix and '.md' suffix, add trailing slash
-    const formattedPath = path.replace(/^docs\//, '').replace(/\.md$/, '/');
-    window.location.href = `../../${formattedPath}`;
+function viewDocument(title) {
+    // Just encode the title as-is
+    const encodedName = encodeURIComponent(title);
+    // Construct the final URL with the correct base path
+    const url = `../../markdowns/${encodedName}/`;
+    window.location.href = url;
 }
 
 // Initialize when the page loads
@@ -168,12 +247,22 @@ document.addEventListener('DOMContentLoaded', () => {
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: calc(100vh - 100px); /* Increased height */
+    max-width: 1200px; /* Added max-width */
+    margin: 0 auto; /* Center the section */
+    display: flex;
+    flex-direction: column;
 }
 
 .search-container {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1;
+    padding: 10px 0;
 }
 
 .search-container input {
@@ -184,25 +273,17 @@ document.addEventListener('DOMContentLoaded', () => {
     font-size: 14px;
 }
 
-.refresh-button {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 8px 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: white;
-    cursor: pointer;
-}
-
-.refresh-button:hover {
-    background: #f5f5f5;
-}
-
 .document-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 10px;
+    margin: 0 -10px; /* Negative margin to allow full-width scrolling */
+}
+
+.scrollable {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 10px;
 }
 
 .category-section {
@@ -210,6 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
     border: 1px solid #ddd;
     border-radius: 8px;
     overflow: hidden;
+    margin-bottom: 20px;
 }
 
 .category-title {
@@ -219,34 +301,49 @@ document.addEventListener('DOMContentLoaded', () => {
     border-bottom: 1px solid #ddd;
     font-size: 1.1em;
     color: #333;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.document-items {
+    padding: 8px 0;
 }
 
 .document-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
-    border-bottom: 1px solid #ddd;
+    padding: 16px 20px; /* Increased padding */
+    border: 1px solid #ddd;
+    border-radius: 8px; /* Increased border radius */
     background: white;
+    margin-bottom: 12px; /* Increased margin */
+    transition: all 0.2s ease;
 }
 
-.document-item:last-child {
-    border-bottom: none;
+.document-item:hover {
+    border-color: #1a73e8;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Enhanced shadow */
+    transform: translateY(-1px); /* Subtle lift effect */
 }
 
 .document-info {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px; /* Increased gap */
+    flex: 1;
+    padding-right: 20px; /* Added padding */
 }
 
 .document-title {
     font-weight: 500;
     color: #333;
+    font-size: 16px; /* Increased font size */
 }
 
 .document-path {
-    font-size: 12px;
+    font-size: 13px; /* Increased font size */
     color: #666;
 }
 
@@ -258,23 +355,131 @@ document.addEventListener('DOMContentLoaded', () => {
 .button {
     display: flex;
     align-items: center;
-    gap: 5px;
-    padding: 6px 12px;
+    gap: 6px;
+    padding: 8px 16px; /* Increased padding */
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 6px; /* Increased border radius */
     background: white;
     cursor: pointer;
     font-size: 14px;
+    transition: all 0.2s;
+    color: #1a73e8; /* Added color */
 }
 
 .button:hover {
-    background: #f5f5f5;
+    background: #f8f9fa;
+    border-color: #1a73e8;
+    color: #1557b0; /* Darker color on hover */
+}
+
+.button svg {
+    stroke: currentColor; /* Match icon color to text */
+}
+
+.refresh-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 100px; /* Added min-width */
+    justify-content: center; /* Center content */
+}
+
+.refresh-button:hover {
+    background: #f8f9fa;
+    border-color: #1a73e8;
+    color: #1557b0;
 }
 
 .no-documents {
     text-align: center;
-    padding: 20px;
+    padding: 40px 20px; /* Increased padding */
     color: #666;
     font-style: italic;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+/* Add custom scrollbar styling */
+.document-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.document-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.document-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.document-list::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    margin: 50px auto;
+    padding: 0;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5em;
+    color: #333;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal-body {
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 16px 20px;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
 }
 </style> 
