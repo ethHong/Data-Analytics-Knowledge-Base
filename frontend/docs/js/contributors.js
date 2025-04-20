@@ -153,7 +153,16 @@ function openContributionModal(contributorId) {
     // Get current contributions
     const contributionsEl = document.querySelector(`[data-contributor-id="${contributorId}"] details.contributions ul`);
     const currentLinks = Array.from(contributionsEl.querySelectorAll('a'))
-        .map(a => a.getAttribute('href').replace('../', ''));
+        .map(a => {
+            // Get the href and remove the '../' prefix
+            let path = a.getAttribute('href').replace('../', '');
+            // Remove trailing slash if present
+            if (path.endsWith('/')) {
+                path = path.substring(0, path.length - 1);
+            }
+            // Add .md extension to match the document paths
+            return path + '.md';
+        });
     
     // Reset selections
     selectedDocuments = new Set(currentLinks);
