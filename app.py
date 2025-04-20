@@ -37,6 +37,29 @@ def get_all_documents():
         return {"documents": [record["title"] for record in result]}
 
 
+# Define API endpoint for document management
+@app.get("/api/documents")
+def get_documents_for_management():
+    with driver.session() as session:
+        result = session.run(
+            """
+            MATCH (d:Document)
+            RETURN d.title AS title, d.category AS category, d.content AS content
+        """
+        )
+        documents = []
+        for record in result:
+            doc = {
+                "title": record["title"],
+                "path": f"docs/{record['title'].lower().replace(' ', '-')}.md",
+                "category": (
+                    record["category"] if record["category"] else "Uncategorized"
+                ),
+            }
+            documents.append(doc)
+        return {"documents": documents}
+
+
 # Define API endpoint - document content
 @app.get("/documents/{title}")
 def get_content(title: str):

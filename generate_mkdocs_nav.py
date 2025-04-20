@@ -33,12 +33,7 @@ def clean_orphaned_nav(config, markdown_files):
                         cleaned_nav.append({category: valid_items})
                 else:
                     # Keep non-markdown entries (like Home or Knowledge Graph)
-                    if (
-                        items in valid_files
-                        or items == "index.md"
-                        or items == "graph.html"
-                    ):
-                        cleaned_nav.append({category: items})
+                    cleaned_nav.append({category: items})
         else:
             cleaned_nav.append(entry)
     return cleaned_nav
@@ -73,13 +68,23 @@ def update_mkdocs_nav():
     # Update docs directory
     config["docs_dir"] = "docs"
 
-    # Generate navigation correctly
-    config["nav"] = [{"Home": "index.md"}]
-    # config["nav"].append({"Knowledge Graph": "graph.html"})  # Removed extra whitespace
+    # Generate navigation with fixed tabs
+    config["nav"] = [
+        {"🏠 Home": "index.md"},
+        {"🎖️ Contributors": "contributors.md"},
+        {
+            "⚙️ Admin": {
+                "🏠 Overview": "admin/index.md",
+                "📄 Document Management": "admin/documents.md",
+                "👥 Contributor Management": "admin/contributors.md",
+            }
+        },
+    ]
 
+    # Add document categories
     for category, docs in sorted(categories.items()):
         config["nav"].append(
-            {f"📁{category}": sorted(docs, key=lambda x: list(x.keys())[0])}
+            {f"📁 {category}": sorted(docs, key=lambda x: list(x.keys())[0])}
         )
 
     # Clean up orphaned nav entries
@@ -91,9 +96,11 @@ def update_mkdocs_nav():
         "https://polyfill.io/v3/polyfill.min.js?features=es6",
         "https://d3js.org/d3.v7.min.js",
         "js/graph.js",
+        "js/contributors.js",
+        "js/admin.js",
     ]
 
-    config["extra_css"] = ["css/custom.css"]
+    config["extra_css"] = ["css/custom.css", "css/contributors.css", "css/admin.css"]
 
     config["markdown_extensions"] = [{"pymdownx.arithmatex": {"generic": True}}]
 

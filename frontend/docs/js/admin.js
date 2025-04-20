@@ -11,7 +11,7 @@ let selectedDocuments = new Set();
 // API configuration
 const API_BASE_URL = 'http://34.82.192.6:8000';
 
-// Function to fetch documents from the API endpoint
+// Document Management Functions
 async function fetchDocuments() {
     console.log('Fetching documents...');
     try {
@@ -21,33 +21,92 @@ async function fetchDocuments() {
         }
         const data = await response.json();
         console.log('Fetched documents:', data);
-        allDocuments = data;
-        displayDocuments(data);
-        return data;
+        return data.documents;
     } catch (error) {
         console.error('Error fetching documents:', error);
         return null;
     }
 }
 
-// Function to fetch contributors data from JSON
-async function fetchContributorsData() {
-    console.log('Fetching contributors...');
+// Contributor Management Functions
+async function fetchContributors() {
     try {
-        const response = await fetch('../data/contributors.json');
+        const response = await fetch(`${API_BASE_URL}/api/contributors`);
         if (!response.ok) {
-            throw new Error('Failed to fetch contributors data');
+            throw new Error('Failed to fetch contributors');
         }
         const data = await response.json();
-        console.log('Fetched contributors:', data);
-        contributorsData = data.contributors;
-        displayContributors(data.contributors);
         return data.contributors;
     } catch (error) {
-        console.error('Error fetching contributors data:', error);
-        return [];
+        console.error('Error fetching contributors:', error);
+        return null;
     }
 }
+
+async function saveContributor(contributorData, contributorId = null) {
+    const method = contributorId ? 'PUT' : 'POST';
+    const url = contributorId 
+        ? `${API_BASE_URL}/api/contributors/${contributorId}`
+        : `${API_BASE_URL}/api/contributors`;
+
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(contributorData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to save contributor');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error saving contributor:', error);
+        throw error;
+    }
+}
+
+async function deleteContributor(contributorId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to delete contributor');
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Error deleting contributor:', error);
+        throw error;
+    }
+}
+
+// Modal Management Functions
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'block';
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Event Listeners
+document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
+});
 
 // Function to display documents in the document list
 function displayDocuments(documents) {
@@ -194,125 +253,6 @@ function openContributionModal(contributorId) {
     modal.style.display = 'block';
 }
 
-// Function to close any modal
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.style.display = 'none';
-    currentContributor = null;
-    selectedDocuments.clear();
-}
-
-// Function to save contributor information
-async function saveContributor(event) {
-    event.preventDefault();
-    const form = event.target;
-    
-    const contributorData = {
-        id: currentContributor?.id || Date.now().toString(),
-        name: form.name.value,
-        organization: form.organization.value,
-        linkedin: form.linkedin.value,
-        image: form.image.value,
-        contributions: currentContributor?.contributions || []
-    };
-    
-    try {
-        // Update contributors.json
-        const response = await fetch('../data/contributors.json');
-        const data = await response.json();
-        
-        if (currentContributor) {
-            // Update existing contributor
-            const index = data.contributors.findIndex(c => c.id === currentContributor.id);
-            if (index !== -1) {
-                data.contributors[index] = contributorData;
-            }
-        } else {
-            // Add new contributor
-            data.contributors.push(contributorData);
-        }
-        
-        // Save updated data
-        await fetch('../data/contributors.json', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-        
-        // Refresh the display
-        contributorsData = data.contributors;
-        displayContributors(contributorsData);
-        closeModal('contributorModal');
-    } catch (error) {
-        console.error('Error saving contributor:', error);
-        alert('Failed to save contributor. Please try again.');
-    }
-}
-
-// Function to save contributor contributions
-async function saveContributions() {
-    if (!currentContributor) return;
-    
-    try {
-        // Update contributors.json
-        const response = await fetch('../data/contributors.json');
-        const data = await response.json();
-        
-        const index = data.contributors.findIndex(c => c.id === currentContributor.id);
-        if (index !== -1) {
-            data.contributors[index].contributions = Array.from(selectedDocuments);
-            
-            // Save updated data
-            await fetch('../data/contributors.json', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-            
-            // Refresh the display
-            contributorsData = data.contributors;
-            displayContributors(contributorsData);
-            closeModal('contributionModal');
-        }
-    } catch (error) {
-        console.error('Error saving contributions:', error);
-        alert('Failed to save contributions. Please try again.');
-    }
-}
-
-// Function to delete a contributor
-async function deleteContributor(contributorId) {
-    if (!confirm('Are you sure you want to delete this contributor?')) return;
-    
-    try {
-        // Update contributors.json
-        const response = await fetch('../data/contributors.json');
-        const data = await response.json();
-        
-        data.contributors = data.contributors.filter(c => c.id !== contributorId);
-        
-        // Save updated data
-        await fetch('../data/contributors.json', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-        
-        // Refresh the display
-        contributorsData = data.contributors;
-        displayContributors(contributorsData);
-    } catch (error) {
-        console.error('Error deleting contributor:', error);
-        alert('Failed to delete contributor. Please try again.');
-    }
-}
-
 // Function to handle document checkbox changes
 function handleDocumentSelection(event) {
     const checkbox = event.target;
@@ -344,7 +284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         await Promise.all([
             fetchDocuments(),
-            fetchContributorsData()
+            fetchContributors()
         ]);
         console.log('Initialization complete');
     } catch (error) {

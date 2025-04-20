@@ -1,0 +1,277 @@
+.contributors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.profile-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #4CAF50;
+    color: white;
+    font-size: 48px;
+}
+
+.profile-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid white;
+    background: white;
+}
+
+.profile-info {
+    padding: 20px;
+    text-align: center;
+}
+
+.profile-info h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.2em;
+}
+
+.organization {
+    color: #666;
+    margin: 5px 0 15px;
+    font-size: 0.9em;
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 5px;
+}
+
+.button:hover {
+    background: #f5f5f5;
+}
+
+.button.primary {
+    background: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+}
+
+.button.primary:hover {
+    background: #45a049;
+}
+
+.button.danger {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.button.danger:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.contributions {
+    margin: 10px 0;
+}
+
+.contributions summary {
+    width: 100%;
+    text-align: center;
+    list-style: none;
+}
+
+.contributions summary::-webkit-details-marker {
+    display: none;
+}
+
+.contributions ul {
+    text-align: left;
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.contributions li {
+    margin: 5px 0;
+}
+
+.contributions a {
+    color: #2196F3;
+    text-decoration: none;
+}
+
+.contributions a:hover {
+    text-decoration: underline;
+}
+
+.add-contributor {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    min-height: 300px;
+    border: 2px dashed #ddd;
+    background: #f9f9f9;
+}
+
+.add-contributor:hover {
+    border-color: #4CAF50;
+    background: #f0f9f0;
+}
+
+.add-icon {
+    color: #4CAF50;
+    margin-bottom: 10px;
+}
+
+.add-text h3 {
+    color: #4CAF50;
+    margin: 0;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    margin: 50px auto;
+    padding: 0;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal-body {
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #ddd;
+    text-align: right;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.save-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.cancel-btn {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.search-container {
+    margin-bottom: 20px;
+}
+
+.search-row {
+    display: flex;
+    gap: 10px;
+}
+
+.search-row input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.document-list {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.document-item {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.document-item:last-child {
+    border-bottom: none;
+}
+
+.document-title {
+    font-weight: 500;
+} 

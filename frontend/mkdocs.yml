@@ -1,7 +1,7 @@
 docs_dir: docs
-site_dir: site
 extra_css:
 - css/custom.css
+- css/contributors.css
 - css/admin.css
 extra_javascript:
 - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js
@@ -14,29 +14,28 @@ markdown_extensions:
 - pymdownx.arithmatex:
     generic: true
 nav:
-- 🏠Home: index.md
-- 🎖️Contributors: contributors.md
-- 👑Admin:
-  - Overview: admin/index.md
-  - 📄Document Management: admin/documents.md
-  - 👥Contributor Management: admin/contributors.md
-- 📁Causal Inference:
+- 🏠 Home: index.md
+- 🎖️ Contributors: contributors.md
+- ⚙️ Admin:
+    🏠 Overview: admin/index.md
+    👥 Contributor Management: admin/contributors.md
+    📄 Document Management: admin/documents.md
+- 📁 Causal Inference:
   - 📄 AB Testing Framework With Regression: markdowns/AB Testing Framework With Regression.md
   - 📄 Difference in Difference: markdowns/Difference in Difference.md
   - 📄 Endogeneity and Exogeneity: markdowns/Endogeneity and Exogeneity.md
   - 📄 Fixed Effect: markdowns/Fixed Effect.md
   - 📄 Frisch Waugh Theorem: markdowns/Frisch Waugh Theorem.md
   - 📄 Instrument Variable: markdowns/Instrument Variable.md
-  - 📄 Omitted Variable Bias: markdowns/Omitted Variable Bias.md
   - 📄 Using Control Variables: markdowns/Using Control Variables.md
-- 📁Marketing Analytics:
+- 📁 Marketing Analytics:
   - 📄 Bass Model for Demand Prediction: markdowns/Bass Model for Demand Prediction.md
-- 📁Statistics:
+- 📁 Statistics:
   - 📄 Hypothesis testing: markdowns/Hypothesis testing.md
   - 📄 Linear Regression and Coefficient: markdowns/Linear Regression and Coefficient.md
+  - 📄 Omitted Variable Bias: markdowns/Omitted Variable Bias.md
   - 📄 Standard Error: markdowns/Standard Error.md
   - 📄 Statistical Bias: markdowns/Statistical Bias.md
-
 site_name: MSBA Knowledge Base
 theme:
   name: material

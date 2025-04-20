@@ -16,4 +16,6 @@ Manage contributors to the knowledge base, including:
 - Add new contributors
 - Edit contributor information
 - Manage document contributions
-- Remove contributors 
+- Remove contributors
+
+category_specifier: "Admin" 
