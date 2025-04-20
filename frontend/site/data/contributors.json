@@ -1,28 +1,83 @@
 {
     "contributors": [
         {
-            "id": "ethan-hong",
             "name": "Ethan Sukhyun Hong",
             "organization": "UCLA MSBA'25",
             "linkedin": "https://www.linkedin.com/in/sukhyun-hong-ethan/",
-            "image": "https://ui-avatars.com/api/?name=Ethan+Hong&size=200&background=random",
-            "contributions": []
+            "image": "https://media.licdn.com/dms/image/v2/D5603AQE51HYeCAfodg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1728609917769?e=1750896000&v=beta&t=FIQIkwOM51burFwGI8xiceNVrjvWmC4KbgU9-_AE2zA",
+            "id": "ethan-hong",
+            "contributions": [
+                {
+                    "path": "markdowns/AB Testing Framework With Regression.md",
+                    "title": "AB Testing Framework With Regression"
+                },
+                {
+                    "path": "markdowns/Bass Model for Demand Prediction.md",
+                    "title": "Bass Model for Demand Prediction"
+                },
+                {
+                    "path": "markdowns/Frisch Waugh Theorem.md",
+                    "title": "Frisch Waugh Theorem"
+                },
+                {
+                    "path": "markdowns/Hypothesis Testing.md",
+                    "title": "Hypothesis Testing"
+                },
+                {
+                    "path": "markdowns/Using Control Variables.md",
+                    "title": "Using Control Variables"
+                }
+            ]
         },
         {
-            "id": "jiwon-hur",
             "name": "Jiwon Hur",
             "organization": "UCLA MSBA'25",
             "linkedin": "https://www.linkedin.com/in/jiwon-hur/",
-            "image": "https://ui-avatars.com/api/?name=Jiwon+Hur&size=200&background=random",
-            "contributions": []
+            "image": "https://media.licdn.com/dms/image/v2/D5603AQGzJE19LZqNDg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1731958958126?e=1750896000&v=beta&t=BhHHJa0JN0VNWZTxYFIOPBMP_R36Mb-TmH_Y6KBDVtQ",
+            "id": "jiwon-hur",
+            "contributions": [
+                {
+                    "path": "markdowns/Linear Regression and Coefficient.md",
+                    "title": "Linear Regression and Coefficient"
+                },
+                {
+                    "path": "markdowns/Standard Error.md",
+                    "title": "Standard Error"
+                }
+            ]
         },
         {
-            "id": "emily-oh",
             "name": "Emily Oh",
             "organization": "UCLA MSBA'25",
             "linkedin": "https://www.linkedin.com/in/eeoh/",
-            "image": "https://ui-avatars.com/api/?name=Emily+Oh&size=200&background=random",
-            "contributions": []
+            "image": "https://media.licdn.com/dms/image/v2/D5603AQFbSqTJRmRcSw/profile-displayphoto-shrink_800_800/B56ZOJnZ4tG4Ac-/0/1733180629796?e=1750896000&v=beta&t=_5vH7bkoOtz8Kj8YJnLH8YztmZhLWR0fvw0oiuoZSFE",
+            "id": "emily-oh",
+            "contributions": [
+                {
+                    "path": "markdowns/Difference in Difference.md",
+                    "title": "Difference in Difference"
+                },
+                {
+                    "path": "markdowns/Endogeneity and Exogeneity.md",
+                    "title": "Endogeneity and Exogeneity"
+                },
+                {
+                    "path": "markdowns/Fixed Effect.md",
+                    "title": "Fixed Effect"
+                },
+                {
+                    "path": "markdowns/Instrument Variable.md",
+                    "title": "Instrument Variable"
+                },
+                {
+                    "path": "markdowns/Omitted Variable Bias.md",
+                    "title": "Omitted Variable Bias"
+                },
+                {
+                    "path": "markdowns/Statistical Bias.md",
+                    "title": "Statistical Bias"
+                }
+            ]
         }
     ]
-} 
+}

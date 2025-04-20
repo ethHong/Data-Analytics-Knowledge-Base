@@ -2,7 +2,7 @@
 
 **category_specifier** : "Statistics"
 
-**Reference Docs:** [Hypothesis Testing](Hypothesis testing.md)|[Using Control Variables](Using Control Variables.md)
+**Reference Docs:** [Hypothesis Testing](Hypothesis Testing.md)|[Using Control Variables](Using Control Variables.md)
 
 ## **Context**
 

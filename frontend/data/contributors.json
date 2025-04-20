@@ -1,0 +1,86 @@
+{
+  "ethan": {
+    "contributions": [
+      {
+        "path": "markdowns/Fixed Effect.md",
+        "title": "Fixed Effect"
+      },
+      {
+        "path": "markdowns/Endogeneity and Exogeneity.md",
+        "title": "Endogeneity And Exogeneity"
+      }
+    ]
+  },
+  "jiwon": {
+    "contributions": [
+      {
+        "path": "markdowns/Hypothesis Testing.md",
+        "title": "Hypothesis Testing"
+      }
+    ]
+  },
+  "ethan-hong": {
+    "contributions": [
+      {
+        "path": "markdowns/Using Control Variables.md",
+        "title": "Using Control Variables"
+      },
+      {
+        "path": "markdowns/Frisch Waugh Theorem.md",
+        "title": "Frisch Waugh Theorem"
+      },
+      {
+        "path": "markdowns/AB Testing Framework With Regression.md",
+        "title": "Ab Testing Framework With Regression"
+      },
+      {
+        "path": "markdowns/Hypothesis Testing.md",
+        "title": "Hypothesis Testing"
+      },
+      {
+        "path": "markdowns/Bass Model for Demand Prediction.md",
+        "title": "Bass Model For Demand Prediction"
+      }
+    ]
+  },
+  "jiwon-hur": {
+    "contributions": [
+      {
+        "path": "markdowns/Standard Error.md",
+        "title": "Standard Error"
+      },
+      {
+        "path": "markdowns/Linear Regression and Coefficient.md",
+        "title": "Linear Regression And Coefficient"
+      }
+    ]
+  },
+  "emily-oh": {
+    "contributions": [
+      {
+        "path": "markdowns/Statistical Bias.md",
+        "title": "Statistical Bias"
+      },
+      {
+        "path": "markdowns/Instrument Variable.md",
+        "title": "Instrument Variable"
+      },
+      {
+        "path": "markdowns/Fixed Effect.md",
+        "title": "Fixed Effect"
+      },
+      {
+        "path": "markdowns/Endogeneity and Exogeneity.md",
+        "title": "Endogeneity And Exogeneity"
+      },
+      {
+        "path": "markdowns/Difference in Difference.md",
+        "title": "Difference In Difference"
+      },
+      {
+        "path": "markdowns/Omitted Variable Bias.md",
+        "title": "Omitted Variable Bias"
+      }
+    ]
+  }
+}

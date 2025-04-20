@@ -27,13 +27,13 @@ nav:
   - 📄 Fixed Effect: markdowns/Fixed Effect.md
   - 📄 Frisch Waugh Theorem: markdowns/Frisch Waugh Theorem.md
   - 📄 Instrument Variable: markdowns/Instrument Variable.md
+  - 📄 Omitted Variable Bias: markdowns/Omitted Variable Bias.md
   - 📄 Using Control Variables: markdowns/Using Control Variables.md
 - 📁 Marketing Analytics:
   - 📄 Bass Model for Demand Prediction: markdowns/Bass Model for Demand Prediction.md
 - 📁 Statistics:
   - 📄 Hypothesis testing: markdowns/Hypothesis testing.md
   - 📄 Linear Regression and Coefficient: markdowns/Linear Regression and Coefficient.md
-  - 📄 Omitted Variable Bias: markdowns/Omitted Variable Bias.md
   - 📄 Standard Error: markdowns/Standard Error.md
   - 📄 Statistical Bias: markdowns/Statistical Bias.md
 site_name: MSBA Knowledge Base
