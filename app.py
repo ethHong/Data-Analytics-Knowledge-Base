@@ -4,7 +4,7 @@ from neo4j import GraphDatabase
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 import json
 
 app = FastAPI()  # Initialize APP
@@ -136,103 +136,206 @@ class Document(BaseModel):
     title: str
 
 
-class Contribution(BaseModel):
-    path: str
-    title: str
+class ContributorBase(BaseModel):
+    name: str
+    organization: str
+    linkedin: Optional[str] = None
+    image: Optional[str] = None
 
 
-class ContributorData(BaseModel):
-    contributions: List[Contribution]
+class ContributorCreate(ContributorBase):
+    id: str
 
 
-# Path to store contributor data
-CONTRIBUTOR_DATA_FILE = "frontend/data/contributors.json"
+class ContributorUpdate(ContributorBase):
+    pass
+
+
+class Contributor(ContributorBase):
+    id: str
+    contributions: List[Document] = []
+
+
+class ContributionUpdate(BaseModel):
+    contributions: List[Document]
+
+
+# Update the path to contributors.json - use one consistent location
+CONTRIBUTORS_FILE = os.path.join("frontend", "docs", "data", "contributors.json")
 
 # Ensure the data directory exists
-os.makedirs(os.path.dirname(CONTRIBUTOR_DATA_FILE), exist_ok=True)
+os.makedirs(os.path.dirname(CONTRIBUTORS_FILE), exist_ok=True)
 
 
-def load_contributor_data():
+def read_contributors():
+    """Helper function to read contributors data"""
     try:
-        if os.path.exists(CONTRIBUTOR_DATA_FILE):
-            with open(CONTRIBUTOR_DATA_FILE, "r") as f:
-                return json.load(f)
-        return {}
+        with open(CONTRIBUTORS_FILE, "r") as f:
+            return json.load(f)
     except Exception as e:
-        print(f"Error loading contributor data: {e}")
-        return {}
+        print(f"Error reading contributors: {e}")
+        return {"contributors": []}
 
 
-def save_contributor_data(data):
+def write_contributors(data):
+    """Helper function to write contributors data"""
     try:
-        with open(CONTRIBUTOR_DATA_FILE, "w") as f:
-            json.dump(data, f, indent=2)
+        os.makedirs(os.path.dirname(CONTRIBUTORS_FILE), exist_ok=True)
+        with open(CONTRIBUTORS_FILE, "w") as f:
+            json.dump(data, f, indent=4)
         return True
     except Exception as e:
-        print(f"Error saving contributor data: {e}")
+        print(f"Error writing contributors: {e}")
         return False
 
 
-@app.get("/api/contributors/{contributor_id}", response_model=ContributorData)
+# Get all contributors
+@app.get("/api/contributors", response_model=dict)
+async def get_all_contributors():
+    try:
+        return read_contributors()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to read contributors")
+
+
+# Get single contributor
+@app.get("/api/contributors/{contributor_id}", response_model=Contributor)
 async def get_contributor(contributor_id: str):
     try:
-        data = load_contributor_data()
-        return ContributorData(
-            contributions=data.get(contributor_id, {}).get("contributions", [])
+        data = read_contributors()
+        contributor = next(
+            (c for c in data["contributors"] if c["id"] == contributor_id), None
         )
+
+        if not contributor:
+            raise HTTPException(status_code=404, detail="Contributor not found")
+
+        return contributor
+    except HTTPException as he:
+        raise he
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to read contributor")
 
 
-@app.put("/api/contributors/{contributor_id}", response_model=ContributorData)
-async def update_contributor(contributor_id: str, data: ContributorData):
+# Create new contributor
+@app.post("/api/contributors", response_model=Contributor)
+async def create_contributor(contributor: ContributorCreate):
     try:
-        contributor_data = load_contributor_data()
-        contributor_data[contributor_id] = data.dict()
-        if save_contributor_data(contributor_data):
-            return data
-        else:
-            raise HTTPException(
-                status_code=500, detail="Failed to save contributor data"
-            )
+        data = read_contributors()
+
+        # Check if ID already exists
+        if any(c["id"] == contributor.id for c in data["contributors"]):
+            raise HTTPException(status_code=400, detail="Contributor ID already exists")
+
+        new_contributor = {**contributor.dict(), "contributions": []}
+
+        data["contributors"].append(new_contributor)
+        if not write_contributors(data):
+            raise HTTPException(status_code=500, detail="Failed to save contributor")
+
+        return new_contributor
+    except HTTPException as he:
+        raise he
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to create contributor")
 
 
-@app.get("/api/documents", response_model=List[Document])
-async def get_documents():
+# Update contributor info
+@app.put("/api/contributors/{contributor_id}", response_model=Contributor)
+async def update_contributor_info(contributor_id: str, contributor: ContributorUpdate):
     try:
-        # Base directory for markdown files
-        base_dir = Path("frontend/docs/markdowns")
+        data = read_contributors()
+        contributor_index = next(
+            (
+                i
+                for i, c in enumerate(data["contributors"])
+                if c["id"] == contributor_id
+            ),
+            -1,
+        )
 
-        # List all markdown files
-        documents = []
-        for file_path in base_dir.glob("**/*.md"):
-            # Get relative path from base_dir
-            relative_path = file_path.relative_to(base_dir)
+        if contributor_index == -1:
+            raise HTTPException(status_code=404, detail="Contributor not found")
 
-            # Convert path to title
-            title = file_path.stem.replace("-", " ").title()
+        # Preserve contributions when updating info
+        contributions = data["contributors"][contributor_index]["contributions"]
+        updated_contributor = {
+            **contributor.dict(),
+            "id": contributor_id,
+            "contributions": contributions,
+        }
 
-            documents.append(Document(path=f"markdowns/{relative_path}", title=title))
+        data["contributors"][contributor_index] = updated_contributor
+        if not write_contributors(data):
+            raise HTTPException(status_code=500, detail="Failed to save contributor")
 
-        return documents
+        return updated_contributor
+    except HTTPException as he:
+        raise he
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to update contributor")
 
 
-@app.get("/api/documents/search")
-async def search_documents(query: str):
+# Update contributor contributions
+@app.put("/api/contributors/{contributor_id}/contributions", response_model=Contributor)
+async def update_contributor_contributions(
+    contributor_id: str, contribution_data: ContributionUpdate
+):
     try:
-        # Get all documents
-        documents = await get_documents()
+        data = read_contributors()
+        contributor_index = next(
+            (
+                i
+                for i, c in enumerate(data["contributors"])
+                if c["id"] == contributor_id
+            ),
+            -1,
+        )
 
-        # Filter documents based on query
-        filtered_docs = [doc for doc in documents if query.lower() in doc.title.lower()]
+        if contributor_index == -1:
+            raise HTTPException(status_code=404, detail="Contributor not found")
 
-        return filtered_docs
+        # Update only the contributions field
+        data["contributors"][contributor_index]["contributions"] = [
+            doc.dict() for doc in contribution_data.contributions
+        ]
+
+        if not write_contributors(data):
+            raise HTTPException(status_code=500, detail="Failed to save contributions")
+
+        return data["contributors"][contributor_index]
+    except HTTPException as he:
+        raise he
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to update contributions")
+
+
+# Delete contributor
+@app.delete("/api/contributors/{contributor_id}")
+async def delete_contributor(contributor_id: str):
+    try:
+        data = read_contributors()
+        contributor_index = next(
+            (
+                i
+                for i, c in enumerate(data["contributors"])
+                if c["id"] == contributor_id
+            ),
+            -1,
+        )
+
+        if contributor_index == -1:
+            raise HTTPException(status_code=404, detail="Contributor not found")
+
+        data["contributors"].pop(contributor_index)
+        if not write_contributors(data):
+            raise HTTPException(status_code=500, detail="Failed to save changes")
+
+        return {"status": "success"}
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to delete contributor")
 
 
 # Start the FastAPI server

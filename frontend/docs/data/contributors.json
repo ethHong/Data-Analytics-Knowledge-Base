@@ -1,0 +1,28 @@
+{
+    "contributors": [
+        {
+            "id": "ethan-hong",
+            "name": "Ethan Sukhyun Hong",
+            "organization": "UCLA MSBA'25",
+            "linkedin": "https://www.linkedin.com/in/sukhyun-hong-ethan/",
+            "image": "https://ui-avatars.com/api/?name=Ethan+Hong&size=200&background=random",
+            "contributions": []
+        },
+        {
+            "id": "jiwon-hur",
+            "name": "Jiwon Hur",
+            "organization": "UCLA MSBA'25",
+            "linkedin": "https://www.linkedin.com/in/jiwon-hur/",
+            "image": "https://ui-avatars.com/api/?name=Jiwon+Hur&size=200&background=random",
+            "contributions": []
+        },
+        {
+            "id": "emily-oh",
+            "name": "Emily Oh",
+            "organization": "UCLA MSBA'25",
+            "linkedin": "https://www.linkedin.com/in/eeoh/",
+            "image": "https://ui-avatars.com/api/?name=Emily+Oh&size=200&background=random",
+            "contributions": []
+        }
+    ]
+} 
