@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pathlib import Path
 from typing import List
+import json
 
 app = FastAPI()  # Initialize APP
 
@@ -133,6 +134,69 @@ def get_graph_data():
 class Document(BaseModel):
     path: str
     title: str
+
+
+class Contribution(BaseModel):
+    path: str
+    title: str
+
+
+class ContributorData(BaseModel):
+    contributions: List[Contribution]
+
+
+# Path to store contributor data
+CONTRIBUTOR_DATA_FILE = "frontend/data/contributors.json"
+
+# Ensure the data directory exists
+os.makedirs(os.path.dirname(CONTRIBUTOR_DATA_FILE), exist_ok=True)
+
+
+def load_contributor_data():
+    try:
+        if os.path.exists(CONTRIBUTOR_DATA_FILE):
+            with open(CONTRIBUTOR_DATA_FILE, "r") as f:
+                return json.load(f)
+        return {}
+    except Exception as e:
+        print(f"Error loading contributor data: {e}")
+        return {}
+
+
+def save_contributor_data(data):
+    try:
+        with open(CONTRIBUTOR_DATA_FILE, "w") as f:
+            json.dump(data, f, indent=2)
+        return True
+    except Exception as e:
+        print(f"Error saving contributor data: {e}")
+        return False
+
+
+@app.get("/api/contributors/{contributor_id}", response_model=ContributorData)
+async def get_contributor(contributor_id: str):
+    try:
+        data = load_contributor_data()
+        return ContributorData(
+            contributions=data.get(contributor_id, {}).get("contributions", [])
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.put("/api/contributors/{contributor_id}", response_model=ContributorData)
+async def update_contributor(contributor_id: str, data: ContributorData):
+    try:
+        contributor_data = load_contributor_data()
+        contributor_data[contributor_id] = data.dict()
+        if save_contributor_data(contributor_data):
+            return data
+        else:
+            raise HTTPException(
+                status_code=500, detail="Failed to save contributor data"
+            )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/documents", response_model=List[Document])

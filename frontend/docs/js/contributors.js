@@ -24,6 +24,63 @@ async function fetchDocuments() {
     }
 }
 
+// Function to fetch contributor data
+async function fetchContributorData(contributorId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch contributor data');
+        }
+        const data = await response.json();
+        return data.contributions || [];
+    } catch (error) {
+        console.error('Error fetching contributor data:', error);
+        return [];
+    }
+}
+
+// Function to update contributor data
+async function updateContributorData(contributorId, contributions) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ contributions }),
+        });
+        if (!response.ok) {
+            throw new Error('Failed to update contributor data');
+        }
+        return true;
+    } catch (error) {
+        console.error('Error updating contributor data:', error);
+        return false;
+    }
+}
+
+// Function to initialize contributor sections
+async function initializeContributors() {
+    const contributorElements = document.querySelectorAll('[data-contributor-id]');
+    for (const element of contributorElements) {
+        const contributorId = element.getAttribute('data-contributor-id');
+        const contributions = await fetchContributorData(contributorId);
+        updateContributorDisplay(contributorId, contributions);
+    }
+}
+
+// Function to update contributor display
+function updateContributorDisplay(contributorId, contributions) {
+    const contributionsEl = document.querySelector(`[data-contributor-id="${contributorId}"] .contributions ul`);
+    if (!contributionsEl) return;
+
+    const contributionsList = contributions.map(doc => 
+        `<li><a href="../${doc.path}">${doc.title}</a></li>`
+    ).join('');
+    
+    contributionsEl.innerHTML = contributionsList;
+}
+
 // Function to search documents
 async function searchDocuments(query) {
     try {
@@ -69,6 +126,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Initial document fetch
     await refreshDocuments();
+    
+    // Initialize contributors
+    await initializeContributors();
 });
 
 function openContributionModal(contributorId) {
@@ -80,10 +140,12 @@ function openContributionModal(contributorId) {
     const contributionsEl = document.querySelector(`[onclick="openContributionModal('${contributorId}')"]`)
         .previousElementSibling;
     const currentLinks = Array.from(contributionsEl.querySelectorAll('a'))
-        .map(a => a.getAttribute('href'));
+        .map(a => a.getAttribute('href').replace('../', ''));
     
     // Reset selections
     selectedDocuments = new Set(currentLinks);
+    
+    // Update the checkboxes to match current selections
     updateDocumentSelection();
 }
 
@@ -98,7 +160,7 @@ function populateDocumentList() {
     const documentList = document.querySelector('.document-list');
     documentList.innerHTML = '';
     
-    if (allDocuments.length === 0) {
+    if (!allDocuments || allDocuments.length === 0) {
         documentList.innerHTML = '<div class="no-documents">No documents found. Try refreshing the list.</div>';
         return;
     }
@@ -112,7 +174,8 @@ function populateDocumentList() {
             <label for="${doc.path}">${doc.title}</label>
         `;
         
-        item.querySelector('input').addEventListener('change', (e) => {
+        const checkbox = item.querySelector('input');
+        checkbox.addEventListener('change', (e) => {
             if (e.target.checked) {
                 selectedDocuments.add(doc.path);
                 item.classList.add('selected');
@@ -146,8 +209,10 @@ function updateDocumentSelection() {
     items.forEach(item => {
         const path = item.getAttribute('data-path');
         const checkbox = item.querySelector('input');
-        checkbox.checked = selectedDocuments.has(path);
-        item.classList.toggle('selected', checkbox.checked);
+        if (checkbox) {
+            checkbox.checked = selectedDocuments.has(path);
+            item.classList.toggle('selected', checkbox.checked);
+        }
     });
 }
 
@@ -169,20 +234,23 @@ async function handleRefresh() {
     }
 }
 
-function saveContributions() {
+async function saveContributions() {
     if (!currentContributor) return;
     
-    const contributionsEl = document.querySelector(`[onclick="openContributionModal('${currentContributor}')"]`)
-        .previousElementSibling
-        .querySelector('ul');
+    // Convert selected documents to array of objects
+    const selectedDocs = Array.from(selectedDocuments).map(path => {
+        const doc = allDocuments.find(d => d.path === path);
+        return doc ? { path: doc.path, title: doc.title } : null;
+    }).filter(doc => doc !== null);
+
+    // Save to server
+    const success = await updateContributorData(currentContributor, selectedDocs);
     
-    // Update the contributions list
-    contributionsEl.innerHTML = Array.from(selectedDocuments)
-        .map(path => {
-            const doc = allDocuments.find(d => d.path === path);
-            return `<li><a href="${path}">${doc.title}</a></li>`;
-        })
-        .join('');
-    
-    closeContributionModal();
+    if (success) {
+        // Update the display
+        updateContributorDisplay(currentContributor, selectedDocs);
+        closeContributionModal();
+    } else {
+        alert('Failed to save changes. Please try again.');
+    }
 } 
