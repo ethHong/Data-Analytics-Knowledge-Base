@@ -278,4 +278,4 @@ document.addEventListener("DOMContentLoaded", () => {
 <script type="text/javascript" async
   id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-## Explore, search knowledges based on their relationship.
+## Network based Wiki for Business Analytics, and Data professionals
