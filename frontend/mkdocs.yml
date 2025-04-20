@@ -6,11 +6,13 @@ extra_javascript:
 - https://polyfill.io/v3/polyfill.min.js?features=es6
 - https://d3js.org/d3.v7.min.js
 - js/graph.js
+- js/contributors.js
 markdown_extensions:
 - pymdownx.arithmatex:
     generic: true
 nav:
 - Home: index.md
+- Contributors: contributors.md
 - 📁Causal Inference:
   - 📄 AB Testing Framework With Regression: markdowns/AB Testing Framework With Regression.md
   - 📄 Difference in Difference: markdowns/Difference in Difference.md

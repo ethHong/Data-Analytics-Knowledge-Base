@@ -2,6 +2,9 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 import os
 from neo4j import GraphDatabase
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from pathlib import Path
+from typing import List
 
 app = FastAPI()  # Initialize APP
 
@@ -100,7 +103,7 @@ def get_graph_data():
             RETURN d.title AS title, d.category AS category
             """
         )
-        
+
         # Then get all relationships
         links_result = session.run(
             """
@@ -121,13 +124,51 @@ def get_graph_data():
         # Create links list
         links = []
         for record in links_result:
-            links.append({
-                "source": record["source"],
-                "target": record["target"]
-            })
+            links.append({"source": record["source"], "target": record["target"]})
 
         node_list = list(nodes.values())
         return {"nodes": node_list, "links": links}
+
+
+class Document(BaseModel):
+    path: str
+    title: str
+
+
+@app.get("/api/documents", response_model=List[Document])
+async def get_documents():
+    try:
+        # Base directory for markdown files
+        base_dir = Path("frontend/docs/markdowns")
+
+        # List all markdown files
+        documents = []
+        for file_path in base_dir.glob("**/*.md"):
+            # Get relative path from base_dir
+            relative_path = file_path.relative_to(base_dir)
+
+            # Convert path to title
+            title = file_path.stem.replace("-", " ").title()
+
+            documents.append(Document(path=f"markdowns/{relative_path}", title=title))
+
+        return documents
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/documents/search")
+async def search_documents(query: str):
+    try:
+        # Get all documents
+        documents = await get_documents()
+
+        # Filter documents based on query
+        filtered_docs = [doc for doc in documents if query.lower() in doc.title.lower()]
+
+        return filtered_docs
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # Start the FastAPI server
