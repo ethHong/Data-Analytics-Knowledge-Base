@@ -1,7 +1,7 @@
 # Contributors
 <div class="contributors-grid">
   <!-- Ethan Sukhyun Hong -->
-  <div class="profile-card">
+  <div class="profile-card" data-contributor-id="ethan-hong">
     <div class="profile-image">
       <img src="https://ui-avatars.com/api/?name=Ethan+Hong&size=200&background=random" alt="Ethan Sukhyun Hong">
     </div>
@@ -17,13 +17,9 @@
       <div class="contributions-container">
         <details class="contributions">
           <summary>Contributions</summary>
-          <ul>
-            <li><a href="../markdowns/AB Testing Framework With Regression/">AB Testing Framework</a></li>
-            <li><a href="../markdowns/Fixed Effect/">Fixed Effect</a></li>
-            <li><a href="../markdowns/Bass Model for Demand Prediction/">Bass Model</a></li>
-          </ul>
+          <ul></ul>
         </details>
-        <button class="edit-contributions" onclick="openContributionModal('ethan')">
+        <button class="edit-contributions" onclick="openContributionModal('ethan-hong')">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
             <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
@@ -35,7 +31,7 @@
   </div>
 
   <!-- Jiwon Hur -->
-  <div class="profile-card">
+  <div class="profile-card" data-contributor-id="jiwon-hur">
     <div class="profile-image">
       <img src="https://ui-avatars.com/api/?name=Jiwon+Hur&size=200&background=random" alt="Jiwon Hur">
     </div>
@@ -51,13 +47,9 @@
       <div class="contributions-container">
         <details class="contributions">
           <summary>Contributions</summary>
-          <ul>
-            <li><a href="../markdowns/Difference in Difference/">Difference in Difference</a></li>
-            <li><a href="../markdowns/Instrument Variable/">Instrument Variable</a></li>
-            <li><a href="../markdowns/Statistical Bias/">Statistical Bias</a></li>
-          </ul>
+          <ul></ul>
         </details>
-        <button class="edit-contributions" onclick="openContributionModal('jiwon')">
+        <button class="edit-contributions" onclick="openContributionModal('jiwon-hur')">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
             <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
@@ -69,7 +61,7 @@
   </div>
 
   <!-- Emily Oh -->
-  <div class="profile-card">
+  <div class="profile-card" data-contributor-id="emily-oh">
     <div class="profile-image">
       <img src="https://ui-avatars.com/api/?name=Emily+Oh&size=200&background=random" alt="Emily Oh">
     </div>
@@ -85,13 +77,9 @@
       <div class="contributions-container">
         <details class="contributions">
           <summary>Contributions</summary>
-          <ul>
-            <li><a href="../markdowns/Hypothesis Testing/">Hypothesis Testing</a></li>
-            <li><a href="../markdowns/Linear Regression and Coefficient/">Linear Regression</a></li>
-            <li><a href="../markdowns/Standard Error/">Standard Error</a></li>
-          </ul>
+          <ul></ul>
         </details>
-        <button class="edit-contributions" onclick="openContributionModal('emily')">
+        <button class="edit-contributions" onclick="openContributionModal('emily-oh')">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
             <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>

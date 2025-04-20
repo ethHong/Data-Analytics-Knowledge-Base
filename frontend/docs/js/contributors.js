@@ -71,8 +71,11 @@ async function initializeContributors() {
 
 // Function to update contributor display
 function updateContributorDisplay(contributorId, contributions) {
-    const contributionsEl = document.querySelector(`[data-contributor-id="${contributorId}"] .contributions ul`);
-    if (!contributionsEl) return;
+    const contributionsEl = document.querySelector(`[data-contributor-id="${contributorId}"] details.contributions ul`);
+    if (!contributionsEl) {
+        console.error('Could not find contributions element for', contributorId);
+        return;
+    }
 
     const contributionsList = contributions.map(doc => 
         `<li><a href="../${doc.path}">${doc.title}</a></li>`
@@ -137,8 +140,7 @@ function openContributionModal(contributorId) {
     modal.style.display = 'block';
     
     // Get current contributions
-    const contributionsEl = document.querySelector(`[onclick="openContributionModal('${contributorId}')"]`)
-        .previousElementSibling;
+    const contributionsEl = document.querySelector(`[data-contributor-id="${contributorId}"] details.contributions ul`);
     const currentLinks = Array.from(contributionsEl.querySelectorAll('a'))
         .map(a => a.getAttribute('href').replace('../', ''));
     
