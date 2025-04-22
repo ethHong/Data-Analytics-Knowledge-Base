@@ -29,8 +29,8 @@
   $$
 
   * In the example above, $X_1$ = 1 if the user is exposed to the ad, 0 if they are not exposed to the ad.
-  * **Interpretation of $/beta_1$:** Effect of 'Ad exposure' on increasing value of the sales. (How likely the sales will increase, when user is exposed to the ad?)
-  * **Interpretation of $/beta_0$:** Baseline expected sales, when user is not exposed to the ad. (When Ad exposure dummy = 0)
+  * **Interpretation of $\beta_1$:** Effect of 'Ad exposure' on increasing value of the sales. (How likely the sales will increase, when user is exposed to the ad?)
+  * **Interpretation of $\beta_0$:** Baseline expected sales, when user is not exposed to the ad. (When Ad exposure dummy = 0)
 
 ### Problem
 
