@@ -2,7 +2,7 @@
 
 **category_specifier** : "Causal Inference"
 
-**Reference Docs:** [Using Control Variables](Using Control Variables.md)
+**Reference Docs:**[Linear regression coefficient](Linear Regression and Coefficient.md) | [Using Control Variables](Using Control Variables.md) | [Omitted Variable Bias](Omitted Variable Bias.md) | [Instrument Variables](Instrument Variable.md) | [Diff-in-diff](Difference in Difference.md) 
 
 ---
 
