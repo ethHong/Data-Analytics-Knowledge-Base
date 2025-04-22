@@ -32,7 +32,7 @@
   * **Interpretation of $\beta_1$:** Effect of 'Ad exposure' on increasing value of the sales. (How likely the sales will increase, when user is exposed to the ad?)
   * **Interpretation of $\beta_0$:** Baseline expected sales, when user is not exposed to the ad. (When Ad exposure dummy = 0)
 
-### Problem
+### Problem of using single variate regression, and further bias control techniques. 
 
 * Only relying on single variate regression, only using treatment dummy is both risky for using data from A/B test, and using data from observational data.
 * This is because of  [Omitted Variable Bias](Omitted Variable Bias.md). 
