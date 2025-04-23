@@ -96,9 +96,13 @@ def write_users(data):
 
 def read_users():
     if not os.path.exists(USERS_FILE):
-        return []
+        return {"users": []}
     with open(USERS_FILE, "r") as f:
-        return json.load(f)
+        data = json.load(f)
+        # Ensure we always return a dictionary with a "users" key
+        if isinstance(data, list):
+            return {"users": data}
+        return data
 
 
 def write_verification_codes(data):
@@ -122,8 +126,10 @@ def get_password_hash(password):
 
 
 def get_user(email: str):
-    users = read_users()
-    return next((user for user in users if user["email"] == email), None)
+    users_data = read_users()
+    return next(
+        (user for user in users_data.get("users", []) if user["email"] == email), None
+    )
 
 
 def authenticate_user(email: str, password: str):
