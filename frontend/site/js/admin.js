@@ -11,11 +11,22 @@ let selectedDocuments = new Set();
 // API configuration
 const API_BASE_URL = 'http://34.82.192.6:8000';
 
+// Helper function to get auth headers
+function getAuthHeaders() {
+    const token = localStorage.getItem('token');
+    return {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    };
+}
+
 // Document Management Functions
 async function fetchDocuments() {
     console.log('Fetching documents...');
     try {
-        const response = await fetch(`${API_BASE_URL}/api/documents`);
+        const response = await fetch(`${API_BASE_URL}/api/documents`, {
+            headers: getAuthHeaders()
+        });
         if (!response.ok) {
             throw new Error('Failed to fetch documents');
         }
@@ -31,7 +42,9 @@ async function fetchDocuments() {
 // Contributor Management Functions
 async function fetchContributors() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/contributors`);
+        const response = await fetch(`${API_BASE_URL}/api/contributors`, {
+            headers: getAuthHeaders()
+        });
         if (!response.ok) {
             throw new Error('Failed to fetch contributors');
         }
@@ -52,9 +65,7 @@ async function saveContributor(contributorData, contributorId = null) {
     try {
         const response = await fetch(url, {
             method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(contributorData)
         });
 
@@ -72,7 +83,8 @@ async function saveContributor(contributorData, contributorId = null) {
 async function deleteContributor(contributorId) {
     try {
         const response = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: getAuthHeaders()
         });
 
         if (!response.ok) {

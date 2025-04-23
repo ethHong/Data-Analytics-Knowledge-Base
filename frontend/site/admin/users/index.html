@@ -212,6 +212,64 @@
   
   
   
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    👤 Account
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            👤 Account
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../auth/profile.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    👋 Profile
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="../../auth/login.html" class="md-nav__link">
         
@@ -223,6 +281,14 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -836,45 +902,72 @@
 
 
 
+<!-- User Management -->
 <div class="admin-container">
     <h1>User Management</h1>
 
-    <div class="user-list-container">
-        <h2>Users</h2>
-        <div id="user-list"></div>
-        <button id="add-user-btn" class="btn btn-primary">Add User</button>
-    </div>
-
-    <!-- Add User Modal -->
-    <div id="add-user-modal" class="modal">
-        <div class="modal-content">
-            <h2>Add New User</h2>
-            <form id="add-user-form">
-                <div class="form-group">
-                    <label for="email">Email (Anderson Email Only)</label>
-                    <input type="email" id="email" required pattern=".*@anderson\.ucla\.edu$">
-                </div>
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" required>
-                </div>
-                <div class="form-group">
-                    <label for="role">Role</label>
-                    <select id="role" required>
-                        <option value="user">User</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
-                <div class="modal-buttons">
-                    <button type="submit" class="btn btn-primary">Add User</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('add-user-modal')">Cancel</button>
-                </div>
-            </form>
+    <!-- User List -->
+    <div class="card">
+        <div class="card-header">
+            <h2>Users</h2>
+            <button class="btn btn-primary" onclick="showAddUserModal()">Add User</button>
         </div>
+        <div class="user-list" id="userList">
+            Loading users...
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal" id="addUserModal">
+    <div class="modal-content">
+        <h2>Add User</h2>
+        <form id="addUserForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <div class="form-group">
+                <label for="role">Role</label>
+                <select id="role" required>
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Add User</button>
+                <button type="button" class="btn btn-secondary" onclick="hideAddUserModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal" id="editUserModal">
+    <div class="modal-content">
+        <h2>Edit User</h2>
+        <form id="editUserForm">
+            <input type="hidden" id="editUserId">
+            <div class="form-group">
+                <label for="editEmail">Email</label>
+                <input type="email" id="editEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="editRole">Role</label>
+                <select id="editRole" required>
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-secondary" onclick="hideEditUserModal()">Cancel</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -883,18 +976,31 @@
     padding: 20px;
 }
 
-.user-list-container {
-    margin-top: 20px;
+.card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
 }
 
-.user-card {
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 4px;
+.card-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.user-list {
+    padding: 20px;
+}
+
+.user-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
 }
 
 .user-info {
@@ -913,16 +1019,16 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    z-index: 1000;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-content {
-    background-color: white;
-    margin: 15% auto;
+    background: white;
     padding: 20px;
-    border-radius: 5px;
-    width: 80%;
+    border-radius: 8px;
+    width: 100%;
     max-width: 500px;
 }
 
@@ -943,101 +1049,105 @@
     border-radius: 4px;
 }
 
-.modal-buttons {
+.button-group {
     display: flex;
-    justify-content: flex-end;
     gap: 10px;
+    justify-content: flex-end;
     margin-top: 20px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #1a73e8;
+    color: white;
+}
+
+.btn-secondary {
+    background: #f1f3f4;
+    color: #1a73e8;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
 }
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    loadUsers();
-    setupEventListeners();
-});
+let currentUser = null;
 
 async function loadUsers() {
-    try {
-        const response = await fetch('http://34.82.192.6:8000/api/users/', {
-            credentials: 'include'
-        });
-        const users = await response.json();
-        displayUsers(users);
-    } catch (error) {
-        console.error('Error loading users:', error);
-    }
-}
-
-function displayUsers(users) {
-    const userList = document.getElementById('user-list');
-    userList.innerHTML = users.map(user => `
-        <div class="user-card">
-            <div class="user-info">
-                <strong>${user.username}</strong> (${user.email})
-                <br>
-                Role: ${user.role}
-                <br>
-                Status: ${user.is_verified ? 'Verified' : 'Pending Verification'}
-            </div>
-            <div class="user-actions">
-                <button onclick="deleteUser('${user.id}')" class="btn btn-danger">Delete</button>
-            </div>
-        </div>
-    `).join('');
-}
-
-function setupEventListeners() {
-    const addUserBtn = document.getElementById('add-user-btn');
-    const addUserForm = document.getElementById('add-user-form');
-
-    addUserBtn.addEventListener('click', () => {
-        document.getElementById('add-user-modal').style.display = 'block';
-    });
-
-    addUserForm.addEventListener('submit', handleAddUser);
-}
-
-async function handleAddUser(event) {
-    event.preventDefault();
-
-    const email = document.getElementById('email').value;
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    const role = document.getElementById('role').value;
-
-    if (!email.endsWith('@anderson.ucla.edu')) {
-        alert('Only Anderson email addresses are allowed.');
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '../auth/login.html';
         return;
     }
 
     try {
-        const response = await fetch('http://34.82.192.6:8000/api/users/', {
-            method: 'POST',
+        const response = await fetch('http://34.82.192.6:8000/api/users', {
             headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email,
-                username,
-                password,
-                role
-            }),
-            credentials: 'include'
+                'Authorization': `Bearer ${token}`
+            }
         });
 
-        if (response.ok) {
-            closeModal('add-user-modal');
-            loadUsers();
-            document.getElementById('add-user-form').reset();
-        } else {
-            const error = await response.text();
-            alert('Failed to add user: ' + error);
+        if (!response.ok) {
+            throw new Error('Failed to load users');
         }
+
+        const data = await response.json();
+        const userList = document.getElementById('userList');
+        userList.innerHTML = '';
+
+        data.users.forEach(user => {
+            const userItem = document.createElement('div');
+            userItem.className = 'user-item';
+            userItem.innerHTML = `
+                <div class="user-info">
+                    <div>${user.email}</div>
+                    <div><small>Role: ${user.role}</small></div>
+                </div>
+                <div class="user-actions">
+                    <button class="btn btn-secondary" onclick="editUser('${user.id}', '${user.email}', '${user.role}')">Edit</button>
+                    <button class="btn btn-danger" onclick="deleteUser('${user.id}')">Delete</button>
+                </div>
+            `;
+            userList.appendChild(userItem);
+        });
     } catch (error) {
-        console.error('Error adding user:', error);
-        alert('Failed to add user: Network error');
+        console.error('Error:', error);
+        document.getElementById('userList').innerHTML = 'Failed to load users';
     }
+}
+
+function showAddUserModal() {
+    document.getElementById('addUserModal').style.display = 'flex';
+}
+
+function hideAddUserModal() {
+    document.getElementById('addUserModal').style.display = 'none';
+    document.getElementById('addUserForm').reset();
+}
+
+function showEditUserModal() {
+    document.getElementById('editUserModal').style.display = 'flex';
+}
+
+function hideEditUserModal() {
+    document.getElementById('editUserModal').style.display = 'none';
+    document.getElementById('editUserForm').reset();
+}
+
+function editUser(id, email, role) {
+    document.getElementById('editUserId').value = id;
+    document.getElementById('editEmail').value = email;
+    document.getElementById('editRole').value = role;
+    showEditUserModal();
 }
 
 async function deleteUser(userId) {
@@ -1045,27 +1155,119 @@ async function deleteUser(userId) {
         return;
     }
 
+    const token = localStorage.getItem('token');
     try {
         const response = await fetch(`http://34.82.192.6:8000/api/users/${userId}`, {
             method: 'DELETE',
-            credentials: 'include'
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         });
 
-        if (response.ok) {
-            loadUsers();
-        } else {
-            const error = await response.text();
-            alert('Failed to delete user: ' + error);
+        if (!response.ok) {
+            throw new Error('Failed to delete user');
         }
+
+        loadUsers();
     } catch (error) {
-        console.error('Error deleting user:', error);
-        alert('Failed to delete user: Network error');
+        console.error('Error:', error);
+        alert('Failed to delete user');
     }
 }
 
-function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
-}
+document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await fetch('http://34.82.192.6:8000/api/users', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                role: document.getElementById('role').value
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to add user');
+        }
+
+        hideAddUserModal();
+        loadUsers();
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to add user');
+    }
+});
+
+document.getElementById('editUserForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    const userId = document.getElementById('editUserId').value;
+
+    try {
+        const response = await fetch(`http://34.82.192.6:8000/api/users/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: document.getElementById('editEmail').value,
+                role: document.getElementById('editRole').value
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update user');
+        }
+
+        hideEditUserModal();
+        loadUsers();
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to update user');
+    }
+});
+
+// Check if user is admin and load users
+document.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '../auth/login.html';
+        return;
+    }
+
+    try {
+        const response = await fetch('http://34.82.192.6:8000/api/auth/me', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to get user info');
+        }
+
+        const user = await response.json();
+        currentUser = user;
+
+        if (user.role !== 'admin') {
+            window.location.href = '../';
+            return;
+        }
+
+        loadUsers();
+    } catch (error) {
+        console.error('Error:', error);
+        window.location.href = '../auth/login.html';
+    }
+});
 </script>
 
 
@@ -1136,6 +1338,8 @@ function closeModal(modalId) {
         <script src="../../js/contributors.js"></script>
       
         <script src="../../js/admin.js"></script>
+      
+        <script src="../../js/nav.js"></script>
       
     
   </body>

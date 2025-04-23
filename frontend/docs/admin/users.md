@@ -190,6 +190,20 @@ async function loadUsers() {
     }
 
     try {
+        // First get the current user
+        const currentUserResponse = await fetch('http://34.82.192.6:8000/api/auth/me', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!currentUserResponse.ok) {
+            throw new Error('Failed to get current user');
+        }
+
+        currentUser = await currentUserResponse.json();
+
+        // Then get all users
         const response = await fetch('http://34.82.192.6:8000/api/users', {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -197,31 +211,56 @@ async function loadUsers() {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to load users');
+            throw new Error('Failed to fetch users');
         }
 
         const data = await response.json();
         const userList = document.getElementById('userList');
         userList.innerHTML = '';
 
+        // The API returns an object with a users array
         data.users.forEach(user => {
             const userItem = document.createElement('div');
             userItem.className = 'user-item';
-            userItem.innerHTML = `
-                <div class="user-info">
-                    <div>${user.email}</div>
-                    <div><small>Role: ${user.role}</small></div>
-                </div>
-                <div class="user-actions">
-                    <button class="btn btn-secondary" onclick="editUser('${user.id}', '${user.email}', '${user.role}')">Edit</button>
-                    <button class="btn btn-danger" onclick="deleteUser('${user.id}')">Delete</button>
-                </div>
+            
+            const userInfo = document.createElement('div');
+            userInfo.className = 'user-info';
+            userInfo.innerHTML = `
+                <strong>${user.email}</strong>
+                <span>(${user.role})</span>
             `;
+            
+            const userActions = document.createElement('div');
+            userActions.className = 'user-actions';
+            
+            const editButton = document.createElement('button');
+            editButton.className = 'btn btn-secondary';
+            editButton.textContent = 'Edit';
+            editButton.onclick = () => showEditUserModal(user);
+            
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'btn btn-danger';
+            deleteButton.textContent = 'Delete';
+            
+            // Prevent self-deletion
+            if (user.email === currentUser.email) {
+                deleteButton.disabled = true;
+                deleteButton.title = 'Cannot delete your own account';
+                deleteButton.style.opacity = '0.5';
+            } else {
+                deleteButton.onclick = () => deleteUser(user.id);
+            }
+            
+            userActions.appendChild(editButton);
+            userActions.appendChild(deleteButton);
+            
+            userItem.appendChild(userInfo);
+            userItem.appendChild(userActions);
             userList.appendChild(userItem);
         });
     } catch (error) {
         console.error('Error:', error);
-        document.getElementById('userList').innerHTML = 'Failed to load users';
+        document.getElementById('userList').innerHTML = 'Error loading users: ' + error.message;
     }
 }
 
@@ -234,7 +273,10 @@ function hideAddUserModal() {
     document.getElementById('addUserForm').reset();
 }
 
-function showEditUserModal() {
+function showEditUserModal(user) {
+    document.getElementById('editUserId').value = user.id;
+    document.getElementById('editEmail').value = user.email;
+    document.getElementById('editRole').value = user.role;
     document.getElementById('editUserModal').style.display = 'flex';
 }
 
@@ -243,14 +285,12 @@ function hideEditUserModal() {
     document.getElementById('editUserForm').reset();
 }
 
-function editUser(id, email, role) {
-    document.getElementById('editUserId').value = id;
-    document.getElementById('editEmail').value = email;
-    document.getElementById('editRole').value = role;
-    showEditUserModal();
-}
-
 async function deleteUser(userId) {
+    if (userId === currentUser.id) {
+        alert('You cannot delete your own account while logged in.');
+        return;
+    }
+
     if (!confirm('Are you sure you want to delete this user?')) {
         return;
     }
@@ -305,10 +345,18 @@ document.getElementById('addUserForm').addEventListener('submit', async (e) => {
     }
 });
 
-document.getElementById('editUserForm').addEventListener('submit', async (e) => {
+document.getElementById('editUserForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    
     const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '../auth/login.html';
+        return;
+    }
+    
     const userId = document.getElementById('editUserId').value;
+    const email = document.getElementById('editEmail').value;
+    const role = document.getElementById('editRole').value;
     
     try {
         const response = await fetch(`http://34.82.192.6:8000/api/users/${userId}`, {
@@ -318,20 +366,22 @@ document.getElementById('editUserForm').addEventListener('submit', async (e) => 
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                email: document.getElementById('editEmail').value,
-                role: document.getElementById('editRole').value
+                email: email,
+                role: role
             })
         });
-
+        
         if (!response.ok) {
-            throw new Error('Failed to update user');
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to update user');
         }
-
+        
         hideEditUserModal();
-        loadUsers();
+        loadUsers(); // Reload the user list
+        alert('User updated successfully');
     } catch (error) {
         console.error('Error:', error);
-        alert('Failed to update user');
+        alert('Error updating user: ' + error.message);
     }
 });
 

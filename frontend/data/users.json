@@ -15,25 +15,11 @@
             "is_verified": true
         },
         {
-            "email": "ethantest",
-            "password": "$2b$12$hqU3LY4f28wrT1HAXZbNd.y7LYJg2T/9TBFbUY13t1ScEEDlPxYy.",
-            "id": "02226df8-a0d8-4d7b-9a33-3cdc7f0056db",
-            "role": "user",
-            "is_verified": true
-        },
-        {
-            "email": "ethantest@anderson.ucla.edu",
-            "password": "$2b$12$WT2X9p4X0uv0n6A3Sj3Uw.MxjV9Zr7JpZbta6dIi/.i2WkJhI1TZC",
-            "id": "3c00f0a2-c893-4ef3-99de-7152000f3e42",
-            "role": "user",
-            "is_verified": true
-        },
-        {
-            "email": "admin@test.com",
+            "email": "newadmin@test.com",
             "role": "admin",
-            "is_verified": true,
-            "password": "$2b$12$MF7CCTEq2ZjGeWQWdJLp2u7gHjISVx2Me8ZhoDUiIj.Mqk5EJw5qa",
-            "id": "e8aa2ab2-5ad5-4bca-b9c2-ac1023d0d91f"
+            "is_verified": null,
+            "password": "$2b$12$ewvYVkwn/PqDu3ImS4GO1eFGfGt3c3yQm0f.Di8kjnLZoK.sv03Eq",
+            "id": "edcaa086-e176-4416-afc6-b9659f33e42b"
         }
     ]
 }

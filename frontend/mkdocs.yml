@@ -9,24 +9,24 @@ extra_javascript:
 - https://d3js.org/d3.v7.min.js
 - js/init-superuser.js
 - js/auth.js
-- js/nav.js
 - js/graph.js
 - js/contributors.js
 - js/admin.js
+- js/nav.js
 markdown_extensions:
 - pymdownx.arithmatex:
     generic: true
 nav:
 - 🏠 Home: index.md
 - 👤 Account:
-    - 🔐 Login: auth/login.html
-    - 👋 Profile: auth/profile.html
+    👋 Profile: auth/profile.html
+    🔐 Login: auth/login.html
 - 🎖️ Contributors: contributors.md
 - ⚙️ Admin:
-    - 🏠 Overview: admin/index.md
-    - 👥 User Management: admin/users.md
-    - 📄 Document Management: admin/documents.md
-    - 🥇 Contributor Management: admin/contributors.md
+    🏠 Overview: admin/index.md
+    👥 User Management: admin/users.md
+    📄 Document Management: admin/documents.md
+    🥇 Contributor Management: admin/contributors.md
 - 📁 Causal Inference:
   - 📄 AB Testing Framework With Regression: markdowns/AB Testing Framework With Regression.md
   - 📄 Difference in Difference: markdowns/Difference in Difference.md
