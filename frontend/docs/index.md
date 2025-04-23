@@ -106,119 +106,97 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const graphPanel = document.getElementById("graph-panel"); // ✅ Define graph panel
 
-        function openDocumentPanel(docId, addToHistory = true) {
-            console.log("Opening document panel for:", docId);
-
-            if (!docId) {
-                console.error("Invalid document ID");
+        async function openDocumentPanel(docId, pushState = true) {
+            // Check if user is authenticated
+            const token = localStorage.getItem('token');
+            if (!token) {
+                // Store the docId for after login
+                sessionStorage.setItem('redirectAfterLogin', `/index.html?doc=${encodeURIComponent(docId)}`);
+                // Redirect to login page
+                window.location.href = '/auth/login.html';
                 return;
             }
 
-            // Update history if needed
-            if (addToHistory) {
-                // Remove any forward history
-                documentHistory = documentHistory.slice(0, currentHistoryIndex + 1);
-                documentHistory.push(docId);
-                currentHistoryIndex = documentHistory.length - 1;
-                
-                // Update URL without triggering navigation
-                const url = new URL(window.location);
-                url.searchParams.set('doc', docId);
-                window.history.pushState({ docId }, '', url);
-            }
+            // If authenticated, proceed with loading the document
+            const docUrl = `/markdowns/${encodeURIComponent(docId)}/`;
+            
+            try {
+                const response = await fetch(docUrl);
+                const html = await response.text();
 
-            const encodedDocId = encodeURIComponent(docId.trim());
-            const docUrl = `/markdowns/${encodedDocId}/`;
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const mainContent = doc.querySelector('article');
 
-            console.log("Fetching document from:", docUrl);
+                if (mainContent) {
+                    mainContent.querySelectorAll("nav, aside, .toc, .md-nav, .md-sidebar").forEach(el => el.remove());
+                    mainContent.style.width = "100%";
+                    mainContent.style.maxWidth = "none";
 
-            fetch(docUrl)
-                .then(response => {
-                    if (!response.ok) throw new Error("Failed to fetch document");
-                    return response.text();
-                })
-                .then(htmlText => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(htmlText, "text/html");
-
-                    // 🎯 Extract ONLY the document content, REMOVE Table of Contents & Sidebar
-                    const mainContent = doc.querySelector("main");
-                    if (mainContent) {
-                        mainContent.querySelectorAll("nav, aside, .toc, .md-nav, .md-sidebar").forEach(el => el.remove());
-                        mainContent.style.width = "100%";
-                        mainContent.style.maxWidth = "none";
-
-                        contentContainer.innerHTML = mainContent.innerHTML;
+                    contentContainer.innerHTML = mainContent.innerHTML;
+                    
+                    // Handle internal links
+                    contentContainer.querySelectorAll("a").forEach(link => {
+                        let originalHref = link.getAttribute("href");
+                        if (!originalHref || originalHref.startsWith("http") || originalHref.startsWith("#")) {
+                            return;
+                        }
                         
-                        // ✅ Adjust only internal links to match MkDocs structure
-                        contentContainer.querySelectorAll("a").forEach(link => {
-                            let originalHref = link.getAttribute("href");
-
-                            // ✅ Skip external links and anchor links
-                            if (!originalHref || originalHref.startsWith("http") || originalHref.startsWith("#")) {
-                                return;
-                            }
-
-                            console.log("Fixing internal link:", originalHref);
-
-                            // ✅ Decode to prevent double encoding
-                            originalHref = decodeURIComponent(originalHref.trim());
-
-                            // ✅ Remove leading "../" or "./" to prevent incorrect paths
-                            originalHref = originalHref.replace(/^(\.\.\/|\.\/)+/, "");
-
-                            // ✅ Ensure correct MkDocs URL format
-                            const correctedHref = `/markdowns/${encodeURIComponent(originalHref)}/`;
-
-                            link.setAttribute("href", correctedHref);
-
-                            // ✅ Ensure clicking opens inside the document panel instead of navigating
-                            link.addEventListener("click", (event) => {
-                                event.preventDefault(); // Stop full-page navigation
-                                openDocumentPanel(originalHref, true);  // ✅ Open inside panel
-                            });
+                        originalHref = decodeURIComponent(originalHref.trim());
+                        originalHref = originalHref.replace(/^(\.\.\/|\.\/)+/, "");
+                        const correctedHref = `/markdowns/${encodeURIComponent(originalHref)}/`;
+                        
+                        link.setAttribute("href", correctedHref);
+                        link.addEventListener("click", (event) => {
+                            event.preventDefault();
+                            openDocumentPanel(originalHref, true);
                         });
+                    });
 
-
-
-                    } else {
-                        contentContainer.innerHTML = "<p>Failed to load document content.</p>";
+                    if (pushState) {
+                        const url = new URL(window.location);
+                        url.searchParams.set('doc', docId);
+                        window.history.pushState({ docId }, '', url);
                     }
 
-                    // ✅ Apply visibility and initial transform
-                    panel.style.display = "flex";
-                    panel.style.visibility = "visible";
-                    panel.style.transform = "translateX(100%)";  // Off-screen state
+                    showPanelsWithAnimation();
 
-                    if (graphPanel) {
-                        graphPanel.style.display = "flex"; // ✅ Show graph panel
-                        graphPanel.style.visibility = "visible";
-                        graphPanel.style.transform = "translateX(-100%)"; // ✅ Move off-screen first
-
-                        setTimeout(() => {
-                            graphPanel.style.transition = "transform 0.15s ease-in-out";
-                            graphPanel.style.transform = "translateX(0)"; // ✅ Slide into view
-                        }, 50);
-                    }
-
-        
-                    // ✅ Trigger transition after a slight delay to allow the browser to "see" the change
-                    setTimeout(() => {
-                        panel.style.transition = "transform 0.15s ease-in-out";  // Ensure the transition is applied
-                        panel.style.transform = "translateX(0)";  // Move panel into view
-                    }, 50);  // A small delay (milliseconds)
-
-                    document.body.classList.add("panel-open");
-
-                    // ✅ Re-render Math expressions if MathJax exists
+                    // Re-render Math expressions if MathJax exists
                     if (window.MathJax) {
                         MathJax.typesetPromise().catch(err => console.error("MathJax rendering error:", err));
                     }
-                })
-                .catch(error => {
-                    console.error("Error loading document:", error);
-                    contentContainer.innerHTML = "<p>Failed to load document.</p>";
-                });
+                } else {
+                    contentContainer.innerHTML = "<p>Failed to load document content.</p>";
+                }
+            } catch (error) {
+                console.error("Error loading document:", error);
+                contentContainer.innerHTML = "<p>Failed to load document.</p>";
+            }
+        }
+
+        function showPanelsWithAnimation() {
+            // Show panels with animation
+            panel.style.display = "flex";
+            panel.style.visibility = "visible";
+            panel.style.transform = "translateX(100%)";
+
+            if (graphPanel) {
+                graphPanel.style.display = "flex";
+                graphPanel.style.visibility = "visible";
+                graphPanel.style.transform = "translateX(-100%)";
+
+                setTimeout(() => {
+                    graphPanel.style.transition = "transform 0.15s ease-in-out";
+                    graphPanel.style.transform = "translateX(0)";
+                }, 50);
+            }
+
+            setTimeout(() => {
+                panel.style.transition = "transform 0.15s ease-in-out";
+                panel.style.transform = "translateX(0)";
+            }, 50);
+
+            document.body.classList.add("panel-open");
         }
 
         function closeDocumentPanel() {
@@ -227,11 +205,11 @@ document.addEventListener("DOMContentLoaded", () => {
             // Start sliding animation
             panel.style.transform = "translateX(100%)";
             if (graphPanel) {
-                graphPanel.style.transform = "translateX(-100%)"; // ✅ Slide graph panel out
+                graphPanel.style.transform = "translateX(-100%)";
                 setTimeout(() => {
                     graphPanel.style.visibility = "hidden";
                     graphPanel.style.display = "none";
-                }, 300); // ✅ Hide after transition
+                }, 300);
             }
 
             // Wait for transition to complete, then hide panel
@@ -244,15 +222,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 const url = new URL(window.location);
                 url.searchParams.delete('doc');
                 window.history.replaceState(null, '', url);
-            }, 300); // Match the transition duration
+            }, 300);
         }
 
-        // 🔹 Handle closing the panel with sliding effect
+        // Handle closing the panel with sliding effect
         closeButton.addEventListener("click", () => {
             closeDocumentPanel();
         });
 
-        // ✅ Hover Effect for Close Button
+        // Hover Effect for Close Button
         closeButton.addEventListener("mouseover", () => {
             closeButton.style.transform = "scale(1.2)";
             closeButton.style.background = "rgba(0, 0, 0, 0.9)";
@@ -268,7 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (initialDoc) {
             openDocumentPanel(initialDoc, false);
         }
-    }, 100); // ✅ Delay execution slightly
+    }, 100);
 });
 </script>
 

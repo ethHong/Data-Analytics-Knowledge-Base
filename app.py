@@ -35,10 +35,9 @@ NEO4J_PASSWORD = "sh96699669"
 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
 
 
-# Define API andpoint - document list
-# # Call function when requests GET / documents/
+# Define API endpoint - document list
 @app.get("/documents/")
-def get_all_documents():
+async def get_all_documents(current_user: User = Depends(get_current_user)):
     with driver.session() as session:
         result = session.run("MATCH (d: Document) RETURN d.title AS title")
         return {"documents": [record["title"] for record in result]}
@@ -46,7 +45,7 @@ def get_all_documents():
 
 # Define API endpoint for document management
 @app.get("/api/documents")
-def get_documents_for_management():
+async def get_documents_for_management(current_user: User = Depends(get_current_user)):
     with driver.session() as session:
         result = session.run(
             """
@@ -69,7 +68,7 @@ def get_documents_for_management():
 
 # Define API endpoint - document content
 @app.get("/documents/{title}")
-def get_content(title: str):
+async def get_content(title: str, current_user: User = Depends(get_current_user)):
     with driver.session() as session:
         result = session.run(
             "MATCH (d: Document {title: $title}) RETURN d.content AS content",
@@ -85,9 +84,10 @@ def get_content(title: str):
 
 # Define API endpoint - get related documents
 @app.get("/documents/{title}/related")
-def get_related_documents(title: str):
+async def get_related_documents(
+    title: str, current_user: User = Depends(get_current_user)
+):
     with driver.session() as session:
-
         result = session.run(
             "MATCH (d: Document {title: $title}) -[:RELATED_TO] -> (related: Document) RETURN related.title as related_titles",
             title=title,
@@ -125,7 +125,7 @@ async def upload_markdown(file: UploadFile = File(...)):
 
 # API Endpoint for graph
 @app.get("/graph/")
-def get_graph_data():
+async def get_graph_data(current_user: User = Depends(get_current_user)):
     with driver.session() as session:
         # First get all nodes
         nodes_result = session.run(
