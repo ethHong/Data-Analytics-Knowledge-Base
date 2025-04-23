@@ -1,6 +1,7 @@
 // Authentication and access control
 // Remove hardcoded base URL and use relative paths
 
+// TEMPORARILY DISABLED FOR DEBUGGING
 // Public paths that don't require authentication
 const publicPaths = [
     '/auth/login.html',
@@ -14,12 +15,11 @@ const publicPaths = [
 const userPaths = [
     '/auth/profile.html',
     '/markdowns/'
-
 ];
 
 // Paths that require admin authentication
 const adminPaths = [
-    '/admin/',  // All paths under /admin/ require admin access // All markdown documents require admin access
+    '/admin/',  // All paths under /admin/ require admin access
     '/documents.html'  // Document management requires admin access
 ];
 
@@ -266,39 +266,15 @@ window.auth = {
 function secureAdminPages() {
     const currentPath = window.location.pathname;
     
-    // Check if this is an admin page
-    if (isAdminPath(currentPath)) {
-        // Hide content immediately
-        document.write('<style>body { visibility: hidden; }</style>');
-        
-        const token = localStorage.getItem('token');
-        if (!token) {
-            window.location.replace('/auth/login.html');
-            return;
-        }
-        
-        // Check admin role immediately
-        try {
-            // Parse JWT payload
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const payload = JSON.parse(window.atob(base64));
-            
-            // Check if admin role exists in the token
-            if (!payload.role || payload.role !== 'admin') {
-                window.location.replace('/index.html');
-                return;
-            }
-            
-            // If we get here, user is admin, show content when DOM loaded
-            window.addEventListener('DOMContentLoaded', function() {
-                document.body.style.visibility = 'visible';
-            });
-        } catch (e) {
-            // Invalid token
-            window.location.replace('/auth/login.html');
-        }
+    // Skip for non-admin pages and login page
+    if (!isAdminPath(currentPath) || currentPath.includes('/auth/login.html')) {
+        return;
     }
+    
+    console.log("Checking admin access for:", currentPath);
+    
+    // We'll let the main requireAuth function handle the checks
+    // This avoids duplicate checks and potential conflicts
 }
 
 // Call secure admin check immediately

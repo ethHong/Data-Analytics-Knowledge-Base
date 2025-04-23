@@ -14,10 +14,18 @@ const API_BASE_URL = 'http://34.82.192.6:8000';
 // Helper function to get auth headers
 function getAuthHeaders() {
     const token = localStorage.getItem('token');
-    return {
+    return token ? {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
+    } : {
+        'Content-Type': 'application/json'
     };
+}
+
+// Helper function to handle unauthorized responses
+function handleUnauthorizedResponse() {
+    localStorage.removeItem('token');
+    window.location.replace('/auth/login.html');
 }
 
 // Document Management Functions
@@ -27,9 +35,16 @@ async function fetchDocuments() {
         const response = await fetch(`${API_BASE_URL}/api/documents`, {
             headers: getAuthHeaders()
         });
+        
+        if (response.status === 401 || response.status === 403) {
+            handleUnauthorizedResponse();
+            return null;
+        }
+        
         if (!response.ok) {
             throw new Error('Failed to fetch documents');
         }
+        
         const data = await response.json();
         console.log('Fetched documents:', data);
         return data.documents;

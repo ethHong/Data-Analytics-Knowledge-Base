@@ -1,39 +1,61 @@
 // Authentication and access control
 // Remove hardcoded base URL and use relative paths
 
+// TEMPORARILY DISABLED FOR DEBUGGING
+// Public paths that don't require authentication
 const publicPaths = [
-    '/contributors.html',
     '/auth/login.html',
     '/index.html',
-    '/'
+    '/',
+    '/contributors.html',  // Keep contributors page public
+    '/graph.html'
 ];
 
-// Pages that require authentication but not admin role
+// Paths that require user authentication
 const userPaths = [
     '/auth/profile.html',
-    '/markdowns/',  // All document pages
-    '/documents/',  // Document API endpoints
-    '/graph/'      // Graph visualization
+    '/markdowns/'
 ];
 
-// Pages that require admin role
+// Paths that require admin authentication
 const adminPaths = [
-    '/admin/index.md',
-    '/admin/users.md',
-    '/admin/documents.md',
-    '/admin/contributors.md'
+    '/admin/',  // All paths under /admin/ require admin access
+    '/documents.html'  // Document management requires admin access
 ];
 
 function isPublicPath(path) {
-    return publicPaths.some(publicPath => path.includes(publicPath));
+    return publicPaths.some(publicPath => {
+        if (publicPath.endsWith('/')) {
+            return path.startsWith(publicPath);
+        }
+        return path === publicPath;
+    });
 }
 
 function isUserPath(path) {
-    return userPaths.some(userPath => path.includes(userPath));
+    return userPaths.some(userPath => {
+        if (userPath.endsWith('/')) {
+            return path.startsWith(userPath);
+        }
+        return path === userPath;
+    });
 }
 
 function isAdminPath(path) {
-    return adminPaths.some(adminPath => path.includes(adminPath));
+    // First normalize the path
+    const normalizedPath = path.replace('/admin/auth/login.html', '/auth/login.html');
+    if (normalizedPath !== path) {
+        window.location.replace('/auth/login.html');
+        return true;
+    }
+
+    // Check if path starts with any admin paths
+    return adminPaths.some(adminPath => {
+        if (adminPath.endsWith('/')) {
+            return path.startsWith(adminPath);
+        }
+        return path === adminPath;
+    });
 }
 
 // Get auth headers for API requests
@@ -69,19 +91,16 @@ async function checkAuth() {
                 isAdmin: userData.role === 'admin',
                 user: userData
             };
-        } else if (response.status === 401) {
-            // Only remove token if it's actually invalid
+        } else {
+            // For any error response, remove token and consider not authenticated
             localStorage.removeItem('token');
             return { authenticated: false, isAdmin: false };
-        } else {
-            // For other errors, keep the token and stay logged in
-            console.error('Non-401 error from auth check:', response.status);
-            return { authenticated: true, isAdmin: false };
         }
     } catch (error) {
         console.error('Network error checking authentication:', error);
-        // On network error, assume user is still authenticated
-        return { authenticated: true, isAdmin: false };
+        // On network error, consider not authenticated
+        localStorage.removeItem('token');
+        return { authenticated: false, isAdmin: false };
     }
 }
 
@@ -101,45 +120,46 @@ function getLoginPath() {
 
 // Redirect to login page if not authenticated or not admin for admin pages
 async function requireAuth() {
-    hideContent();  // Hide content while checking auth
-    
-    const { authenticated, isAdmin } = await checkAuth();
+    hideContent();
     const currentPath = window.location.pathname;
-    console.log('Current path:', currentPath);
-    console.log('Auth status:', { authenticated, isAdmin });
-
-    // Check admin access first
-    if (isAdminPath(currentPath)) {
-        console.log('Admin path detected');
-        if (!authenticated || !isAdmin) {
-            console.log('User not authenticated or not admin, redirecting to login');
-            sessionStorage.setItem('redirectAfterLogin', currentPath);
-            window.location.href = getLoginPath();
-            return;
-        }
-        showContent();
-        return;
-    }
-
-    // Check user access for protected paths
-    if (isUserPath(currentPath)) {
-        console.log('User path detected');
-        if (!authenticated) {
-            console.log('User not authenticated, redirecting to login');
-            sessionStorage.setItem('redirectAfterLogin', currentPath);
-            window.location.href = getLoginPath();
-            return;
-        }
-    }
-
-    // Handle public paths
+    
+    // Always allow public paths
     if (isPublicPath(currentPath)) {
         showContent();
-        return;
+        return true;
     }
 
-    // Show content for authenticated users
+    const authCheck = await checkAuth();
+    
+    // If not authenticated, redirect to login
+    if (!authCheck.authenticated) {
+        sessionStorage.setItem('redirectAfterLogin', currentPath);
+        window.location.replace(getLoginPath());
+        return false;
+    }
+
+    // For admin paths, check admin status
+    if (isAdminPath(currentPath)) {
+        if (!authCheck.isAdmin) {
+            window.location.replace('/index.html');
+            return false;
+        }
+    }
+
+    // For user paths, being authenticated is enough
+    if (isUserPath(currentPath)) {
+        showContent();
+        return true;
+    }
+
+    // If path is not in any list, treat as requiring admin authentication
+    if (!authCheck.isAdmin) {
+        window.location.replace('/index.html');
+        return false;
+    }
+
     showContent();
+    return true;
 }
 
 // Handle login form submission
@@ -150,7 +170,7 @@ async function handleLogin(event) {
     const password = document.getElementById('login-password').value;
     
     try {
-        const response = await fetch('http://34.82.192.6:8000/api/auth/token', {
+        const response = await fetch('/api/auth/token', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -165,30 +185,25 @@ async function handleLogin(event) {
             // Check if user is admin and handle redirect
             const authCheck = await checkAuth();
             
-            // Notify parent window of successful login
-            window.parent.postMessage({ type: 'loginSuccess', token: data.access_token }, '*');
+            // Get redirect path from session storage or default to index
+            const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/index.html';
+            sessionStorage.removeItem('redirectAfterLogin');
             
-            // Check if we're in an iframe
-            if (window.self === window.top) {
-                // Only redirect if we're not in an iframe
-                const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/index.html';
-                sessionStorage.removeItem('redirectAfterLogin');
-
-                if (redirectPath.includes('/admin') && !authCheck.isAdmin) {
-                    window.location.href = '/index.html';
-                } else {
-                    window.location.href = redirectPath;
-                }
+            // Only redirect to admin paths if user is admin
+            if (redirectPath.startsWith('/admin/') && !authCheck.isAdmin) {
+                window.location.replace('/index.html');
+            } else {
+                window.location.replace(redirectPath);
             }
-            // If in iframe, do nothing - let the parent handle it
         } else {
-            const error = await response.text();
             const errorDiv = document.querySelector('.error-message') || document.createElement('div');
             errorDiv.className = 'error-message';
-            errorDiv.style.display = 'block';
+            errorDiv.style.color = 'red';
+            errorDiv.style.marginTop = '10px';
             errorDiv.textContent = 'Invalid email or password';
+            
             const loginForm = document.getElementById('login-form');
-            if (loginForm) {
+            if (loginForm && !loginForm.querySelector('.error-message')) {
                 loginForm.appendChild(errorDiv);
             }
         }
@@ -196,10 +211,12 @@ async function handleLogin(event) {
         console.error('Error during login:', error);
         const errorDiv = document.querySelector('.error-message') || document.createElement('div');
         errorDiv.className = 'error-message';
-        errorDiv.style.display = 'block';
+        errorDiv.style.color = 'red';
+        errorDiv.style.marginTop = '10px';
         errorDiv.textContent = 'Network error occurred';
+        
         const loginForm = document.getElementById('login-form');
-        if (loginForm) {
+        if (loginForm && !loginForm.querySelector('.error-message')) {
             loginForm.appendChild(errorDiv);
         }
     }
@@ -209,7 +226,7 @@ async function handleLogin(event) {
 async function handleLogout() {
     localStorage.removeItem('token');
     sessionStorage.removeItem('redirectAfterLogin');
-    window.location.href = '/index.html';
+    window.location.replace('/index.html');
 }
 
 // Add event listeners when the document is loaded
@@ -227,7 +244,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Check auth for current page
-    requireAuth();
+    requireAuth().then(isAuthorized => {
+        if (!isAuthorized) {
+            return;
+        }
+        showContent();
+    });
 });
 
 // Export for use in other files
@@ -238,4 +260,22 @@ window.auth = {
     isUserPath,
     requireAuth,
     getAuthHeaders
-}; 
+};
+
+// Create a new secure admin check function
+function secureAdminPages() {
+    const currentPath = window.location.pathname;
+    
+    // Skip for non-admin pages and login page
+    if (!isAdminPath(currentPath) || currentPath.includes('/auth/login.html')) {
+        return;
+    }
+    
+    console.log("Checking admin access for:", currentPath);
+    
+    // We'll let the main requireAuth function handle the checks
+    // This avoids duplicate checks and potential conflicts
+}
+
+// Call secure admin check immediately
+secureAdminPages(); 

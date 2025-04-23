@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     .on("click touchend", async (event, d) => {
       event.preventDefault();
       console.log("Clicked node:", d.id);
-      window.parent.postMessage({ type: "openPanel", docId: d.id }, "*");
+      handleNodeClick(event, d);
     });
 
   const label = svgGroup.append("g")
@@ -233,3 +233,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     fitGraphToView();
   }, 300);
 });
+
+// Function to handle node click
+function handleNodeClick(event, d) {
+    // Prevent default behavior
+    event.preventDefault();
+    console.log("Clicked node:", d.id);
+    
+    // Check if user is authenticated
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.top.location.href = '/auth/login.html';
+        return;
+    }
+    
+    // Post message to parent window to open panel
+    window.parent.postMessage({ type: "openPanel", docId: d.id }, "*");
+}
+
+
+
