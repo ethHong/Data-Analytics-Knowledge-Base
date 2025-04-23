@@ -247,5 +247,6 @@ function handleNodeClick(event, d) {
         return;
     }
     
+    // Post message to parent window to open panel
     window.parent.postMessage({ type: "openPanel", docId: d.id }, "*");
 }

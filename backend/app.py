@@ -1,7 +1,8 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.security import OAuth2PasswordBearer
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import json
@@ -9,12 +10,22 @@ import os
 
 app = FastAPI()
 
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Mount static files EXCEPT markdowns
 app.mount("/js", StaticFiles(directory="frontend/docs/js"), name="js")
 app.mount("/css", StaticFiles(directory="frontend/docs/css"), name="css")
 app.mount("/images", StaticFiles(directory="frontend/docs/images"), name="images")
 app.mount("/auth", StaticFiles(directory="frontend/docs/auth"), name="auth")
 app.mount("/admin", StaticFiles(directory="frontend/docs/admin"), name="admin")
+app.mount("/data", StaticFiles(directory="frontend/docs/data"), name="data")
 
 # Constants
 CONTRIBUTORS_FILE = "frontend/docs/data/contributors.json"
@@ -24,6 +35,13 @@ TEMPLATE_FILE = "frontend/docs/markdowns/template.html"
 # Read template file
 with open(TEMPLATE_FILE, "r") as f:
     TEMPLATE_HTML = f.read()
+
+
+# Catch unauthorized markdown access
+@app.get("/markdowns/{path:path}")
+async def catch_markdown_access(request: Request, path: str):
+    """Redirect unauthorized markdown access to login"""
+    return RedirectResponse(url="/auth/login.html")
 
 
 # Models
@@ -302,7 +320,7 @@ async def get_document(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/markdowns/{path:path}", response_class=HTMLResponse)
+@app.get("/api/markdown/{path:path}", response_class=HTMLResponse)
 async def serve_markdown(path: str, current_user: User = Depends(get_current_user)):
     """Serve markdown files with authentication"""
     try:
