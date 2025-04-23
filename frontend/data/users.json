@@ -27,6 +27,13 @@
             "id": "3c00f0a2-c893-4ef3-99de-7152000f3e42",
             "role": "user",
             "is_verified": true
+        },
+        {
+            "email": "admin@test.com",
+            "role": "admin",
+            "is_verified": true,
+            "password": "$2b$12$MF7CCTEq2ZjGeWQWdJLp2u7gHjISVx2Me8ZhoDUiIj.Mqk5EJw5qa",
+            "id": "e8aa2ab2-5ad5-4bca-b9c2-ac1023d0d91f"
         }
     ]
 }
