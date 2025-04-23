@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, Request
+from fastapi import FastAPI, HTTPException, Depends, Request, Response
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -347,6 +347,31 @@ async def serve_markdown(path: str, current_user: User = Depends(get_current_use
             "{{{content}}}", content
         )
         return HTMLResponse(content=html)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/markdown/{path:path}")
+async def get_markdown(path: str, current_user: User = Depends(get_current_user)):
+    """
+    Serve markdown content for authenticated users
+    """
+    try:
+        # Normalize the path and ensure it's within the markdowns directory
+        safe_path = os.path.normpath(path)
+        if safe_path.startswith("..") or safe_path.startswith("/"):
+            raise HTTPException(status_code=403, detail="Invalid path")
+
+        markdown_path = os.path.join("markdowns", safe_path)
+
+        if not os.path.exists(markdown_path):
+            raise HTTPException(status_code=404, detail="Markdown not found")
+
+        with open(markdown_path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        return Response(content=content, media_type="text/markdown")
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
