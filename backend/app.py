@@ -1,5 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Optional
 import json
@@ -7,8 +9,21 @@ import os
 
 app = FastAPI()
 
+# Mount static files EXCEPT markdowns
+app.mount("/js", StaticFiles(directory="frontend/docs/js"), name="js")
+app.mount("/css", StaticFiles(directory="frontend/docs/css"), name="css")
+app.mount("/images", StaticFiles(directory="frontend/docs/images"), name="images")
+app.mount("/auth", StaticFiles(directory="frontend/docs/auth"), name="auth")
+app.mount("/admin", StaticFiles(directory="frontend/docs/admin"), name="admin")
+
 # Constants
 CONTRIBUTORS_FILE = "frontend/docs/data/contributors.json"
+MARKDOWN_DIR = "frontend/docs/markdowns"
+TEMPLATE_FILE = "frontend/docs/markdowns/template.html"
+
+# Read template file
+with open(TEMPLATE_FILE, "r") as f:
+    TEMPLATE_HTML = f.read()
 
 
 # Models
@@ -283,5 +298,37 @@ async def get_document(
                 else os.path.basename(document_path).replace(".md", "")
             )
             return {"title": title, "path": document_path, "content": content}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/markdowns/{path:path}", response_class=HTMLResponse)
+async def serve_markdown(path: str, current_user: User = Depends(get_current_user)):
+    """Serve markdown files with authentication"""
+    try:
+        # Clean the path to prevent directory traversal
+        clean_path = path.replace("..", "").strip("/")
+        file_path = os.path.join(MARKDOWN_DIR, clean_path, "index.md")
+
+        if not os.path.exists(file_path):
+            raise HTTPException(status_code=404, detail="Document not found")
+
+        # Read the markdown file
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Get the title from the first line if it starts with #
+        title = (
+            content.split("\n")[0].replace("#", "").strip()
+            if content.split("\n")[0].startswith("#")
+            else path
+        )
+
+        # Render the template with the content
+        html = TEMPLATE_HTML.replace("{{title}}", title).replace(
+            "{{{content}}}", content
+        )
+        return HTMLResponse(content=html)
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
