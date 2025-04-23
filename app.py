@@ -669,15 +669,8 @@ async def update_user_verification(
     )
 
 
-# Catch all markdown access attempts - place this before any static file mounts
-@app.get("/markdowns/{path:path}")
-@app.get("/docs/markdowns/{path:path}")
-async def catch_markdown_access(request: Request, path: str):
-    """Redirect all markdown access attempts to login"""
-    return RedirectResponse(url="/auth/login.html")
-
-
-# Mount specific directories only, avoiding markdowns directory
+# Remove the catch routes and update static file mounting
+# Mount specific directories only, excluding markdowns
 app.mount("/js", StaticFiles(directory="frontend/docs/js"), name="js")
 app.mount("/css", StaticFiles(directory="frontend/docs/css"), name="css")
 app.mount("/images", StaticFiles(directory="frontend/docs/images"), name="images")
@@ -685,8 +678,20 @@ app.mount("/auth", StaticFiles(directory="frontend/docs/auth"), name="auth")
 app.mount("/admin", StaticFiles(directory="frontend/docs/admin"), name="admin")
 app.mount("/data", StaticFiles(directory="frontend/docs/data"), name="data")
 
-# Mount HTML files from root directory, but not subdirectories
-app.mount("/", StaticFiles(directory="frontend/docs", html=True), name="root")
+# Create a StaticFiles instance for the root directory
+root_static = StaticFiles(directory="frontend/docs", html=True)
+
+
+# Mount root directory but serve only specific files
+@app.get("/{path:path}")
+async def serve_root(path: str):
+    # Block access to markdown files
+    if path.startswith("markdowns/") or "/markdowns/" in path:
+        return RedirectResponse(url="/auth/login.html")
+
+    # Serve other files
+    return await root_static.get_response(path, app.scope)
+
 
 # Start the FastAPI server
 if __name__ == "__main__":
