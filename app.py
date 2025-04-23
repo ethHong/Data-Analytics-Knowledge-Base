@@ -343,7 +343,7 @@ class ContributorCreate(ContributorBase):
 
 
 class ContributorUpdate(ContributorBase):
-    pass
+    contributions: Optional[List[Document]] = None
 
 
 class Contributor(ContributorBase):
@@ -353,6 +353,10 @@ class Contributor(ContributorBase):
 
 class ContributionUpdate(BaseModel):
     contributions: List[Document]
+
+
+# Initialize a global variable to track file modified time
+CONTRIBUTORS_LAST_MODIFIED = 0
 
 
 def write_contributors(data):
@@ -366,6 +370,10 @@ def write_contributors(data):
         with open(CONTRIBUTORS_FILE, "w") as f:
             json.dump(data, f, indent=4)
             print(f"Successfully wrote data to {CONTRIBUTORS_FILE}")
+
+        # Update the last modified time
+        global CONTRIBUTORS_LAST_MODIFIED
+        CONTRIBUTORS_LAST_MODIFIED = os.path.getmtime(CONTRIBUTORS_FILE)
         return True
     except Exception as e:
         print(f"Error writing contributors: {str(e)}")
@@ -374,12 +382,37 @@ def write_contributors(data):
 
 
 def read_contributors():
-    """Helper function to read contributors data"""
+    """Helper function to read contributors data with no caching"""
+    global CONTRIBUTORS_LAST_MODIFIED
+
     try:
         print(f"Attempting to read from: {CONTRIBUTORS_FILE}")
+
+        # Check if the file exists
+        if not os.path.exists(CONTRIBUTORS_FILE):
+            print(f"Contributors file does not exist at {CONTRIBUTORS_FILE}")
+            return {"contributors": []}
+
+        # Check if the file has been modified
+        current_mtime = os.path.getmtime(CONTRIBUTORS_FILE)
+        if current_mtime > CONTRIBUTORS_LAST_MODIFIED:
+            print(
+                f"File modified since last read. Last: {CONTRIBUTORS_LAST_MODIFIED}, Current: {current_mtime}"
+            )
+            CONTRIBUTORS_LAST_MODIFIED = current_mtime
+
+        # Always read directly from file
         with open(CONTRIBUTORS_FILE, "r") as f:
             data = json.load(f)
-            print(f"Successfully read data from {CONTRIBUTORS_FILE}")
+            print(
+                f"Successfully read data from {CONTRIBUTORS_FILE}, size: {len(json.dumps(data))} bytes"
+            )
+
+            # Double check data structure
+            if "contributors" not in data:
+                print("WARNING: 'contributors' key missing in data, adding empty list")
+                data["contributors"] = []
+
             return data
     except Exception as e:
         print(f"Error reading contributors: {str(e)}")
@@ -469,23 +502,35 @@ async def update_contributor_info(
         if contributor_index == -1:
             raise HTTPException(status_code=404, detail="Contributor not found")
 
-        # Preserve contributions when updating info
-        contributions = data["contributors"][contributor_index]["contributions"]
-        updated_contributor = {
-            **contributor.dict(),
-            "id": contributor_id,
-            "contributions": contributions,
-        }
+        # Check if contributions are being updated
+        contributor_dict = contributor.dict(exclude_unset=True)
+        if "contributions" not in contributor_dict:
+            # Preserve existing contributions when not updating them
+            print("Preserving existing contributions")
+            contributor_dict["contributions"] = data["contributors"][contributor_index][
+                "contributions"
+            ]
+        else:
+            print(f"Updating contributions to: {contributor_dict['contributions']}")
 
-        data["contributors"][contributor_index] = updated_contributor
+        # Add the ID to the updated contributor
+        contributor_dict["id"] = contributor_id
+
+        # Update the contributor in the data
+        data["contributors"][contributor_index] = contributor_dict
+
+        # Write the updated data
         if not write_contributors(data):
             raise HTTPException(status_code=500, detail="Failed to save contributor")
 
-        return updated_contributor
+        return contributor_dict
     except HTTPException as he:
         raise he
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Failed to update contributor")
+        print(f"Error updating contributor: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to update contributor: {str(e)}"
+        )
 
 
 # Delete contributor - admin only
@@ -915,4 +960,101 @@ async def update_contributor_contributions(
         print(f"Error updating contributions: {str(e)}")
         raise HTTPException(
             status_code=500, detail=f"Failed to update contributions: {str(e)}"
+        )
+
+
+# Add a direct debug endpoint to modify the file with forced reload
+@app.post("/api/debug/update_contributor")
+async def debug_update_contributor(
+    data: dict, current_user: User = Depends(get_current_user)
+):
+    """Debug endpoint to directly modify contributors file with detailed logging and force reload."""
+    if not current_user or current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized"
+        )
+
+    try:
+        # Require contributorId and contributions
+        if "contributorId" not in data or "contributions" not in data:
+            raise HTTPException(
+                status_code=400, detail="Missing contributorId or contributions"
+            )
+
+        contributor_id = data["contributorId"]
+        contributions = data["contributions"]
+
+        print(f"DEBUG: Starting direct update for contributor {contributor_id}")
+
+        # Force reload the contributors file
+        try:
+            with open(CONTRIBUTORS_FILE, "r") as f:
+                contributors_data = json.load(f)
+                print(
+                    f"DEBUG: Read contributors file directly, size: {len(json.dumps(contributors_data))} bytes"
+                )
+        except Exception as e:
+            print(f"DEBUG: Error reading contributors file: {str(e)}")
+            contributors_data = {"contributors": []}
+
+        # Find the contributor to update
+        contributor_index = -1
+        for i, contributor in enumerate(contributors_data.get("contributors", [])):
+            if contributor.get("id") == contributor_id:
+                contributor_index = i
+                break
+
+        if contributor_index == -1:
+            raise HTTPException(status_code=404, detail="Contributor not found")
+
+        # Update the contributions
+        print(
+            f"DEBUG: Before update: {contributors_data['contributors'][contributor_index].get('contributions', [])}"
+        )
+        contributors_data["contributors"][contributor_index][
+            "contributions"
+        ] = contributions
+        print(
+            f"DEBUG: After update: {contributors_data['contributors'][contributor_index]['contributions']}"
+        )
+
+        # Write to both possible locations with detailed logging
+        os.makedirs(os.path.dirname(CONTRIBUTORS_FILE), exist_ok=True)
+        try:
+            with open(CONTRIBUTORS_FILE, "w") as f:
+                json.dump(contributors_data, f, indent=4)
+                print(
+                    f"DEBUG: Successfully wrote {len(json.dumps(contributors_data))} bytes to {CONTRIBUTORS_FILE}"
+                )
+        except Exception as e:
+            print(f"DEBUG: Error writing to main file: {str(e)}")
+            raise HTTPException(
+                status_code=500, detail=f"Failed to write to main file: {str(e)}"
+            )
+
+        # Also try the alternate location
+        alternate_path = os.path.join(BASE_DIR, "frontend", "data", "contributors.json")
+        try:
+            os.makedirs(os.path.dirname(alternate_path), exist_ok=True)
+            with open(alternate_path, "w") as f:
+                json.dump(contributors_data, f, indent=4)
+                print(f"DEBUG: Successfully wrote to alternate path {alternate_path}")
+        except Exception as e:
+            print(f"DEBUG: Warning: Could not write to alternate path: {str(e)}")
+
+        # Clear any cached data
+        print("DEBUG: Trying to clear cached data")
+
+        # Return explicit success with the updated contributor data
+        return {
+            "status": "success",
+            "message": "Contributor file updated directly",
+            "updated_contributor": contributors_data["contributors"][contributor_index],
+        }
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        print(f"DEBUG: Error in direct update: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to update contributor: {str(e)}"
         )

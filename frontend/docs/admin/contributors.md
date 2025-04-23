@@ -816,35 +816,76 @@ async function saveContributions() {
     });
 
     try {
-        // Use the dedicated endpoint for contribution updates
-        console.log('Using dedicated contributions update endpoint');
+        // Use the new direct debug endpoint for updating contributions
+        console.log('Using debug direct update endpoint');
         
-        const updateResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}/contributions`, {
-            method: 'PUT',
+        const debugResponse = await fetch('http://34.82.192.6:8000/api/debug/update_contributor', {
+            method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ contributions: selectedDocs })
+            body: JSON.stringify({
+                contributorId: contributorId,
+                contributions: selectedDocs
+            })
         });
         
-        if (!updateResponse.ok) {
-            const errorText = await updateResponse.text();
-            throw new Error(`Failed to update contributions: ${updateResponse.status} - ${errorText}`);
+        if (!debugResponse.ok) {
+            const errorText = await debugResponse.text();
+            throw new Error(`Direct update failed: ${debugResponse.status} - ${errorText}`);
         }
         
-        const responseData = await updateResponse.json();
-        console.log('Update response:', responseData);
+        const responseData = await debugResponse.json();
+        console.log('Debug update response:', responseData);
         
-        // Update the UI to reflect the changes
+        // Make a standard update to also ensure consistency with the API
+        try {
+            // Get current contributor data
+            const contributorResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (contributorResponse.ok) {
+                const contributorData = await contributorResponse.json();
+                
+                // Standard update to maintain API consistency
+                const updateData = {
+                    name: contributorData.name,
+                    organization: contributorData.organization || '',
+                    linkedin: contributorData.linkedin || '',
+                    image: contributorData.image || '',
+                    // Do not include contributions here to avoid overwriting our direct update
+                };
+                
+                await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                });
+                
+                console.log('Standard update completed for API consistency');
+            }
+        } catch (standardError) {
+            console.warn('Standard update error (non-critical):', standardError);
+            // Continue even if standard update fails
+        }
+        
+        // Update the UI with the contributions we set
         updateContributorContributions(contributorId, selectedDocs);
         
-        // Close the modal
-        closeModal('contributionModal');
+        // Explicitly reload the data to ensure the UI is up to date
+        loadContributors();
         
-        // Show success message
-        alert('Contributions updated successfully!');
+        // Close the modal and show success
+        closeModal('contributionModal');
+        alert('Contributions updated successfully! The changes have been saved directly to the file system.');
     } catch (error) {
         console.error('Error saving contributions:', error);
         
