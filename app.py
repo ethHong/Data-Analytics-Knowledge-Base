@@ -670,14 +670,14 @@ async def update_user_verification(
     )
 
 
-# Keep only the essential parts:
+# Catch markdown access - add this BEFORE any static file mounts
 @app.get("/markdowns/{path:path}")
-async def catch_markdown_access(path: str):
-    """Redirect to login for any markdown access"""
+async def catch_markdown_access(request: Request, path: str):
+    """Redirect all markdown access attempts to login"""
     return RedirectResponse(url="/auth/login.html")
 
 
-# Mount specific directories (excluding markdowns)
+# Mount directories that should be publicly accessible
 app.mount("/js", StaticFiles(directory="frontend/docs/js"), name="js")
 app.mount("/css", StaticFiles(directory="frontend/docs/css"), name="css")
 app.mount("/images", StaticFiles(directory="frontend/docs/images"), name="images")
@@ -685,29 +685,45 @@ app.mount("/auth", StaticFiles(directory="frontend/docs/auth"), name="auth")
 app.mount("/admin", StaticFiles(directory="frontend/docs/admin"), name="admin")
 app.mount("/data", StaticFiles(directory="frontend/docs/data"), name="data")
 
-# Mount the root directory
-app.mount("/", StaticFiles(directory="frontend/docs", html=True), name="root")
 
-
-# Serve specific HTML files
+# Mount HTML files - DON'T mount the markdowns directory
+# Use a custom mount to avoid direct access to the markdowns directory
 @app.get("/")
-async def serve_index():
+async def get_root():
     return FileResponse("frontend/docs/index.html")
 
 
-@app.get("/contributors")
-async def serve_contributors():
+@app.get("/index.html")
+async def get_index():
+    return FileResponse("frontend/docs/index.html")
+
+
+@app.get("/contributors.html")
+async def get_contributors():
     return FileResponse("frontend/docs/contributors.html")
 
 
-@app.get("/graph")
-async def serve_graph():
+@app.get("/graph.html")
+async def get_graph():
     return FileResponse("frontend/docs/graph.html")
 
 
-@app.get("/document-viewer")
-async def serve_document_viewer():
+@app.get("/document-viewer.html")
+async def get_document_viewer():
     return FileResponse("frontend/docs/document-viewer.html")
+
+
+# Finally, add a catch-all route to serve static files but block markdowns
+@app.get("/{path:path}")
+async def catch_all(path: str):
+    if "markdowns" in path:
+        return RedirectResponse(url="/auth/login.html")
+
+    full_path = os.path.join("frontend/docs", path)
+    if os.path.exists(full_path) and os.path.isfile(full_path):
+        return FileResponse(full_path)
+
+    return RedirectResponse(url="/")
 
 
 # Start the FastAPI server
