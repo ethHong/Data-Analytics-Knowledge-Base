@@ -10,3 +10,4 @@ logs/
 # env
 .env
 key.txt
+users.json
