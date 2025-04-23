@@ -229,3 +229,59 @@ async def update_contributor_contributions(
         return {"message": "Contributions updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/documents")
+async def get_documents(current_user: User = Depends(get_current_user)):
+    """Get all documents (requires authentication)"""
+    try:
+        documents = []
+        markdown_dir = "frontend/docs/markdowns"
+        for filename in os.listdir(markdown_dir):
+            if filename.endswith(".md"):
+                doc_path = os.path.join(markdown_dir, filename)
+                with open(doc_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                    # Extract title from first line if it starts with #
+                    title = (
+                        content.split("\n")[0].replace("#", "").strip()
+                        if content.split("\n")[0].startswith("#")
+                        else filename.replace(".md", "")
+                    )
+                    documents.append(
+                        {
+                            "title": title,
+                            "path": f"markdowns/{filename}",
+                            "content": content,
+                        }
+                    )
+        return {"documents": documents}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/documents/{document_path:path}")
+async def get_document(
+    document_path: str, current_user: User = Depends(get_current_user)
+):
+    """Get a specific document by path (requires authentication)"""
+    try:
+        # Ensure the path is safe (no directory traversal)
+        if ".." in document_path or document_path.startswith("/"):
+            raise HTTPException(status_code=400, detail="Invalid document path")
+
+        doc_path = os.path.join("frontend/docs", document_path)
+        if not os.path.exists(doc_path):
+            raise HTTPException(status_code=404, detail="Document not found")
+
+        with open(doc_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            # Extract title from first line if it starts with #
+            title = (
+                content.split("\n")[0].replace("#", "").strip()
+                if content.split("\n")[0].startswith("#")
+                else os.path.basename(document_path).replace(".md", "")
+            )
+            return {"title": title, "path": document_path, "content": content}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

@@ -437,7 +437,7 @@ function updateContributorContributions(contributorId, contributions) {
     }
 
     const contributionsList = contributions.map(doc => {
-        return `<li><a href="../../markdowns/${encodeURIComponent(doc.title)}/">${doc.title}</a></li>`;
+        return `<li><a href="/document-viewer.html?path=${encodeURIComponent(doc.path)}">${doc.title}</a></li>`;
     }).join('');
     
     contributionsEl.innerHTML = contributionsList;
