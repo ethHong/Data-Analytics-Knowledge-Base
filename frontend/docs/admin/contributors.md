@@ -288,6 +288,42 @@
 </style>
 
 <script>
+// Authentication check - redirect non-admin users to login
+document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.replace('/auth/login.html');
+        return;
+    }
+    
+    // Check admin status
+    fetch('http://34.82.192.6:8000/api/auth/me', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => {
+        if (response.status === 401) {
+            window.location.replace('/auth/login.html');
+            return null;
+        }
+        if (!response.ok) {
+            throw new Error('Failed to verify user');
+        }
+        return response.json();
+    })
+    .then(userData => {
+        if (!userData) return;
+        if (userData.role !== 'admin') {
+            window.location.replace('/index.html');
+        }
+    })
+    .catch(error => {
+        console.error('Authentication error:', error);
+        window.location.replace('/auth/login.html');
+    });
+});
+
 // Add these variables at the top of the script section
 let allDocuments = [];
 let selectedContributions = new Set();
@@ -295,34 +331,21 @@ let selectedContributions = new Set();
 // Function to fetch and display contributors
 async function loadContributors() {
     try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            window.location.replace('/auth/login.html');
+        // Try to fetch from API first
+        const apiResponse = await fetch('http://34.82.192.6:8000/api/contributors');
+        if (apiResponse.ok) {
+            const data = await apiResponse.json();
+            displayContributors(data.contributors || []);
             return;
         }
-
-        const response = await fetch(`${API_BASE_URL}/api/contributors`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json'
-            }
-        });
-
-        if (response.status === 401) {
-            window.location.replace('/auth/login.html');
-            return;
+        
+        // If API fails, fall back to local JSON
+        console.log('API unavailable, falling back to local JSON');
+        const jsonResponse = await fetch('../../data/contributors.json');
+        if (!jsonResponse.ok) {
+            throw new Error('Failed to fetch contributors data from both API and local JSON');
         }
-
-        if (response.status === 403) {
-            window.location.replace('/index.html');
-            return;
-        }
-
-        if (!response.ok) {
-            throw new Error(`Server error: ${response.status}`);
-        }
-
-        const data = await response.json();
+        const data = await jsonResponse.json();
         displayContributors(data.contributors || []);
     } catch (error) {
         console.error('Error loading contributors:', error);
@@ -415,7 +438,7 @@ function displayContributors(contributors) {
 // Function to load contributor contributions
 async function loadContributorContributions(contributorId) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`);
+        const response = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`);
         if (!response.ok) {
             throw new Error('Failed to fetch contributor data');
         }
@@ -437,7 +460,7 @@ function updateContributorContributions(contributorId, contributions) {
     }
 
     const contributionsList = contributions.map(doc => {
-        return `<li><a href="/document-viewer.html?path=${encodeURIComponent(doc.path)}">${doc.title}</a></li>`;
+        return `<li><a href="../../markdowns/${encodeURIComponent(doc.title)}/">${doc.title}</a></li>`;
     }).join('');
     
     contributionsEl.innerHTML = contributionsList;
@@ -478,7 +501,7 @@ function openContributorModal(contributorId = null) {
     if (contributorId) {
         title.textContent = 'Edit Contributor';
         // Fetch current contributor data
-        fetch(`${API_BASE_URL}/api/contributors/${contributorId}`)
+        fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`)
             .then(response => response.json())
             .then(data => {
                 form.elements.name.value = data.name;
@@ -519,7 +542,7 @@ async function saveContributor(event) {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/contributors${isNewContributor ? '' : '/' + contributorId}`, {
+        const response = await fetch(`http://34.82.192.6:8000/api/contributors${isNewContributor ? '' : '/' + contributorId}`, {
             method: isNewContributor ? 'POST' : 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -550,7 +573,7 @@ async function deleteContributor(contributorId) {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`, {
+        const response = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
             method: 'DELETE'
         });
 
@@ -598,23 +621,17 @@ async function openContributionModal(contributorId) {
     
     try {
         // Fetch documents
-        const apiUrl = `${API_BASE_URL}/api/documents`;
+        const apiUrl = 'http://34.82.192.6:8000/api/documents';
         console.log('Fetching documents from:', apiUrl);
         
         const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
-                ...getAuthHeaders(),
                 'Accept': 'application/json'
             }
         });
         
         console.log('Documents response status:', response.status);
-        
-        if (response.status === 401 || response.status === 403) {
-            window.location.replace('/auth/login.html');
-            return;
-        }
         
         if (!response.ok) {
             throw new Error('Failed to fetch documents');
@@ -631,19 +648,10 @@ async function openContributionModal(contributorId) {
         allDocuments = data.documents;
         
         // Get current contributor data to know which documents are selected
-        const contributorResponse = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`, {
-            headers: getAuthHeaders()
-        });
-        
-        if (contributorResponse.status === 401 || contributorResponse.status === 403) {
-            window.location.replace('/auth/login.html');
-            return;
-        }
-        
+        const contributorResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`);
         if (!contributorResponse.ok) {
             throw new Error('Failed to fetch contributor data');
         }
-        
         const contributor = await contributorResponse.json();
         
         // Reset and set selected documents
@@ -696,6 +704,21 @@ function displayContributionDocuments(documents) {
     console.log('Documents displayed:', documents.length);
 }
 
+// Helper function to fetch documents
+async function fetchDocuments() {
+    try {
+        const response = await fetch('http://34.82.192.6:8000/api/documents');
+        if (!response.ok) {
+            throw new Error('Failed to fetch documents');
+        }
+        const data = await response.json();
+        return data.documents || [];
+    } catch (error) {
+        console.error('Error fetching documents:', error);
+        return [];
+    }
+}
+
 // Function to save contributions
 async function saveContributions() {
     const modal = document.getElementById('contributionModal');
@@ -721,7 +744,7 @@ async function saveContributions() {
 
     try {
         // First, save to API
-        const apiResponse = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}/contributions`, {
+        const apiResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}/contributions`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -781,60 +804,26 @@ async function saveContributions() {
 // Initialize document loading
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Contributor management page loaded');
+    // Initial contributors fetch
+    await loadContributors();
     
-    // Check authentication and admin role
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.location.replace('/auth/login.html');
-        return;
+    // Initial documents fetch
+    const documents = await fetchDocuments();
+    if (documents) {
+        allDocuments = documents;
     }
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (response.status === 401) {
-            window.location.replace('/auth/login.html');
-            return;
-        }
-
-        if (response.status === 403) {
-            window.location.replace('/index.html');
-            return;
-        }
-
-        if (!response.ok) {
-            throw new Error('Failed to get user info');
-        }
-
-        const user = await response.json();
-        if (user.role !== 'admin') {
-            window.location.replace('/index.html');
-            return;
-        }
-
-        // If we get here, user is authenticated and is an admin
-        await loadContributors();
-        
-        // Initial documents fetch
-        const documents = await fetchDocuments();
-        if (documents) {
-            allDocuments = documents;
-        }
-        
-        // Add event listener for the refresh button
-        const refreshButton = document.querySelector('.refresh-button');
-        if (refreshButton) {
-            refreshButton.addEventListener('click', handleRefresh);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        window.location.replace('/auth/login.html');
+    
+    // Add event listener for the refresh button
+    const refreshButton = document.querySelector('.refresh-button');
+    if (refreshButton) {
+        refreshButton.addEventListener('click', handleRefresh);
     }
 });
+
+// Simple refresh function
+function handleRefresh() {
+    loadContributors();
+}
 </script>
 
 <!-- Contribution Modal -->
