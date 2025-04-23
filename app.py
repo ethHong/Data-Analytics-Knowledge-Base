@@ -1058,3 +1058,119 @@ async def debug_update_contributor(
         raise HTTPException(
             status_code=500, detail=f"Failed to update contributor: {str(e)}"
         )
+
+
+# Create a new synchronized endpoint for contributors
+@app.post("/api/contributors/sync", response_model=dict)
+async def sync_contributors(data: dict, current_user: User = Depends(get_current_user)):
+    """
+    Completely synchronize the contributors data across all locations.
+    This is a complete rewrite that guarantees consistency.
+    """
+    if not current_user or current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized"
+        )
+
+    try:
+        # Validate the data structure
+        if "contributors" not in data:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid data format - missing 'contributors' key",
+            )
+
+        # Log the operation
+        print(f"Syncing contributors data: {len(data['contributors'])} contributors")
+
+        # Make a fresh copy to avoid reference issues
+        contributors_data = {"contributors": []}
+
+        # Copy each contributor with proper validation
+        for contributor in data["contributors"]:
+            # Ensure required fields
+            if (
+                "id" not in contributor
+                or "name" not in contributor
+                or "organization" not in contributor
+            ):
+                print(f"Warning: Skipping invalid contributor data: {contributor}")
+                continue
+
+            # Create a clean contributor record
+            clean_contributor = {
+                "id": contributor["id"],
+                "name": contributor["name"],
+                "organization": contributor["organization"],
+                "linkedin": contributor.get("linkedin", ""),
+                "image": contributor.get("image", ""),
+                "contributions": contributor.get("contributions", []),
+            }
+
+            # Validate contributions format if present
+            if clean_contributor["contributions"]:
+                valid_contributions = []
+                for contrib in clean_contributor["contributions"]:
+                    if (
+                        isinstance(contrib, dict)
+                        and "title" in contrib
+                        and "path" in contrib
+                    ):
+                        valid_contributions.append(
+                            {"title": contrib["title"], "path": contrib["path"]}
+                        )
+                clean_contributor["contributions"] = valid_contributions
+
+            # Add to our clean data
+            contributors_data["contributors"].append(clean_contributor)
+
+        # Write the data to all possible locations
+        success_locations = []
+
+        # 1. Primary location (frontend/docs/data)
+        try:
+            primary_path = CONTRIBUTORS_FILE
+            os.makedirs(os.path.dirname(primary_path), exist_ok=True)
+            with open(primary_path, "w") as f:
+                json.dump(contributors_data, f, indent=4)
+            print(f"Successfully wrote data to primary location: {primary_path}")
+            success_locations.append(primary_path)
+        except Exception as e:
+            print(f"Error writing to primary location: {str(e)}")
+
+        # 2. Secondary location (frontend/data)
+        try:
+            secondary_path = os.path.join(
+                BASE_DIR, "frontend", "data", "contributors.json"
+            )
+            os.makedirs(os.path.dirname(secondary_path), exist_ok=True)
+            with open(secondary_path, "w") as f:
+                json.dump(contributors_data, f, indent=4)
+            print(f"Successfully wrote data to secondary location: {secondary_path}")
+            success_locations.append(secondary_path)
+        except Exception as e:
+            print(f"Error writing to secondary location: {str(e)}")
+
+        # Reset the modified time tracker to force a fresh read
+        global CONTRIBUTORS_LAST_MODIFIED
+        CONTRIBUTORS_LAST_MODIFIED = 0
+
+        # Return success with information
+        if not success_locations:
+            raise HTTPException(
+                status_code=500, detail="Failed to write data to any location"
+            )
+
+        return {
+            "status": "success",
+            "message": f"Data synchronized to {len(success_locations)} locations",
+            "locations": success_locations,
+            "contributors_count": len(contributors_data["contributors"]),
+        }
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        print(f"Error in contributors sync: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to sync contributors: {str(e)}"
+        )

@@ -324,29 +324,24 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Add these variables at the top of the script section
+// Add these variables at the top of the script section for managing contributors
+let allContributors = [];
 let allDocuments = [];
 let selectedContributions = new Set();
+let isSyncing = false;
 
-// Function to fetch and display contributors
+// Function to fetch and display contributors with fresh data
 async function loadContributors() {
     try {
-        // Try to fetch from API first
         const apiResponse = await fetch('http://34.82.192.6:8000/api/contributors');
-        if (apiResponse.ok) {
-            const data = await apiResponse.json();
-            displayContributors(data.contributors || []);
-            return;
+        if (!apiResponse.ok) {
+            throw new Error(`Failed to fetch contributors: ${apiResponse.status}`);
         }
         
-        // If API fails, fall back to local JSON
-        console.log('API unavailable, falling back to local JSON');
-        const jsonResponse = await fetch('../../data/contributors.json');
-        if (!jsonResponse.ok) {
-            throw new Error('Failed to fetch contributors data from both API and local JSON');
-        }
-        const data = await jsonResponse.json();
-        displayContributors(data.contributors || []);
+        const data = await apiResponse.json();
+        // Store contributors globally for easier access
+        allContributors = data.contributors || [];
+        displayContributors(allContributors);
     } catch (error) {
         console.error('Error loading contributors:', error);
         const grid = document.querySelector('.contributors-grid');
@@ -358,6 +353,150 @@ async function loadContributors() {
                 </div>
             `;
         }
+    }
+}
+
+// Function to sync all contributors data to the server
+async function syncContributors() {
+    if (isSyncing) {
+        console.log('Already syncing, please wait...');
+        return;
+    }
+    
+    try {
+        isSyncing = true;
+        
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('Authentication token not found. Please log in again.');
+        }
+        
+        // Create a clean, properly formatted data object for sync
+        const syncData = {
+            contributors: allContributors
+        };
+        
+        const response = await fetch('http://34.82.192.6:8000/api/contributors/sync', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(syncData)
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Sync failed: ${response.status} - ${errorText}`);
+        }
+        
+        const result = await response.json();
+        console.log('Sync successful:', result);
+        
+        // Refresh contributors after successful sync
+        await loadContributors();
+        
+        return true;
+    } catch (error) {
+        console.error('Error syncing contributors:', error);
+        alert(`Failed to sync contributors: ${error.message}`);
+        return false;
+    } finally {
+        isSyncing = false;
+    }
+}
+
+// Function to save contributor - creates or updates
+async function saveContributor(event) {
+    event.preventDefault();
+    const form = event.target;
+    const contributorId = form.dataset.contributorId;
+    const isNewContributor = !contributorId;
+
+    const name = form.elements.name.value;
+    const organization = form.elements.organization.value;
+    
+    // Create a new/updated contributor object
+    const contributorData = {
+        name: name,
+        organization: organization,
+        linkedin: form.elements.linkedin.value || '',
+        image: form.elements.image.value || ''
+    };
+
+    // For new contributors, generate ID from name
+    const id = isNewContributor 
+        ? name.toLowerCase().replace(/\s+/g, '-') 
+        : contributorId;
+    
+    contributorData.id = id;
+    
+    // For existing contributors, preserve their contributions
+    if (!isNewContributor) {
+        const existingContributor = allContributors.find(c => c.id === id);
+        if (existingContributor && existingContributor.contributions) {
+            contributorData.contributions = existingContributor.contributions;
+        } else {
+            contributorData.contributions = [];
+        }
+    } else {
+        contributorData.contributions = [];
+    }
+    
+    try {
+        // Update local data
+        if (isNewContributor) {
+            // Add new contributor
+            allContributors.push(contributorData);
+        } else {
+            // Update existing contributor
+            const index = allContributors.findIndex(c => c.id === id);
+            if (index >= 0) {
+                allContributors[index] = contributorData;
+            } else {
+                throw new Error(`Contributor with ID ${id} not found`);
+            }
+        }
+        
+        // Sync changes to server
+        const syncSuccess = await syncContributors();
+        
+        if (syncSuccess) {
+            // Close modal after successful update
+            closeModal('contributorModal');
+            alert(isNewContributor ? 'Contributor added successfully!' : 'Contributor updated successfully!');
+        }
+    } catch (error) {
+        console.error('Error saving contributor:', error);
+        alert(`Failed to save contributor: ${error.message}`);
+    }
+}
+
+// Function to delete contributor
+async function deleteContributor(contributorId) {
+    if (!confirm('Are you sure you want to delete this contributor? This action cannot be undone.')) {
+        return;
+    }
+
+    try {
+        // Find and remove the contributor from our local data
+        const index = allContributors.findIndex(c => c.id === contributorId);
+        if (index === -1) {
+            throw new Error(`Contributor with ID ${contributorId} not found`);
+        }
+        
+        // Remove from local array
+        allContributors.splice(index, 1);
+        
+        // Sync to server
+        const syncSuccess = await syncContributors();
+        
+        if (syncSuccess) {
+            alert('Contributor deleted successfully!');
+        }
+    } catch (error) {
+        console.error('Error deleting contributor:', error);
+        alert(`Failed to delete contributor: ${error.message}`);
     }
 }
 
@@ -523,22 +662,24 @@ function openContributorModal(contributorId = null) {
     form.reset();
     
     if (contributorId) {
+        // Edit existing contributor
         title.textContent = 'Edit Contributor';
-        // Fetch current contributor data
-        fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`)
-            .then(response => response.json())
-            .then(data => {
-                form.elements.name.value = data.name;
-                form.elements.organization.value = data.organization;
-                form.elements.linkedin.value = data.linkedin || '';
-                form.elements.image.value = data.image || '';
-                form.dataset.contributorId = contributorId;
-            })
-            .catch(error => {
-                console.error('Error loading contributor:', error);
-                alert('Failed to load contributor data');
-            });
+        
+        // Find contributor in our local data
+        const contributor = allContributors.find(c => c.id === contributorId);
+        if (contributor) {
+            form.elements.name.value = contributor.name;
+            form.elements.organization.value = contributor.organization;
+            form.elements.linkedin.value = contributor.linkedin || '';
+            form.elements.image.value = contributor.image || '';
+            form.dataset.contributorId = contributorId;
+        } else {
+            console.error(`Contributor with ID ${contributorId} not found`);
+            alert('Failed to load contributor data');
+            return;
+        }
     } else {
+        // Add new contributor
         title.textContent = 'Add New Contributor';
         delete form.dataset.contributorId;
     }
@@ -546,99 +687,7 @@ function openContributorModal(contributorId = null) {
     modal.style.display = 'block';
 }
 
-// Function to save contributor
-async function saveContributor(event) {
-    event.preventDefault();
-    const form = event.target;
-    const contributorId = form.dataset.contributorId;
-    const isNewContributor = !contributorId;
-
-    const contributorData = {
-        name: form.elements.name.value,
-        organization: form.elements.organization.value,
-        linkedin: form.elements.linkedin.value,
-        image: form.elements.image.value
-    };
-
-    if (isNewContributor) {
-        // Generate ID from name (lowercase, replace spaces with hyphens)
-        contributorData.id = contributorData.name.toLowerCase().replace(/\s+/g, '-');
-    }
-
-    try {
-        const response = await fetch(`http://34.82.192.6:8000/api/contributors${isNewContributor ? '' : '/' + contributorId}`, {
-            method: isNewContributor ? 'POST' : 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(contributorData)
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to save contributor');
-        }
-
-        // Close modal and refresh list
-        closeModal('contributorModal');
-        loadContributors();
-        
-        // Show success message
-        alert(isNewContributor ? 'Contributor added successfully!' : 'Contributor updated successfully!');
-    } catch (error) {
-        console.error('Error saving contributor:', error);
-        alert('Failed to save contributor. Please try again.');
-    }
-}
-
-// Function to delete contributor
-async function deleteContributor(contributorId) {
-    if (!confirm('Are you sure you want to delete this contributor? This action cannot be undone.')) {
-        return;
-    }
-
-    try {
-        const response = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
-            method: 'DELETE'
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to delete contributor');
-        }
-
-        // Refresh list
-        loadContributors();
-        
-        // Show success message
-        alert('Contributor deleted successfully!');
-    } catch (error) {
-        console.error('Error deleting contributor:', error);
-        alert('Failed to delete contributor. Please try again.');
-    }
-}
-
-// Add these functions before the openContributionModal function
-function filterContributionDocuments() {
-    const searchInput = document.getElementById('contributionSearch');
-    if (!searchInput) return;
-    
-    const searchTerm = searchInput.value.toLowerCase();
-    const filteredDocs = allDocuments.filter(doc => 
-        doc.title.toLowerCase().includes(searchTerm)
-    );
-    
-    displayContributionDocuments(filteredDocs);
-}
-
-function handleContributionSelection(event) {
-    const title = event.target.value;
-    if (event.target.checked) {
-        selectedContributions.add(title);
-    } else {
-        selectedContributions.delete(title);
-    }
-}
-
-// Update the openContributionModal function
+// Function to open contribution modal
 async function openContributionModal(contributorId) {
     const modal = document.getElementById('contributionModal');
     modal.dataset.contributorId = contributorId;
@@ -650,55 +699,19 @@ async function openContributionModal(contributorId) {
             throw new Error('Authentication token not found. Please log in again.');
         }
         
-        // Fetch documents
-        const apiUrl = 'http://34.82.192.6:8000/api/documents';
-        console.log('Fetching documents from:', apiUrl);
-        
-        const response = await fetch(apiUrl, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json'
+        // Fetch documents if we don't have them yet
+        if (allDocuments.length === 0) {
+            const docs = await fetchDocuments();
+            if (docs) {
+                allDocuments = docs;
             }
-        });
-        
-        console.log('Documents response status:', response.status);
-        
-        if (response.status === 401) {
-            throw new Error('Authentication expired. Please log in again.');
         }
         
-        if (!response.ok) {
-            throw new Error('Failed to fetch documents');
+        // Find contributor in our local data
+        const contributor = allContributors.find(c => c.id === contributorId);
+        if (!contributor) {
+            throw new Error(`Contributor with ID ${contributorId} not found`);
         }
-        
-        const data = await response.json();
-        console.log('Documents data:', data);
-        
-        if (!data || !Array.isArray(data.documents)) {
-            throw new Error('Invalid data format received from API');
-        }
-        
-        // Store all documents globally
-        allDocuments = data.documents;
-        
-        // Get current contributor data to know which documents are selected
-        const contributorResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json'
-            }
-        });
-        
-        if (contributorResponse.status === 401) {
-            throw new Error('Authentication expired. Please log in again.');
-        }
-        
-        if (!contributorResponse.ok) {
-            throw new Error('Failed to fetch contributor data');
-        }
-        
-        const contributor = await contributorResponse.json();
         
         // Reset and set selected documents
         selectedContributions.clear();
@@ -717,7 +730,7 @@ async function openContributionModal(contributorId) {
     }
 }
 
-// Update the displayContributionDocuments function
+// Function to display contribution documents
 function displayContributionDocuments(documents) {
     const documentList = document.getElementById('contributionDocumentList');
     if (!documentList) {
@@ -794,14 +807,6 @@ async function saveContributions() {
         return;
     }
 
-    // Get authentication token
-    const token = localStorage.getItem('token');
-    if (!token) {
-        alert('Authentication token not found. Please log in again.');
-        window.location.replace('/auth/login.html');
-        return;
-    }
-
     // Get selected documents
     const selectedDocs = Array.from(document.querySelectorAll('#contributionDocumentList input[type="checkbox"]:checked'))
         .map(checkbox => ({
@@ -816,89 +821,29 @@ async function saveContributions() {
     });
 
     try {
-        // Use the new direct debug endpoint for updating contributions
-        console.log('Using debug direct update endpoint');
-        
-        const debugResponse = await fetch('http://34.82.192.6:8000/api/debug/update_contributor', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                contributorId: contributorId,
-                contributions: selectedDocs
-            })
-        });
-        
-        if (!debugResponse.ok) {
-            const errorText = await debugResponse.text();
-            throw new Error(`Direct update failed: ${debugResponse.status} - ${errorText}`);
+        // Find the contributor in our local data
+        const index = allContributors.findIndex(c => c.id === contributorId);
+        if (index === -1) {
+            throw new Error(`Contributor with ID ${contributorId} not found`);
         }
         
-        const responseData = await debugResponse.json();
-        console.log('Debug update response:', responseData);
+        // Update the contributions locally
+        allContributors[index].contributions = selectedDocs;
         
-        // Make a standard update to also ensure consistency with the API
-        try {
-            // Get current contributor data
-            const contributorResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Accept': 'application/json'
-                }
-            });
+        // Sync to server
+        const syncSuccess = await syncContributors();
+        
+        if (syncSuccess) {
+            // Update the UI to show changes
+            updateContributorContributions(contributorId, selectedDocs);
             
-            if (contributorResponse.ok) {
-                const contributorData = await contributorResponse.json();
-                
-                // Standard update to maintain API consistency
-                const updateData = {
-                    name: contributorData.name,
-                    organization: contributorData.organization || '',
-                    linkedin: contributorData.linkedin || '',
-                    image: contributorData.image || '',
-                    // Do not include contributions here to avoid overwriting our direct update
-                };
-                
-                await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updateData)
-                });
-                
-                console.log('Standard update completed for API consistency');
-            }
-        } catch (standardError) {
-            console.warn('Standard update error (non-critical):', standardError);
-            // Continue even if standard update fails
+            // Close the modal
+            closeModal('contributionModal');
+            alert('Contributions updated successfully!');
         }
-        
-        // Update the UI with the contributions we set
-        updateContributorContributions(contributorId, selectedDocs);
-        
-        // Explicitly reload the data to ensure the UI is up to date
-        loadContributors();
-        
-        // Close the modal and show success
-        closeModal('contributionModal');
-        alert('Contributions updated successfully! The changes have been saved directly to the file system.');
     } catch (error) {
         console.error('Error saving contributions:', error);
-        
-        // Provide a clear error message with the manual workaround
-        alert(`
-Server update failed: ${error.message}
-
-For a temporary workaround, please:
-1. Contact the administrator
-2. Ask them to manually update the contributions for ${contributorId}
-3. Provide this data:
-${JSON.stringify(selectedDocs, null, 2)}
-        `);
+        alert(`Failed to update contributions: ${error.message}`);
         
         // Update the UI anyway so the user sees their changes
         updateContributorContributions(contributorId, selectedDocs);
@@ -906,9 +851,10 @@ ${JSON.stringify(selectedDocs, null, 2)}
     }
 }
 
-// Initialize document loading
+// Initialize page
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Contributor management page loaded');
+    
     // Initial contributors fetch
     await loadContributors();
     
@@ -917,17 +863,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (documents) {
         allDocuments = documents;
     }
-    
-    // Add event listener for the refresh button
-    const refreshButton = document.querySelector('.refresh-button');
-    if (refreshButton) {
-        refreshButton.addEventListener('click', handleRefresh);
-    }
 });
 
-// Simple refresh function
-function handleRefresh() {
-    loadContributors();
+// Add these helper functions for document management
+function filterContributionDocuments() {
+    const searchInput = document.getElementById('contributionSearch');
+    if (!searchInput) return;
+    
+    const searchTerm = searchInput.value.toLowerCase();
+    const filteredDocs = allDocuments.filter(doc => 
+        doc.title.toLowerCase().includes(searchTerm)
+    );
+    
+    displayContributionDocuments(filteredDocs);
+}
+
+function handleContributionSelection(event) {
+    const title = event.target.value;
+    if (event.target.checked) {
+        selectedContributions.add(title);
+    } else {
+        selectedContributions.delete(title);
+    }
 }
 </script>
 
