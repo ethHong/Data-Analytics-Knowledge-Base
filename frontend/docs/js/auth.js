@@ -12,13 +12,14 @@ const publicPaths = [
 
 // Paths that require user authentication
 const userPaths = [
-    '/auth/profile.html'
+    '/auth/profile.html',
+    '/markdowns/'
+
 ];
 
 // Paths that require admin authentication
 const adminPaths = [
-    '/admin/',  // All paths under /admin/ require admin access
-    '/markdowns/',  // All markdown documents require admin access
+    '/admin/',  // All paths under /admin/ require admin access // All markdown documents require admin access
     '/documents.html'  // Document management requires admin access
 ];
 

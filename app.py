@@ -14,7 +14,7 @@ import uuid
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, FileResponse
 from fastapi import Request
 
 app = FastAPI()  # Initialize APP
@@ -669,8 +669,7 @@ async def update_user_verification(
     )
 
 
-# Remove the catch routes and update static file mounting
-# Mount specific directories only, excluding markdowns
+# Mount specific files and directories, excluding markdowns
 app.mount("/js", StaticFiles(directory="frontend/docs/js"), name="js")
 app.mount("/css", StaticFiles(directory="frontend/docs/css"), name="css")
 app.mount("/images", StaticFiles(directory="frontend/docs/images"), name="images")
@@ -678,19 +677,26 @@ app.mount("/auth", StaticFiles(directory="frontend/docs/auth"), name="auth")
 app.mount("/admin", StaticFiles(directory="frontend/docs/admin"), name="admin")
 app.mount("/data", StaticFiles(directory="frontend/docs/data"), name="data")
 
-# Create a StaticFiles instance for the root directory
-root_static = StaticFiles(directory="frontend/docs", html=True)
+
+# Mount specific HTML files from root
+@app.get("/")
+async def serve_index():
+    return FileResponse("frontend/docs/index.html")
 
 
-# Mount root directory but serve only specific files
-@app.get("/{path:path}")
-async def serve_root(path: str):
-    # Block access to markdown files
-    if path.startswith("markdowns/") or "/markdowns/" in path:
-        return RedirectResponse(url="/auth/login.html")
+@app.get("/contributors")
+async def serve_contributors():
+    return FileResponse("frontend/docs/contributors.html")
 
-    # Serve other files
-    return await root_static.get_response(path, app.scope)
+
+@app.get("/graph")
+async def serve_graph():
+    return FileResponse("frontend/docs/graph.html")
+
+
+@app.get("/document-viewer")
+async def serve_document_viewer():
+    return FileResponse("frontend/docs/document-viewer.html")
 
 
 # Start the FastAPI server
