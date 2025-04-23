@@ -136,16 +136,54 @@
 </style>
 
 <script>
-async function loadContributors() {
+async function loadContributors(forceRefresh = false) {
     try {
-        const response = await fetch('../../data/contributors.json');
+        const grid = document.querySelector('.contributors-grid');
+        if (grid) {
+            grid.innerHTML = '<div class="loading">Loading contributors...</div>';
+        }
+        
+        // Try the API first with cache-busting
+        const timestamp = new Date().getTime();
+        let url = forceRefresh ? 
+            `http://34.82.192.6:8000/api/contributors?t=${timestamp}` : 
+            '../../data/contributors.json';
+            
+        const fetchOptions = {
+            cache: forceRefresh ? 'no-cache' : 'default',
+            headers: {
+                'Accept': 'application/json',
+                'Pragma': forceRefresh ? 'no-cache' : 'default',
+                'Cache-Control': forceRefresh ? 'no-cache' : 'default'
+            }
+        };
+        
+        console.log(`Loading contributors from ${url}${forceRefresh ? ' (force refresh)' : ''}`);
+        
+        const response = await fetch(url, fetchOptions);
         if (!response.ok) {
             throw new Error('Failed to fetch contributors data');
         }
+        
         const data = await response.json();
-        displayContributors(data.contributors);
+        displayContributors(data.contributors || []);
+        
+        // Add last updated timestamp
+        const lastUpdated = document.getElementById('lastUpdated');
+        if (lastUpdated) {
+            lastUpdated.textContent = new Date().toLocaleString();
+        }
     } catch (error) {
         console.error('Error loading contributors:', error);
+        const grid = document.querySelector('.contributors-grid');
+        if (grid) {
+            grid.innerHTML = `
+                <div class="error-message">
+                    <p>Error loading contributors: ${error.message}</p>
+                    <button class="button primary" onclick="loadContributors(true)">Try Again</button>
+                </div>
+            `;
+        }
     }
 }
 
@@ -191,5 +229,76 @@ function displayContributors(contributors) {
 }
 
 // Initialize contributors loading
-document.addEventListener('DOMContentLoaded', loadContributors);
+document.addEventListener('DOMContentLoaded', function() {
+    // Add refresh button and last updated info
+    const container = document.querySelector('.contributors-grid');
+    if (container) {
+        const refreshControls = document.createElement('div');
+        refreshControls.className = 'refresh-controls';
+        refreshControls.innerHTML = `
+            <div class="refresh-bar">
+                <button class="refresh-button" onclick="loadContributors(true)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M23 4v6h-6"></path>
+                        <path d="M1 20v-6h6"></path>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"></path>
+                        <path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                    Refresh Contributors
+                </button>
+                <span class="last-updated">Last updated: <span id="lastUpdated">Never</span></span>
+            </div>
+        `;
+        
+        container.parentNode.insertBefore(refreshControls, container);
+        
+        // Add some CSS for the refresh controls
+        const style = document.createElement('style');
+        style.textContent = `
+            .refresh-controls {
+                width: 100%;
+                max-width: 1200px;
+                margin: 0 auto 20px;
+                padding: 0 20px;
+            }
+            .refresh-bar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px;
+                background: #f5f5f5;
+                border-radius: 8px;
+                margin-bottom: 20px;
+            }
+            .refresh-button {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 16px;
+                background: #1a73e8;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+            }
+            .refresh-button:hover {
+                background: #1557b0;
+            }
+            .last-updated {
+                font-size: 14px;
+                color: #666;
+            }
+            .loading {
+                padding: 20px;
+                text-align: center;
+                color: #666;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // Load contributors
+    loadContributors();
+});
 </script> 

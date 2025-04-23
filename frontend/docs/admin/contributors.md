@@ -356,7 +356,7 @@ async function loadContributors() {
     }
 }
 
-// Function to sync all contributors data to the server
+// Function to sync all contributors data to the server using existing endpoints
 async function syncContributors() {
     if (isSyncing) {
         console.log('Already syncing, please wait...');
@@ -371,32 +371,106 @@ async function syncContributors() {
             throw new Error('Authentication token not found. Please log in again.');
         }
         
-        // Create a clean, properly formatted data object for sync
-        const syncData = {
-            contributors: allContributors
-        };
+        console.log('Starting sync of contributors using existing endpoints');
         
-        const response = await fetch('http://34.82.192.6:8000/api/contributors/sync', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(syncData)
-        });
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Sync failed: ${response.status} - ${errorText}`);
+        // First get the current server state for comparison
+        const currentResponse = await fetch('http://34.82.192.6:8000/api/contributors');
+        if (!currentResponse.ok) {
+            throw new Error(`Failed to get current contributors: ${currentResponse.status}`);
         }
         
-        const result = await response.json();
-        console.log('Sync successful:', result);
+        const currentData = await currentResponse.json();
+        const serverContributors = currentData.contributors || [];
         
-        // Refresh contributors after successful sync
-        await loadContributors();
+        console.log(`Server has ${serverContributors.length} contributors, local has ${allContributors.length}`);
         
-        return true;
+        // Track operations for reporting
+        const operations = {
+            created: 0,
+            updated: 0,
+            deleted: 0,
+            failed: 0
+        };
+        
+        // Find contributors to delete (in server but not in local)
+        const serverIds = new Set(serverContributors.map(c => c.id));
+        const localIds = new Set(allContributors.map(c => c.id));
+        
+        // Handle deletions
+        for (const serverId of serverIds) {
+            if (!localIds.has(serverId)) {
+                console.log(`Deleting contributor: ${serverId}`);
+                try {
+                    const deleteResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${serverId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (deleteResponse.ok) {
+                        operations.deleted++;
+                    } else {
+                        console.error(`Failed to delete contributor ${serverId}: ${deleteResponse.status}`);
+                        operations.failed++;
+                    }
+                } catch (error) {
+                    console.error(`Error deleting contributor ${serverId}:`, error);
+                    operations.failed++;
+                }
+            }
+        }
+        
+        // Handle creates and updates
+        for (const contributor of allContributors) {
+            const isNew = !serverIds.has(contributor.id);
+            
+            try {
+                // Prepare contributor data (copy to avoid modifying original)
+                const contributorToSend = { ...contributor };
+                
+                // Prepare the request
+                const url = isNew 
+                    ? 'http://34.82.192.6:8000/api/contributors' 
+                    : `http://34.82.192.6:8000/api/contributors/${contributor.id}`;
+                    
+                const method = isNew ? 'POST' : 'PUT';
+                
+                console.log(`${method} contributor: ${contributor.id}`);
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(contributorToSend)
+                });
+                
+                if (response.ok) {
+                    if (isNew) {
+                        operations.created++;
+                    } else {
+                        operations.updated++;
+                    }
+                } else {
+                    console.error(`Failed to ${isNew ? 'create' : 'update'} contributor ${contributor.id}: ${response.status}`);
+                    operations.failed++;
+                }
+            } catch (error) {
+                console.error(`Error ${isNew ? 'creating' : 'updating'} contributor ${contributor.id}:`, error);
+                operations.failed++;
+            }
+        }
+        
+        console.log('Sync operations completed:', operations);
+        
+        // Reload contributors after all operations
+        if (operations.created > 0 || operations.updated > 0 || operations.deleted > 0) {
+            await loadContributors();
+        }
+        
+        return operations.failed === 0;
     } catch (error) {
         console.error('Error syncing contributors:', error);
         alert(`Failed to sync contributors: ${error.message}`);
@@ -807,6 +881,14 @@ async function saveContributions() {
         return;
     }
 
+    // Get authentication token
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert('Authentication token not found. Please log in again.');
+        window.location.replace('/auth/login.html');
+        return;
+    }
+
     // Get selected documents
     const selectedDocs = Array.from(document.querySelectorAll('#contributionDocumentList input[type="checkbox"]:checked'))
         .map(checkbox => ({
@@ -822,30 +904,60 @@ async function saveContributions() {
 
     try {
         // Find the contributor in our local data
-        const index = allContributors.findIndex(c => c.id === contributorId);
-        if (index === -1) {
+        const contributorIndex = allContributors.findIndex(c => c.id === contributorId);
+        if (contributorIndex === -1) {
             throw new Error(`Contributor with ID ${contributorId} not found`);
         }
         
-        // Update the contributions locally
-        allContributors[index].contributions = selectedDocs;
+        // Get the contributor data and make a copy
+        const contributor = { ...allContributors[contributorIndex] };
         
-        // Sync to server
-        const syncSuccess = await syncContributors();
+        // Update the contributions
+        contributor.contributions = selectedDocs;
         
-        if (syncSuccess) {
-            // Update the UI to show changes
-            updateContributorContributions(contributorId, selectedDocs);
-            
-            // Close the modal
-            closeModal('contributionModal');
-            alert('Contributions updated successfully!');
+        // Also update in local array
+        allContributors[contributorIndex].contributions = selectedDocs;
+        
+        // Instead of using sync, directly update this specific contributor
+        console.log('Directly updating contributor with contributions:', contributor);
+        
+        // Create data to send - only include the required fields for PUT
+        const updateData = {
+            name: contributor.name,
+            organization: contributor.organization,
+            linkedin: contributor.linkedin || '',
+            image: contributor.image || '',
+            contributions: selectedDocs
+        };
+        
+        // Send the update
+        const updateResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        });
+        
+        if (!updateResponse.ok) {
+            const errorText = await updateResponse.text();
+            throw new Error(`Update failed: ${updateResponse.status} - ${errorText}`);
         }
+        
+        console.log('Contributions updated successfully on server');
+        
+        // Update the UI to show changes - no need to reload everything
+        updateContributorContributions(contributorId, selectedDocs);
+        
+        // Close the modal
+        closeModal('contributionModal');
+        alert('Contributions updated successfully!');
     } catch (error) {
         console.error('Error saving contributions:', error);
         alert(`Failed to update contributions: ${error.message}`);
         
-        // Update the UI anyway so the user sees their changes
+        // Still update the UI anyway so the user sees their changes
         updateContributorContributions(contributorId, selectedDocs);
         closeModal('contributionModal');
     }
