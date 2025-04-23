@@ -17,5 +17,5 @@ logs/
 key.txt
 
 # User data
-//frontend/data/users.json
+frontend/data/users.json
 frontend/data/verification_codes.json
