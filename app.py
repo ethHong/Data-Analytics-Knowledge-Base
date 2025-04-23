@@ -670,37 +670,7 @@ async def update_user_verification(
     )
 
 
-# Add this function to the beginning of your routes, BEFORE any static file mounts
-@app.middleware("http")
-async def check_markdown_access(request: Request, call_next):
-    """Middleware to check for markdown access and require authentication"""
-    # Check if the path contains 'markdowns'
-    if "markdowns" in request.url.path:
-        # Try to get token from headers or cookies
-        token = None
-        auth_header = request.headers.get("Authorization")
-        if auth_header and auth_header.startswith("Bearer "):
-            token = auth_header.split(" ")[1]
-
-        # If no token, redirect to login
-        if not token:
-            return RedirectResponse(url="/auth/login.html", status_code=303)
-
-        # Try to validate token
-        try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            email = payload.get("sub")
-            if not email:
-                return RedirectResponse(url="/auth/login.html", status_code=303)
-        except:
-            return RedirectResponse(url="/auth/login.html", status_code=303)
-
-    # Continue processing the request
-    response = await call_next(request)
-    return response
-
-
-# Mount specific directories, excluding markdowns
+# Mount specific directories, but DO NOT mount markdowns
 app.mount("/js", StaticFiles(directory="frontend/docs/js"), name="js")
 app.mount("/css", StaticFiles(directory="frontend/docs/css"), name="css")
 app.mount("/images", StaticFiles(directory="frontend/docs/images"), name="images")
@@ -708,8 +678,21 @@ app.mount("/auth", StaticFiles(directory="frontend/docs/auth"), name="auth")
 app.mount("/admin", StaticFiles(directory="frontend/docs/admin"), name="admin")
 app.mount("/data", StaticFiles(directory="frontend/docs/data"), name="data")
 
-# Mount the root directory - our middleware will catch any markdown access
-app.mount("/", StaticFiles(directory="frontend/docs", html=True), name="root")
+
+# Create a custom static files handler that blocks markdown access
+class CustomStaticFiles(StaticFiles):
+    async def __call__(self, scope, receive, send):
+        path = scope["path"]
+        if "markdowns" in path:
+            # Create a redirect response
+            return await RedirectResponse(url="/auth/login.html").__call__(
+                scope, receive, send
+            )
+        return await super().__call__(scope, receive, send)
+
+
+# Mount the root directory using the custom handler
+app.mount("/", CustomStaticFiles(directory="frontend/docs", html=True), name="root")
 
 
 # Start the FastAPI server
