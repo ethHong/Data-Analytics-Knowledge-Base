@@ -438,10 +438,28 @@ function displayContributors(contributors) {
 // Function to load contributor contributions
 async function loadContributorContributions(contributorId) {
     try {
-        const response = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`);
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('No authentication token found');
+            return;
+        }
+        
+        const response = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (response.status === 401) {
+            console.error('Authentication expired');
+            return;
+        }
+        
         if (!response.ok) {
             throw new Error('Failed to fetch contributor data');
         }
+        
         const data = await response.json();
         updateContributorContributions(contributorId, data.contributions || []);
     } catch (error) {
@@ -620,6 +638,12 @@ async function openContributionModal(contributorId) {
     modal.dataset.contributorId = contributorId;
     
     try {
+        // Get authentication token
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('Authentication token not found. Please log in again.');
+        }
+        
         // Fetch documents
         const apiUrl = 'http://34.82.192.6:8000/api/documents';
         console.log('Fetching documents from:', apiUrl);
@@ -627,11 +651,16 @@ async function openContributionModal(contributorId) {
         const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
+                'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
             }
         });
         
         console.log('Documents response status:', response.status);
+        
+        if (response.status === 401) {
+            throw new Error('Authentication expired. Please log in again.');
+        }
         
         if (!response.ok) {
             throw new Error('Failed to fetch documents');
@@ -648,10 +677,21 @@ async function openContributionModal(contributorId) {
         allDocuments = data.documents;
         
         // Get current contributor data to know which documents are selected
-        const contributorResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`);
+        const contributorResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (contributorResponse.status === 401) {
+            throw new Error('Authentication expired. Please log in again.');
+        }
+        
         if (!contributorResponse.ok) {
             throw new Error('Failed to fetch contributor data');
         }
+        
         const contributor = await contributorResponse.json();
         
         // Reset and set selected documents
@@ -667,7 +707,7 @@ async function openContributionModal(contributorId) {
         modal.style.display = 'block';
     } catch (error) {
         console.error('Error opening contribution modal:', error);
-        alert('Failed to load documents. Please try again.');
+        alert('Failed to load documents. Please try again. Error: ' + error.message);
     }
 }
 
@@ -707,10 +747,28 @@ function displayContributionDocuments(documents) {
 // Helper function to fetch documents
 async function fetchDocuments() {
     try {
-        const response = await fetch('http://34.82.192.6:8000/api/documents');
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('No authentication token found');
+            return [];
+        }
+        
+        const response = await fetch('http://34.82.192.6:8000/api/documents', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (response.status === 401) {
+            console.error('Authentication expired');
+            return [];
+        }
+        
         if (!response.ok) {
             throw new Error('Failed to fetch documents');
         }
+        
         const data = await response.json();
         return data.documents || [];
     } catch (error) {
@@ -727,6 +785,14 @@ async function saveContributions() {
     if (!contributorId) {
         console.error('No contributor ID found');
         alert('Error: Could not identify the contributor');
+        return;
+    }
+
+    // Get authentication token
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert('Authentication token not found. Please log in again.');
+        window.location.replace('/auth/login.html');
         return;
     }
 
@@ -747,6 +813,7 @@ async function saveContributions() {
         const apiResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}/contributions`, {
             method: 'PUT',
             headers: {
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
@@ -754,6 +821,10 @@ async function saveContributions() {
                 contributions: selectedDocs
             })
         });
+
+        if (apiResponse.status === 401) {
+            throw new Error('Authentication expired. Please log in again.');
+        }
 
         if (!apiResponse.ok) {
             const errorData = await apiResponse.text();
@@ -780,6 +851,7 @@ async function saveContributions() {
         const saveResponse = await fetch('../../data/contributors.json', {
             method: 'PUT',
             headers: {
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(jsonData, null, 2)
