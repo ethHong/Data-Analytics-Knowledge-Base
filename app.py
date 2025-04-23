@@ -254,9 +254,9 @@ async def upload_markdown(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# API Endpoint for graph
+# API Endpoint for graph - make it public
 @app.get("/graph/")
-async def get_graph_data(current_user: User = Depends(get_current_user)):
+async def get_graph_data():  # Remove authentication requirement
     with driver.session() as session:
         # First get all nodes
         nodes_result = session.run(
