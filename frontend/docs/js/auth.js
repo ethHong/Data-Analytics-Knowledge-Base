@@ -41,14 +41,14 @@ function isUserPath(path) {
 }
 
 function isAdminPath(path) {
-    // Normalize the path to handle potential variations
+    // First normalize the path
     const normalizedPath = path.replace('/admin/auth/login.html', '/auth/login.html');
     if (normalizedPath !== path) {
-        window.location.replace(normalizedPath);
+        window.location.replace('/auth/login.html');
         return true;
     }
-    
-    // Check if path matches any admin paths
+
+    // Check if path starts with any admin paths
     return adminPaths.some(adminPath => {
         if (adminPath.endsWith('/')) {
             return path.startsWith(adminPath);
@@ -90,19 +90,16 @@ async function checkAuth() {
                 isAdmin: userData.role === 'admin',
                 user: userData
             };
-        } else if (response.status === 401) {
-            // Only remove token if it's actually invalid
+        } else {
+            // For any error response, remove token and consider not authenticated
             localStorage.removeItem('token');
             return { authenticated: false, isAdmin: false };
-        } else {
-            // For other errors, keep the token and stay logged in
-            console.error('Non-401 error from auth check:', response.status);
-            return { authenticated: true, isAdmin: false };
         }
     } catch (error) {
         console.error('Network error checking authentication:', error);
-        // On network error, assume user is still authenticated
-        return { authenticated: true, isAdmin: false };
+        // On network error, consider not authenticated
+        localStorage.removeItem('token');
+        return { authenticated: false, isAdmin: false };
     }
 }
 
@@ -143,12 +140,9 @@ async function requireAuth() {
     // For admin paths, check admin status
     if (isAdminPath(currentPath)) {
         if (!authCheck.isAdmin) {
-            // If not admin, redirect to home page
             window.location.replace('/index.html');
             return false;
         }
-        showContent();
-        return true;
     }
 
     // For user paths, being authenticated is enough
@@ -157,7 +151,12 @@ async function requireAuth() {
         return true;
     }
 
-    // If path is not in any list, treat as requiring authentication
+    // If path is not in any list, treat as requiring admin authentication
+    if (!authCheck.isAdmin) {
+        window.location.replace('/index.html');
+        return false;
+    }
+
     showContent();
     return true;
 }
@@ -185,29 +184,23 @@ async function handleLogin(event) {
             // Check if user is admin and handle redirect
             const authCheck = await checkAuth();
             
-            // Notify parent window of successful login
-            window.parent.postMessage({ type: 'loginSuccess', token: data.access_token }, '*');
+            // Get redirect path from session storage or default to index
+            const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/index.html';
+            sessionStorage.removeItem('redirectAfterLogin');
             
-            // Check if we're in an iframe
-            if (window.self === window.top) {
-                // Only redirect if we're not in an iframe
-                const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/index.html';
-                sessionStorage.removeItem('redirectAfterLogin');
-
-                if (redirectPath.includes('/admin') && !authCheck.isAdmin) {
-                    window.location.href = '/index.html';
-                } else {
-                    window.location.href = redirectPath;
-                }
+            // Only redirect to admin paths if user is admin
+            if (redirectPath.startsWith('/admin/') && !authCheck.isAdmin) {
+                window.location.replace('/index.html');
+            } else {
+                window.location.replace(redirectPath);
             }
-            // If in iframe, do nothing - let the parent handle it
         } else {
             const errorDiv = document.querySelector('.error-message') || document.createElement('div');
             errorDiv.className = 'error-message';
             errorDiv.style.color = 'red';
             errorDiv.style.marginTop = '10px';
-            errorDiv.style.display = 'block';
             errorDiv.textContent = 'Invalid email or password';
+            
             const loginForm = document.getElementById('login-form');
             if (loginForm && !loginForm.querySelector('.error-message')) {
                 loginForm.appendChild(errorDiv);
@@ -219,8 +212,8 @@ async function handleLogin(event) {
         errorDiv.className = 'error-message';
         errorDiv.style.color = 'red';
         errorDiv.style.marginTop = '10px';
-        errorDiv.style.display = 'block';
         errorDiv.textContent = 'Network error occurred';
+        
         const loginForm = document.getElementById('login-form');
         if (loginForm && !loginForm.querySelector('.error-message')) {
             loginForm.appendChild(errorDiv);
@@ -232,7 +225,7 @@ async function handleLogin(event) {
 async function handleLogout() {
     localStorage.removeItem('token');
     sessionStorage.removeItem('redirectAfterLogin');
-    window.location.href = '/index.html';
+    window.location.replace('/index.html');
 }
 
 // Add event listeners when the document is loaded
@@ -252,7 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check auth for current page
     requireAuth().then(isAuthorized => {
         if (!isAuthorized) {
-            // If not authorized, content will remain hidden
             return;
         }
         showContent();

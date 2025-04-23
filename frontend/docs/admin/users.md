@@ -183,84 +183,39 @@ title: User Management
 let currentUser = null;
 
 async function loadUsers() {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.location.href = '../auth/login.html';
-        return;
-    }
-
     try {
-        // First get the current user
-        const currentUserResponse = await fetch('http://34.82.192.6:8000/api/auth/me', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (!currentUserResponse.ok) {
-            throw new Error('Failed to get current user');
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.replace('/auth/login.html');
+            return;
         }
 
-        currentUser = await currentUserResponse.json();
-
-        // Then get all users
-        const response = await fetch('http://34.82.192.6:8000/api/users', {
+        const response = await fetch(`${API_BASE_URL}/api/users`, {
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
             }
         });
+
+        if (response.status === 401) {
+            window.location.replace('/auth/login.html');
+            return;
+        }
+
+        if (response.status === 403) {
+            window.location.replace('/index.html');
+            return;
+        }
 
         if (!response.ok) {
-            throw new Error('Failed to fetch users');
+            throw new Error(`Server error: ${response.status}`);
         }
 
-        const data = await response.json();
-        const userList = document.getElementById('userList');
-        userList.innerHTML = '';
-
-        // The API returns an object with a users array
-        data.users.forEach(user => {
-            const userItem = document.createElement('div');
-            userItem.className = 'user-item';
-            
-            const userInfo = document.createElement('div');
-            userInfo.className = 'user-info';
-            userInfo.innerHTML = `
-                <strong>${user.email}</strong>
-                <span>(${user.role})</span>
-            `;
-            
-            const userActions = document.createElement('div');
-            userActions.className = 'user-actions';
-            
-            const editButton = document.createElement('button');
-            editButton.className = 'btn btn-secondary';
-            editButton.textContent = 'Edit';
-            editButton.onclick = () => showEditUserModal(user);
-            
-            const deleteButton = document.createElement('button');
-            deleteButton.className = 'btn btn-danger';
-            deleteButton.textContent = 'Delete';
-            
-            // Prevent self-deletion
-            if (user.email === currentUser.email) {
-                deleteButton.disabled = true;
-                deleteButton.title = 'Cannot delete your own account';
-                deleteButton.style.opacity = '0.5';
-            } else {
-                deleteButton.onclick = () => deleteUser(user.id);
-            }
-            
-            userActions.appendChild(editButton);
-            userActions.appendChild(deleteButton);
-            
-            userItem.appendChild(userInfo);
-            userItem.appendChild(userActions);
-            userList.appendChild(userItem);
-        });
+        const users = await response.json();
+        displayUsers(users);
     } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('userList').innerHTML = 'Error loading users: ' + error.message;
+        console.error('Error loading users:', error);
+        displayError('Failed to load users. Please try again later.');
     }
 }
 
@@ -274,10 +229,14 @@ function hideAddUserModal() {
 }
 
 function showEditUserModal(user) {
-    document.getElementById('editUserId').value = user.id;
-    document.getElementById('editEmail').value = user.email;
-    document.getElementById('editRole').value = user.role;
-    document.getElementById('editUserModal').style.display = 'flex';
+    const form = document.getElementById('editUserForm');
+    form.dataset.userId = user.id;
+    form.querySelector('[name="email"]').value = user.email;
+    form.querySelector('[name="role"]').value = user.role;
+    
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+    modal.show();
 }
 
 function hideEditUserModal() {
@@ -285,104 +244,225 @@ function hideEditUserModal() {
     document.getElementById('editUserForm').reset();
 }
 
-async function deleteUser(userId) {
-    if (userId === currentUser.id) {
-        alert('You cannot delete your own account while logged in.');
-        return;
-    }
+function displayUsers(data) {
+    const userList = document.getElementById('userList');
+    userList.innerHTML = '';
 
+    // The API returns an object with a users array
+    data.users.forEach(user => {
+        const userItem = document.createElement('div');
+        userItem.className = 'user-item';
+        
+        const userInfo = document.createElement('div');
+        userInfo.className = 'user-info';
+        userInfo.innerHTML = `
+            <strong>${user.email}</strong>
+            <span>(${user.role})</span>
+        `;
+        
+        const userActions = document.createElement('div');
+        userActions.className = 'user-actions';
+        
+        const editButton = document.createElement('button');
+        editButton.className = 'btn btn-secondary';
+        editButton.textContent = 'Edit';
+        editButton.onclick = () => showEditUserModal(user);
+        
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'btn btn-danger';
+        deleteButton.textContent = 'Delete';
+        
+        // Prevent self-deletion
+        if (user.email === currentUser.email) {
+            deleteButton.disabled = true;
+            deleteButton.title = 'Cannot delete your own account';
+            deleteButton.style.opacity = '0.5';
+        } else {
+            deleteButton.onclick = () => deleteUser(user.id);
+        }
+        
+        userActions.appendChild(editButton);
+        userActions.appendChild(deleteButton);
+        
+        userItem.appendChild(userInfo);
+        userItem.appendChild(userActions);
+        userList.appendChild(userItem);
+    });
+}
+
+function displayError(message) {
+    const userList = document.getElementById('userList');
+    userList.innerHTML = `<div class="alert alert-danger">${message}</div>`;
+}
+
+async function deleteUser(userId) {
     if (!confirm('Are you sure you want to delete this user?')) {
         return;
     }
 
-    const token = localStorage.getItem('token');
     try {
-        const response = await fetch(`http://34.82.192.6:8000/api/users/${userId}`, {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.replace('/auth/login.html');
+            return;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
 
-        if (!response.ok) {
-            throw new Error('Failed to delete user');
+        if (response.status === 401) {
+            window.location.replace('/auth/login.html');
+            return;
         }
 
-        loadUsers();
+        if (response.status === 403) {
+            window.location.replace('/index.html');
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+
+        // Reload the user list
+        await loadUsers();
     } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to delete user');
+        console.error('Error deleting user:', error);
+        displayError('Failed to delete user. Please try again later.');
     }
 }
 
-document.getElementById('addUserForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const token = localStorage.getItem('token');
-    
+async function updateUser(userId, userData) {
     try {
-        const response = await fetch('http://34.82.192.6:8000/api/users', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value,
-                role: document.getElementById('role').value
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to add user');
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.replace('/auth/login.html');
+            return;
         }
 
-        hideAddUserModal();
-        loadUsers();
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to add user');
-    }
-});
-
-document.getElementById('editUserForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.location.href = '../auth/login.html';
-        return;
-    }
-    
-    const userId = document.getElementById('editUserId').value;
-    const email = document.getElementById('editEmail').value;
-    const role = document.getElementById('editRole').value;
-    
-    try {
-        const response = await fetch(`http://34.82.192.6:8000/api/users/${userId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                email: email,
-                role: role
-            })
+            body: JSON.stringify(userData)
         });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || 'Failed to update user');
+
+        if (response.status === 401) {
+            window.location.replace('/auth/login.html');
+            return;
         }
-        
-        hideEditUserModal();
-        loadUsers(); // Reload the user list
-        alert('User updated successfully');
+
+        if (response.status === 403) {
+            window.location.replace('/index.html');
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+
+        // Reload the user list
+        await loadUsers();
     } catch (error) {
-        console.error('Error:', error);
-        alert('Error updating user: ' + error.message);
+        console.error('Error updating user:', error);
+        displayError('Failed to update user. Please try again later.');
     }
+}
+
+async function createUser(userData) {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.replace('/auth/login.html');
+            return;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/users`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        });
+
+        if (response.status === 401) {
+            window.location.replace('/auth/login.html');
+            return;
+        }
+
+        if (response.status === 403) {
+            window.location.replace('/index.html');
+            return;
+        }
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || `Server error: ${response.status}`);
+        }
+
+        // Close the modal and reload users
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
+        modal.hide();
+        document.getElementById('addUserForm').reset();
+        await loadUsers();
+    } catch (error) {
+        console.error('Error creating user:', error);
+        const errorElement = document.getElementById('addUserError');
+        errorElement.textContent = error.message || 'Failed to create user. Please try again later.';
+        errorElement.style.display = 'block';
+    }
+}
+
+// Event listeners for forms
+document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const userData = {
+        email: form.querySelector('[name="email"]').value,
+        password: form.querySelector('[name="password"]').value,
+        role: form.querySelector('[name="role"]').value
+    };
+    await createUser(userData);
+});
+
+document.getElementById('editUserForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const userId = form.dataset.userId;
+    const userData = {
+        email: form.querySelector('[name="email"]').value,
+        role: form.querySelector('[name="role"]').value
+    };
+    
+    // If password field exists and has a value, include it
+    const passwordField = form.querySelector('[name="password"]');
+    if (passwordField && passwordField.value.trim()) {
+        userData.password = passwordField.value;
+    }
+    
+    await updateUser(userId, userData);
+    
+    // Close the modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+    modal.hide();
+});
+
+// Clear error messages when modals are hidden
+document.getElementById('addUserModal').addEventListener('hidden.bs.modal', () => {
+    document.getElementById('addUserError').style.display = 'none';
+    document.getElementById('addUserForm').reset();
+});
+
+document.getElementById('editUserModal').addEventListener('hidden.bs.modal', () => {
+    document.getElementById('editUserError').style.display = 'none';
+    document.getElementById('editUserForm').reset();
 });
 
 // Check if user is admin and load users
@@ -417,5 +497,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error:', error);
         window.location.href = '../auth/login.html';
     }
+});
+
+// Initialize the page
+document.addEventListener('DOMContentLoaded', () => {
+    loadUsers();
 });
 </script> 

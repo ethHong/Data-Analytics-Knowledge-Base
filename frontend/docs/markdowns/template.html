@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+    <script src="/js/auth.js"></script>
+</head>
+<body style="visibility: hidden;">
+    <!-- Content will be loaded here -->
+    {{ content }}
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Check auth for markdown pages
+        requireAuth().then(isAuthorized => {
+            if (!isAuthorized) {
+                return;
+            }
+            showContent();
+        });
+    });
+    </script>
+</body>
+</html> 
