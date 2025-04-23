@@ -235,3 +235,4 @@ function checkAuth(event) {
 
 // Initialize navigation when the page loads
 document.addEventListener('DOMContentLoaded', loadNavigation); 
+ 

@@ -1200,6 +1200,9 @@
 </style>
 
 <script>
+// Define API_BASE_URL if not already defined
+const API_BASE_URL = ''; // Empty string for relative URLs
+
 // Add these variables at the top of the script section
 let allDocuments = [];
 let selectedContributions = new Set();
@@ -1207,21 +1210,54 @@ let selectedContributions = new Set();
 // Function to fetch and display contributors
 async function loadContributors() {
     try {
-        // Try to fetch from API first
-        const apiResponse = await fetch('http://34.82.192.6:8000/api/contributors');
-        if (apiResponse.ok) {
-            const data = await apiResponse.json();
-            displayContributors(data.contributors || []);
+        console.log('Loading contributors...');
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('No token found when loading contributors');
+            window.location.replace('/auth/login.html');
             return;
         }
 
-        // If API fails, fall back to local JSON
-        console.log('API unavailable, falling back to local JSON');
-        const jsonResponse = await fetch('../../data/contributors.json');
-        if (!jsonResponse.ok) {
-            throw new Error('Failed to fetch contributors data from both API and local JSON');
+        // Log the API URL for debugging
+        const apiUrl = `${API_BASE_URL}/api/contributors`;
+        console.log('Fetching contributors from:', apiUrl);
+
+        const response = await fetch(apiUrl, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            }
+        });
+
+        console.log('Contributors response status:', response.status);
+
+        if (response.status === 401) {
+            console.error('Authentication failed when loading contributors');
+            window.location.replace('/auth/login.html');
+            return;
         }
-        const data = await jsonResponse.json();
+
+        if (response.status === 403) {
+            console.error('Authorization failed when loading contributors');
+            window.location.replace('/index.html');
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`Server error ${response.status}: ${response.statusText}`);
+        }
+
+        // Try to parse the response
+        let data;
+        try {
+            data = await response.json();
+            console.log('Contributors data received:', data.contributors?.length || 0, 'items');
+        } catch (parseError) {
+            console.error('Error parsing JSON response:', parseError);
+            throw new Error('Failed to parse server response');
+        }
+
+        // Display the contributors
         displayContributors(data.contributors || []);
     } catch (error) {
         console.error('Error loading contributors:', error);
@@ -1314,7 +1350,7 @@ function displayContributors(contributors) {
 // Function to load contributor contributions
 async function loadContributorContributions(contributorId) {
     try {
-        const response = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`);
+        const response = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`);
         if (!response.ok) {
             throw new Error('Failed to fetch contributor data');
         }
@@ -1336,7 +1372,7 @@ function updateContributorContributions(contributorId, contributions) {
     }
 
     const contributionsList = contributions.map(doc => {
-        return `<li><a href="../../markdowns/${encodeURIComponent(doc.title)}/">${doc.title}</a></li>`;
+        return `<li><a href="/document-viewer.html?path=${encodeURIComponent(doc.path)}">${doc.title}</a></li>`;
     }).join('');
 
     contributionsEl.innerHTML = contributionsList;
@@ -1377,7 +1413,7 @@ function openContributorModal(contributorId = null) {
     if (contributorId) {
         title.textContent = 'Edit Contributor';
         // Fetch current contributor data
-        fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`)
+        fetch(`${API_BASE_URL}/api/contributors/${contributorId}`)
             .then(response => response.json())
             .then(data => {
                 form.elements.name.value = data.name;
@@ -1418,7 +1454,7 @@ async function saveContributor(event) {
     }
 
     try {
-        const response = await fetch(`http://34.82.192.6:8000/api/contributors${isNewContributor ? '' : '/' + contributorId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/contributors${isNewContributor ? '' : '/' + contributorId}`, {
             method: isNewContributor ? 'POST' : 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -1449,7 +1485,7 @@ async function deleteContributor(contributorId) {
     }
 
     try {
-        const response = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`, {
             method: 'DELETE'
         });
 
@@ -1497,17 +1533,23 @@ async function openContributionModal(contributorId) {
 
     try {
         // Fetch documents
-        const apiUrl = 'http://34.82.192.6:8000/api/documents';
+        const apiUrl = `${API_BASE_URL}/api/documents`;
         console.log('Fetching documents from:', apiUrl);
 
         const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
+                ...getAuthHeaders(),
                 'Accept': 'application/json'
             }
         });
 
         console.log('Documents response status:', response.status);
+
+        if (response.status === 401 || response.status === 403) {
+            window.location.replace('/auth/login.html');
+            return;
+        }
 
         if (!response.ok) {
             throw new Error('Failed to fetch documents');
@@ -1524,10 +1566,19 @@ async function openContributionModal(contributorId) {
         allDocuments = data.documents;
 
         // Get current contributor data to know which documents are selected
-        const contributorResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`);
+        const contributorResponse = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`, {
+            headers: getAuthHeaders()
+        });
+
+        if (contributorResponse.status === 401 || contributorResponse.status === 403) {
+            window.location.replace('/auth/login.html');
+            return;
+        }
+
         if (!contributorResponse.ok) {
             throw new Error('Failed to fetch contributor data');
         }
+
         const contributor = await contributorResponse.json();
 
         // Reset and set selected documents
@@ -1605,7 +1656,7 @@ async function saveContributions() {
 
     try {
         // First, save to API
-        const apiResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}/contributions`, {
+        const apiResponse = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}/contributions`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -1662,22 +1713,105 @@ async function saveContributions() {
     }
 }
 
+// Function to fetch documents
+async function fetchDocuments() {
+    try {
+        console.log('Fetching documents...');
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('No token found');
+            return null;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/documents`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            }
+        });
+
+        console.log('Documents response status:', response.status);
+
+        if (response.status === 401) {
+            console.error('Authentication error');
+            return null;
+        }
+
+        if (!response.ok) {
+            console.error('Failed to fetch documents:', response.statusText);
+            return null;
+        }
+
+        const data = await response.json();
+        console.log('Documents data received:', data.documents?.length || 0, 'items');
+        return data.documents || [];
+    } catch (error) {
+        console.error('Error fetching documents:', error);
+        return null;
+    }
+}
+
+// Function to refresh contributors
+async function handleRefresh() {
+    try {
+        await loadContributors();
+        console.log('Contributors refreshed');
+    } catch (error) {
+        console.error('Error refreshing contributors:', error);
+        alert('Failed to refresh contributors: ' + error.message);
+    }
+}
+
 // Initialize document loading
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Contributor management page loaded');
-    // Initial contributors fetch
-    await loadContributors();
 
-    // Initial documents fetch
-    const documents = await fetchDocuments();
-    if (documents) {
-        allDocuments = documents;
+    // Display a loading message
+    const grid = document.querySelector('.contributors-grid');
+    if (grid) {
+        grid.innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                <p>Loading contributors...</p>
+            </div>
+        `;
     }
 
-    // Add event listener for the refresh button
-    const refreshButton = document.querySelector('.refresh-button');
-    if (refreshButton) {
-        refreshButton.addEventListener('click', handleRefresh);
+    // Check if token exists
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.error('No token found');
+        window.location.replace('/auth/login.html');
+        return;
+    }
+
+    try {
+        // First load contributors - this will verify authentication
+        await loadContributors();
+
+        // Try to fetch documents but don't block on errors
+        try {
+            const documents = await fetchDocuments();
+            if (documents) {
+                allDocuments = documents;
+                console.log('Documents loaded:', documents.length);
+            }
+        } catch (docError) {
+            console.error('Error fetching documents:', docError);
+            // Continue without documents - they'll be fetched when needed
+        }
+
+    } catch (error) {
+        console.error('Error loading page:', error);
+        // Show error message instead of redirecting
+        if (grid) {
+            grid.innerHTML = `
+                <div class="error-message" style="text-align: center; padding: 20px; color: red;">
+                    <h3>Error Loading Contributors</h3>
+                    <p>${error.message}</p>
+                    <button class="button primary" onclick="window.location.reload()">Try Again</button>
+                </div>
+            `;
+        }
     }
 });
 </script>
@@ -1796,6 +1930,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
         <script src="https://d3js.org/d3.v7.min.js"></script>
+      
+        <script src="../../js/token-debugger.js"></script>
+      
+        <script src="../../js/auth-utils.js"></script>
+      
+        <script src="../../js/admin-auth.js"></script>
+      
+        <script src="../../js/admin-check.js"></script>
+      
+        <script src="../../js/markdown-auth.js"></script>
       
         <script src="../../js/init-superuser.js"></script>
       

@@ -347,3 +347,4 @@ function displayError(message) {
         </div>
     `;
 } 
+ 
