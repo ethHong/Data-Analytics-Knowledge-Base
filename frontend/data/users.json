@@ -6,6 +6,27 @@
             "id": "5d10093e-8bea-44d1-a09d-4afca72fd99c",
             "role": "admin",
             "is_verified": true
+        },
+        {
+            "email": "ethan@anderson.ucla.edu",
+            "password": "$2b$12$RpLl31pipwRxHSKdxv0/NOjBchE0desM9x4flSDTqBL3o3Is0adt.",
+            "id": "c877ab14-9c57-4d3a-89b7-482e572d1157",
+            "role": "user",
+            "is_verified": true
+        },
+        {
+            "email": "ethantest",
+            "password": "$2b$12$hqU3LY4f28wrT1HAXZbNd.y7LYJg2T/9TBFbUY13t1ScEEDlPxYy.",
+            "id": "02226df8-a0d8-4d7b-9a33-3cdc7f0056db",
+            "role": "user",
+            "is_verified": true
+        },
+        {
+            "email": "ethantest@anderson.ucla.edu",
+            "password": "$2b$12$WT2X9p4X0uv0n6A3Sj3Uw.MxjV9Zr7JpZbta6dIi/.i2WkJhI1TZC",
+            "id": "3c00f0a2-c893-4ef3-99de-7152000f3e42",
+            "role": "user",
+            "is_verified": true
         }
     ]
 }
