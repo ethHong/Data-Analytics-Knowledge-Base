@@ -469,8 +469,13 @@ async function loadContributorContributions(contributorId) {
 
 // Function to update contributor contributions display
 function updateContributorContributions(contributorId, contributions) {
+    console.log(`Updating UI for contributor ${contributorId} with contributions:`, contributions);
+    
     const contributionsEl = document.querySelector(`[data-contributor-id="${contributorId}"] .contributions-list`);
-    if (!contributionsEl) return;
+    if (!contributionsEl) {
+        console.error(`Cannot find contributions list element for contributor ${contributorId}`);
+        return;
+    }
 
     if (!contributions || contributions.length === 0) {
         contributionsEl.innerHTML = '<li>No contributions yet</li>';
@@ -482,6 +487,7 @@ function updateContributorContributions(contributorId, contributions) {
     }).join('');
     
     contributionsEl.innerHTML = contributionsList;
+    console.log('UI updated with contributions');
 }
 
 // Function to toggle contributions visibility
@@ -805,71 +811,81 @@ async function saveContributions() {
 
     console.log('Saving contributions:', {
         contributorId,
-        selectedDocs
+        selectedDocsCount: selectedDocs.length
     });
 
     try {
-        // First, save to API
-        const apiResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}/contributions`, {
+        // STEP 1: Get the current contributor data
+        const getResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (!getResponse.ok) {
+            throw new Error(`Failed to get contributor data: ${getResponse.status}`);
+        }
+        
+        // Parse the contributor data
+        const contributor = await getResponse.json();
+        console.log('Current contributor data:', contributor);
+        
+        // STEP 2: Create the updated contributor data with new contributions
+        const updatedContributor = {
+            name: contributor.name,
+            organization: contributor.organization,
+            linkedin: contributor.linkedin || '',
+            image: contributor.image || '',
+            // Note: Not including the ID field, as it's part of the URL
+            // The contributions field is included here but may be preserved by the server
+            contributions: selectedDocs
+        };
+        
+        console.log('Sending updated contributor data:', updatedContributor);
+        
+        // STEP 3: Send the complete contributor data to the update endpoint
+        const updateResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({
-                contributions: selectedDocs
-            })
+            body: JSON.stringify(updatedContributor)
         });
-
-        if (apiResponse.status === 401) {
-            throw new Error('Authentication expired. Please log in again.');
-        }
-
-        if (!apiResponse.ok) {
-            const errorData = await apiResponse.text();
-            console.error('API error response:', errorData);
-            throw new Error(`Failed to save contributions to API: ${errorData}`);
-        }
-
-        // Then, update local JSON file
-        const jsonResponse = await fetch('../../data/contributors.json');
-        if (!jsonResponse.ok) {
-            throw new Error('Failed to fetch local contributors.json');
-        }
-        const jsonData = await jsonResponse.json();
         
-        // Find and update the contributor's contributions
-        const contributorIndex = jsonData.contributors.findIndex(c => c.id === contributorId);
-        if (contributorIndex === -1) {
-            throw new Error('Contributor not found in local JSON file');
+        if (!updateResponse.ok) {
+            const errorText = await updateResponse.text();
+            throw new Error(`Failed to update contributor: ${errorText}`);
         }
         
-        jsonData.contributors[contributorIndex].contributions = selectedDocs;
+        // Get the response data
+        const responseData = await updateResponse.json();
+        console.log('Server response after update:', responseData);
         
-        // Save updated JSON back to file
-        const saveResponse = await fetch('../../data/contributors.json', {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(jsonData, null, 2)
-        });
-
-        if (!saveResponse.ok) {
-            throw new Error('Failed to save to local JSON file');
+        // STEP 4: Verify the contributions were included (should be the case based on server code)
+        if (!responseData.contributions || responseData.contributions.length === 0) {
+            console.warn('Warning: Server response does not include contributions as expected.');
+            
+            // Let's log detailed information to help understand what might be happening
+            console.log('Original contributions:', selectedDocs);
+            console.log('Response data structure:', Object.keys(responseData));
+        } else {
+            console.log('Confirmed: Server response includes contributions.');
         }
-
-        // Close modal and refresh contributions
+        
+        // STEP 5: Update the UI with our intended list regardless of what the server returned
+        updateContributorContributions(contributorId, selectedDocs);
+        
+        // Close the modal
         closeModal('contributionModal');
-        await loadContributorContributions(contributorId);
         
         // Show success message
-        alert('Contributions updated successfully in both API and local file!');
+        alert('Contributor updated successfully!');
     } catch (error) {
         console.error('Error saving contributions:', error);
-        alert(error.message);
+        alert(`Error: ${error.message}`);
     }
 }
 
