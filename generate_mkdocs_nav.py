@@ -71,12 +71,14 @@ def update_mkdocs_nav():
     # Generate navigation with fixed tabs
     config["nav"] = [
         {"🏠 Home": "index.md"},
+        {"🔐 Login": "auth/login.html"},
         {"🎖️ Contributors": "contributors.md"},
         {
             "⚙️ Admin": {
                 "🏠 Overview": "admin/index.md",
+                "👥 User Management": "admin/users.md",
+                "🥇 Contributor Management": "admin/contributors.md",
                 "📄 Document Management": "admin/documents.md",
-                "👥 Contributor Management": "admin/contributors.md",
             }
         },
     ]
@@ -95,6 +97,8 @@ def update_mkdocs_nav():
         "https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js",
         "https://polyfill.io/v3/polyfill.min.js?features=es6",
         "https://d3js.org/d3.v7.min.js",
+        "js/init-superuser.js",
+        "js/auth.js",
         "js/graph.js",
         "js/contributors.js",
         "js/admin.js",

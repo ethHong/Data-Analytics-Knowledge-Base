@@ -6,6 +6,13 @@ from pydantic import BaseModel
 from pathlib import Path
 from typing import List, Optional
 import json
+from fastapi import status, Depends
+from fastapi.security import OAuth2PasswordRequestForm
+from jose import jwt, JWTError
+from datetime import datetime, timedelta
+import uuid
+from passlib.context import CryptContext
+from fastapi.security import OAuth2PasswordBearer
 
 app = FastAPI()  # Initialize APP
 
@@ -373,8 +380,228 @@ async def delete_contributor(contributor_id: str):
         raise HTTPException(status_code=500, detail="Failed to delete contributor")
 
 
+class UserBase(BaseModel):
+    email: str
+
+
+class UserCreate(UserBase):
+    password: str
+
+
+class User(UserBase):
+    id: str
+    is_verified: bool = False
+    role: str = "user"
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    email: Optional[str] = None
+
+
+class VerificationCode(BaseModel):
+    email: str
+    code: str
+
+
+class LoginData(BaseModel):
+    email: str
+    password: str
+
+
+# Update the path to users.json
+USERS_FILE = os.path.join(BASE_DIR, "frontend", "data", "users.json")
+VERIFICATION_CODES_FILE = os.path.join(
+    BASE_DIR, "frontend", "data", "verification_codes.json"
+)
+
+
+def write_users(data):
+    """Helper function to write users data"""
+    try:
+        os.makedirs(os.path.dirname(USERS_FILE), exist_ok=True)
+        with open(USERS_FILE, "w") as f:
+            json.dump(data, f, indent=4)
+        return True
+    except Exception as e:
+        print(f"Error writing users: {str(e)}")
+        return False
+
+
+def read_users():
+    """Helper function to read users data"""
+    try:
+        if not os.path.exists(USERS_FILE):
+            return {"users": []}
+        with open(USERS_FILE, "r") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Error reading users: {str(e)}")
+        return {"users": []}
+
+
+def write_verification_codes(data):
+    """Helper function to write verification codes"""
+    try:
+        os.makedirs(os.path.dirname(VERIFICATION_CODES_FILE), exist_ok=True)
+        with open(VERIFICATION_CODES_FILE, "w") as f:
+            json.dump(data, f, indent=4)
+        return True
+    except Exception as e:
+        print(f"Error writing verification codes: {str(e)}")
+        return False
+
+
+def read_verification_codes():
+    """Helper function to read verification codes"""
+    try:
+        if not os.path.exists(VERIFICATION_CODES_FILE):
+            return {"codes": []}
+        with open(VERIFICATION_CODES_FILE, "r") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Error reading verification codes: {str(e)}")
+        return {"codes": []}
+
+
+# Read secret key from file
+def get_secret_key():
+    try:
+        with open("key.txt", "r") as f:
+            key = f.read().strip()
+            if not key:
+                raise ValueError("Secret key file is empty")
+            return key
+    except FileNotFoundError:
+        raise RuntimeError(
+            "key.txt file not found. Please create it with a secure secret key."
+        )
+    except Exception as e:
+        raise RuntimeError(f"Error reading secret key: {str(e)}")
+
+
+# Authentication utilities
+SECRET_KEY = get_secret_key()
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")
+
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+
+def get_user(email: str):
+    users_data = read_users()
+    for user in users_data.get("users", []):
+        if user["email"] == email:
+            return User(**user)
+    return None
+
+
+def authenticate_user(email: str, password: str):
+    users_data = read_users()
+    for stored_user in users_data.get("users", []):
+        if stored_user["email"] == email and verify_password(
+            password, stored_user["password"]
+        ):
+            return User(**stored_user)
+    return False
+
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+        token_data = TokenData(email=email)
+    except JWTError:
+        raise credentials_exception
+    user = get_user(email=token_data.email)
+    if user is None:
+        raise credentials_exception
+    return user
+
+
+# Authentication endpoints
+@app.post("/api/auth/register", response_model=User)
+async def register(user: UserCreate):
+    users_data = read_users()
+    if any(u["email"] == user.email for u in users_data.get("users", [])):
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    user_dict = user.dict()
+    user_dict["id"] = str(uuid.uuid4())
+    user_dict["password"] = get_password_hash(user.password)
+    users_data.setdefault("users", []).append(user_dict)
+
+    if write_users(users_data):
+        return User(**user_dict)
+    raise HTTPException(status_code=500, detail="Failed to register user")
+
+
+@app.post("/api/auth/token")
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = authenticate_user(form_data.username, form_data.password)
+    if not user or isinstance(user, bool):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.email}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+@app.get("/api/auth/me", response_model=User)
+async def read_users_me(current_user: User = Depends(get_current_user)):
+    return current_user
+
+
+@app.post("/api/auth/logout")
+async def logout():
+    # Since we're using JWT tokens, we don't need to do anything server-side
+    # The client should remove the token
+    return {"message": "Successfully logged out"}
+
+
+@app.get("/api/auth/check")
+async def check_auth(current_user: User = Depends(get_current_user)):
+    return {"authenticated": True, "user": current_user}
+
+
 # Start the FastAPI server
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
