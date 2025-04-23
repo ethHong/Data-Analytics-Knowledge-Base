@@ -811,81 +811,59 @@ async function saveContributions() {
 
     console.log('Saving contributions:', {
         contributorId,
-        selectedDocsCount: selectedDocs.length
+        selectedDocsCount: selectedDocs.length,
+        selectedDocs
     });
 
     try {
-        // STEP 1: Get the current contributor data
-        const getResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json'
-            }
-        });
-        
-        if (!getResponse.ok) {
-            throw new Error(`Failed to get contributor data: ${getResponse.status}`);
-        }
-        
-        // Parse the contributor data
-        const contributor = await getResponse.json();
-        console.log('Current contributor data:', contributor);
-        
-        // STEP 2: Create the updated contributor data with new contributions
-        const updatedContributor = {
-            name: contributor.name,
-            organization: contributor.organization,
-            linkedin: contributor.linkedin || '',
-            image: contributor.image || '',
-            // Note: Not including the ID field, as it's part of the URL
-            // The contributions field is included here but may be preserved by the server
-            contributions: selectedDocs
-        };
-        
-        console.log('Sending updated contributor data:', updatedContributor);
-        
-        // STEP 3: Send the complete contributor data to the update endpoint
-        const updateResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
-            method: 'PUT',
+        // Use the direct admin endpoint for most reliable update
+        console.log('Using admin direct file update endpoint');
+        const adminUpdateResponse = await fetch('http://34.82.192.6:8000/api/admin/updateContributors', {
+            method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify(updatedContributor)
+            body: JSON.stringify({
+                contributorId: contributorId,
+                contributions: selectedDocs
+            })
         });
         
-        if (!updateResponse.ok) {
-            const errorText = await updateResponse.text();
-            throw new Error(`Failed to update contributor: ${errorText}`);
+        if (!adminUpdateResponse.ok) {
+            const errorText = await adminUpdateResponse.text();
+            throw new Error(`Admin update failed: ${adminUpdateResponse.status} - ${errorText}`);
         }
         
-        // Get the response data
-        const responseData = await updateResponse.json();
-        console.log('Server response after update:', responseData);
+        const responseData = await adminUpdateResponse.json();
+        console.log('Admin update response:', responseData);
         
-        // STEP 4: Verify the contributions were included (should be the case based on server code)
-        if (!responseData.contributions || responseData.contributions.length === 0) {
-            console.warn('Warning: Server response does not include contributions as expected.');
-            
-            // Let's log detailed information to help understand what might be happening
-            console.log('Original contributions:', selectedDocs);
-            console.log('Response data structure:', Object.keys(responseData));
-        } else {
-            console.log('Confirmed: Server response includes contributions.');
-        }
-        
-        // STEP 5: Update the UI with our intended list regardless of what the server returned
+        // Update the UI to reflect the changes
         updateContributorContributions(contributorId, selectedDocs);
         
         // Close the modal
         closeModal('contributionModal');
         
         // Show success message
-        alert('Contributor updated successfully!');
+        alert('Contributions updated successfully!');
     } catch (error) {
         console.error('Error saving contributions:', error);
-        alert(`Error: ${error.message}`);
+        
+        // Provide a clear error message with the manual workaround
+        alert(`
+Server update failed: ${error.message}
+
+For a temporary workaround, please:
+1. Contact the administrator
+2. Ask them to manually update the contributions for ${contributorId}
+3. Provide this data:
+${JSON.stringify(selectedDocs, null, 2)}
+        `);
+        
+        // Update the UI anyway so the user sees their changes
+        updateContributorContributions(contributorId, selectedDocs);
+        closeModal('contributionModal');
     }
 }
 

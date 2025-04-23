@@ -775,3 +775,76 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
+
+
+# Add admin API endpoint for direct file update
+@app.post("/api/admin/updateContributors")
+async def update_contributors_file(
+    data: dict, current_user: User = Depends(get_current_user)
+):
+    """Admin endpoint to directly update the contributors file with detailed logging."""
+    if not current_user or current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized"
+        )
+
+    try:
+        # Log everything for debugging
+        print(f"Admin update request received")
+        print(f"Current contributors file path: {CONTRIBUTORS_FILE}")
+
+        # Read the existing data first
+        contributors_data = read_contributors()
+
+        # Find the contributor to update
+        if "contributorId" not in data:
+            raise HTTPException(status_code=400, detail="Missing contributorId")
+
+        contributor_id = data["contributorId"]
+        print(f"Updating contributor with ID: {contributor_id}")
+
+        # Find the contributor index
+        contributor_index = -1
+        for i, contributor in enumerate(contributors_data["contributors"]):
+            if contributor["id"] == contributor_id:
+                contributor_index = i
+                break
+
+        if contributor_index == -1:
+            raise HTTPException(status_code=404, detail="Contributor not found")
+
+        # Update the contributions
+        if "contributions" in data:
+            contributors_data["contributors"][contributor_index]["contributions"] = (
+                data["contributions"]
+            )
+            print(f"Updated contributions for contributor {contributor_id}")
+
+        # Write to both possible locations to ensure consistency
+        success = write_contributors(contributors_data)
+
+        # Also try to write to the potential frontend/data location
+        alternate_path = os.path.join(BASE_DIR, "frontend", "data", "contributors.json")
+        try:
+            print(f"Also writing to alternate path: {alternate_path}")
+            os.makedirs(os.path.dirname(alternate_path), exist_ok=True)
+            with open(alternate_path, "w") as f:
+                json.dump(contributors_data, f, indent=4)
+                print(f"Successfully wrote data to alternate path")
+        except Exception as e:
+            print(f"Warning: Could not write to alternate path: {str(e)}")
+            # Continue as this is just a backup attempt
+
+        if success:
+            return {"status": "success", "message": "Contributors file updated"}
+        else:
+            raise HTTPException(
+                status_code=500, detail="Failed to update contributors file"
+            )
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        print(f"Error in admin update: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to update contributors: {str(e)}"
+        )
