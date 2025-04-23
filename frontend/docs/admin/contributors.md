@@ -591,11 +591,17 @@ async function openContributionModal(contributorId) {
         const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
+                ...getAuthHeaders(),
                 'Accept': 'application/json'
             }
         });
         
         console.log('Documents response status:', response.status);
+        
+        if (response.status === 401 || response.status === 403) {
+            window.location.replace('/auth/login.html');
+            return;
+        }
         
         if (!response.ok) {
             throw new Error('Failed to fetch documents');
@@ -612,10 +618,19 @@ async function openContributionModal(contributorId) {
         allDocuments = data.documents;
         
         // Get current contributor data to know which documents are selected
-        const contributorResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`);
+        const contributorResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
+            headers: getAuthHeaders()
+        });
+        
+        if (contributorResponse.status === 401 || contributorResponse.status === 403) {
+            window.location.replace('/auth/login.html');
+            return;
+        }
+        
         if (!contributorResponse.ok) {
             throw new Error('Failed to fetch contributor data');
         }
+        
         const contributor = await contributorResponse.json();
         
         // Reset and set selected documents

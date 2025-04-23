@@ -47,45 +47,39 @@ let selectedContributions = new Set();
 
 async function fetchDocuments() {
     try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('Not authenticated');
-        }
-
         const apiUrl = 'http://34.82.192.6:8000/api/documents';
         console.log('Fetching documents from:', apiUrl);
-        
+
         const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${token}`
+                ...getAuthHeaders(),
+                'Accept': 'application/json'
             }
         });
-        
+
         console.log('Response status:', response.status);
-        
+
+        if (response.status === 401 || response.status === 403) {
+            window.location.replace('/auth/login.html');
+            return;
+        }
+
         if (!response.ok) {
-            if (response.status === 401) {
-                window.location.href = '/auth/login.html';
-                return;
-            } else if (response.status === 403) {
-                window.location.href = '/index.html';
-                return;
-            } else if (response.status === 404) {
+            if (response.status === 404) {
                 throw new Error('API endpoint not found. Please check if the API server is running.');
             } else {
                 throw new Error(`Server error: ${response.status}`);
             }
         }
-        
+
         const data = await response.json();
         console.log('Response data:', data);
-        
+
         if (!data || !Array.isArray(data.documents)) {
             throw new Error('Invalid data format received from API');
         }
-        
+
         allDocuments = data.documents;
         displayDocuments(allDocuments);
     } catch (error) {
@@ -94,12 +88,7 @@ async function fetchDocuments() {
             name: error.name,
             stack: error.stack
         });
-        
-        if (error.message === 'Not authenticated') {
-            window.location.href = '/auth/login.html';
-            return;
-        }
-        
+
         const documentList = document.getElementById('documentList');
         if (documentList) {
             documentList.innerHTML = `

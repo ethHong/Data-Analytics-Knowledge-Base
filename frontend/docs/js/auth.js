@@ -12,14 +12,14 @@ const publicPaths = [
 
 // Paths that require user authentication
 const userPaths = [
-    '/auth/profile.html',
-    '/markdowns/',
-    '/documents.html'
+    '/auth/profile.html'
 ];
 
 // Paths that require admin authentication
 const adminPaths = [
-    '/admin/'  // All paths under /admin/ require admin access
+    '/admin/',  // All paths under /admin/ require admin access
+    '/markdowns/',  // All markdown documents require admin access
+    '/documents.html'  // Document management requires admin access
 ];
 
 function isPublicPath(path) {
@@ -47,7 +47,14 @@ function isAdminPath(path) {
         window.location.replace(normalizedPath);
         return true;
     }
-    return path.startsWith('/admin/');
+    
+    // Check if path matches any admin paths
+    return adminPaths.some(adminPath => {
+        if (adminPath.endsWith('/')) {
+            return path.startsWith(adminPath);
+        }
+        return path === adminPath;
+    });
 }
 
 // Get auth headers for API requests
