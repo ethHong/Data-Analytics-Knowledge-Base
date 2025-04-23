@@ -47,20 +47,32 @@ let selectedContributions = new Set();
 
 async function fetchDocuments() {
     try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('Not authenticated');
+        }
+
         const apiUrl = 'http://34.82.192.6:8000/api/documents';
         console.log('Fetching documents from:', apiUrl);
         
         const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`
             }
         });
         
         console.log('Response status:', response.status);
         
         if (!response.ok) {
-            if (response.status === 404) {
+            if (response.status === 401) {
+                window.location.href = '/auth/login.html';
+                return;
+            } else if (response.status === 403) {
+                window.location.href = '/index.html';
+                return;
+            } else if (response.status === 404) {
                 throw new Error('API endpoint not found. Please check if the API server is running.');
             } else {
                 throw new Error(`Server error: ${response.status}`);
@@ -82,6 +94,11 @@ async function fetchDocuments() {
             name: error.name,
             stack: error.stack
         });
+        
+        if (error.message === 'Not authenticated') {
+            window.location.href = '/auth/login.html';
+            return;
+        }
         
         const documentList = document.getElementById('documentList');
         if (documentList) {
@@ -226,12 +243,41 @@ function handleRefresh() {
     fetchDocuments();
 }
 
-function viewDocument(title) {
-    // Just encode the title as-is
-    const encodedName = encodeURIComponent(title);
-    // Construct the final URL with the correct base path
-    const url = `../../markdowns/${encodedName}/`;
-    window.location.href = url;
+async function viewDocument(title) {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/auth/login.html';
+            return;
+        }
+
+        const encodedName = encodeURIComponent(title);
+        const url = `../../markdowns/${encodedName}/`;
+        
+        // First check if user has access
+        const response = await fetch(`http://34.82.192.6:8000/documents/${encodedName}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                window.location.href = '/auth/login.html';
+                return;
+            } else if (response.status === 403) {
+                window.location.href = '/index.html';
+                return;
+            }
+            throw new Error(`Server error: ${response.status}`);
+        }
+
+        window.location.href = url;
+    } catch (error) {
+        console.error('Error accessing document:', error);
+        alert('Error accessing document. Please try again.');
+    }
 }
 
 // Initialize when the page loads

@@ -175,6 +175,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 # Define API endpoint - document list
 @app.get("/documents/")
 async def get_all_documents(current_user: User = Depends(get_current_user)):
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
+        )
     with driver.session() as session:
         result = session.run("MATCH (d: Document) RETURN d.title AS title")
         return {"documents": [record["title"] for record in result]}
@@ -183,6 +187,14 @@ async def get_all_documents(current_user: User = Depends(get_current_user)):
 # Define API endpoint for document management
 @app.get("/api/documents")
 async def get_documents_for_management(current_user: User = Depends(get_current_user)):
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
+        )
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized"
+        )
     with driver.session() as session:
         result = session.run(
             """
@@ -206,6 +218,10 @@ async def get_documents_for_management(current_user: User = Depends(get_current_
 # Define API endpoint - document content
 @app.get("/documents/{title}")
 async def get_content(title: str, current_user: User = Depends(get_current_user)):
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
+        )
     with driver.session() as session:
         result = session.run(
             "MATCH (d: Document {title: $title}) RETURN d.content AS content",
@@ -359,7 +375,7 @@ def read_contributors():
         return {"contributors": []}
 
 
-# Get all contributors
+# Get all contributors - public access
 @app.get("/api/contributors", response_model=dict)
 async def get_all_contributors():
     try:
@@ -368,7 +384,7 @@ async def get_all_contributors():
         raise HTTPException(status_code=500, detail="Failed to read contributors")
 
 
-# Get single contributor
+# Get single contributor - public access
 @app.get("/api/contributors/{contributor_id}", response_model=Contributor)
 async def get_contributor(contributor_id: str):
     try:
@@ -387,9 +403,15 @@ async def get_contributor(contributor_id: str):
         raise HTTPException(status_code=500, detail="Failed to read contributor")
 
 
-# Create new contributor
+# Create new contributor - admin only
 @app.post("/api/contributors", response_model=Contributor)
-async def create_contributor(contributor: ContributorCreate):
+async def create_contributor(
+    contributor: ContributorCreate, current_user: User = Depends(get_current_user)
+):
+    if not current_user or current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized"
+        )
     try:
         data = read_contributors()
 
@@ -410,9 +432,17 @@ async def create_contributor(contributor: ContributorCreate):
         raise HTTPException(status_code=500, detail="Failed to create contributor")
 
 
-# Update contributor info
+# Update contributor info - admin only
 @app.put("/api/contributors/{contributor_id}", response_model=Contributor)
-async def update_contributor_info(contributor_id: str, contributor: ContributorUpdate):
+async def update_contributor_info(
+    contributor_id: str,
+    contributor: ContributorUpdate,
+    current_user: User = Depends(get_current_user),
+):
+    if not current_user or current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized"
+        )
     try:
         data = read_contributors()
         contributor_index = next(
@@ -446,43 +476,15 @@ async def update_contributor_info(contributor_id: str, contributor: ContributorU
         raise HTTPException(status_code=500, detail="Failed to update contributor")
 
 
-# Update contributor contributions
-@app.put("/api/contributors/{contributor_id}/contributions", response_model=Contributor)
-async def update_contributor_contributions(
-    contributor_id: str, contribution_data: ContributionUpdate
-):
-    try:
-        data = read_contributors()
-        contributor_index = next(
-            (
-                i
-                for i, c in enumerate(data["contributors"])
-                if c["id"] == contributor_id
-            ),
-            -1,
-        )
-
-        if contributor_index == -1:
-            raise HTTPException(status_code=404, detail="Contributor not found")
-
-        # Update only the contributions field
-        data["contributors"][contributor_index]["contributions"] = [
-            doc.dict() for doc in contribution_data.contributions
-        ]
-
-        if not write_contributors(data):
-            raise HTTPException(status_code=500, detail="Failed to save contributions")
-
-        return data["contributors"][contributor_index]
-    except HTTPException as he:
-        raise he
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Failed to update contributions")
-
-
-# Delete contributor
+# Delete contributor - admin only
 @app.delete("/api/contributors/{contributor_id}")
-async def delete_contributor(contributor_id: str):
+async def delete_contributor(
+    contributor_id: str, current_user: User = Depends(get_current_user)
+):
+    if not current_user or current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized"
+        )
     try:
         data = read_contributors()
         contributor_index = next(

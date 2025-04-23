@@ -6,7 +6,7 @@ const publicPaths = [
     '/auth/login.html',
     '/index.html',
     '/',
-    '/contributors.html',
+    '/contributors.html',  // Keep contributors page public
     '/graph.html'
 ];
 
@@ -19,10 +19,7 @@ const userPaths = [
 
 // Paths that require admin authentication
 const adminPaths = [
-    '/admin/index.md',
-    '/admin/users.md',
-    '/admin/documents.md',
-    '/admin/contributors.md'
+    '/admin/'  // All paths under /admin/ require admin access
 ];
 
 function isPublicPath(path) {
@@ -44,7 +41,13 @@ function isUserPath(path) {
 }
 
 function isAdminPath(path) {
-    return adminPaths.some(adminPath => path === adminPath);
+    // Normalize the path to handle potential variations
+    const normalizedPath = path.replace('/admin/auth/login.html', '/auth/login.html');
+    if (normalizedPath !== path) {
+        window.location.replace(normalizedPath);
+        return true;
+    }
+    return path.startsWith('/admin/');
 }
 
 // Get auth headers for API requests
@@ -112,19 +115,21 @@ function getLoginPath() {
 
 // Redirect to login page if not authenticated or not admin for admin pages
 async function requireAuth() {
+    hideContent();
     const currentPath = window.location.pathname;
     
     // Always allow public paths
     if (isPublicPath(currentPath)) {
+        showContent();
         return true;
     }
 
     const authCheck = await checkAuth();
     
     // If not authenticated, redirect to login
-    if (!authCheck.isAuthenticated) {
+    if (!authCheck.authenticated) {
         sessionStorage.setItem('redirectAfterLogin', currentPath);
-        window.location.replace('/auth/login.html');
+        window.location.replace(getLoginPath());
         return false;
     }
 
@@ -134,15 +139,18 @@ async function requireAuth() {
             window.location.replace('/index.html');
             return false;
         }
+        showContent();
         return true;
     }
 
     // For user paths, being authenticated is enough
     if (isUserPath(currentPath)) {
+        showContent();
         return true;
     }
 
     // If path is not in any list, treat as requiring authentication
+    showContent();
     return true;
 }
 
