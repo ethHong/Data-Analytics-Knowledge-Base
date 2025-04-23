@@ -49,7 +49,7 @@ VERIFICATION_CODES_FILE = os.path.join(
 class UserBase(BaseModel):
     email: str
     role: Optional[str] = None
-    is_verified: Optional[bool] = None
+    is_verified: Optional[bool] = False
 
 
 class UserCreate(UserBase):
@@ -512,11 +512,12 @@ async def register(user: UserCreate):
     user_dict = user.dict()
     user_dict["id"] = str(uuid.uuid4())
     user_dict["password"] = get_password_hash(user.password)
+    user_dict["is_verified"] = False
     users_data.setdefault("users", []).append(user_dict)
 
     if write_users(users_data):
         return User(**user_dict)
-    raise HTTPException(status_code=500, detail="Failed to register user")
+    raise HTTPException(status_code=500, detail="Failed to create user")
 
 
 @app.post("/api/auth/token")
@@ -622,6 +623,31 @@ async def delete_user(user_id: str, current_user: User = Depends(get_current_use
     if write_users(users_data):
         return {"status": "success"}
     raise HTTPException(status_code=500, detail="Failed to delete user")
+
+
+# Add a new endpoint to update user verification status
+@app.put("/api/users/{user_id}/verify")
+async def update_user_verification(
+    user_id: str, is_verified: bool, current_user: User = Depends(get_current_user)
+):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    users_data = read_users()
+    user_index = next(
+        (i for i, u in enumerate(users_data["users"]) if u["id"] == user_id), -1
+    )
+
+    if user_index == -1:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    users_data["users"][user_index]["is_verified"] = is_verified
+
+    if write_users(users_data):
+        return {"status": "success", "is_verified": is_verified}
+    raise HTTPException(
+        status_code=500, detail="Failed to update user verification status"
+    )
 
 
 # Start the FastAPI server

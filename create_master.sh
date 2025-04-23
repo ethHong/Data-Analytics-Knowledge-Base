@@ -17,7 +17,8 @@ response=$(curl -s -X POST "http://34.82.192.6:8000/api/auth/register" \
   -d "{
     \"email\": \"$email\",
     \"password\": \"$password\",
-    \"role\": \"$role\"
+    \"role\": \"$role\",
+    \"is_verified\": true
   }")
 
 # Check if the request was successful
@@ -25,6 +26,7 @@ if echo "$response" | grep -q "id"; then
     echo "User created successfully!"
     echo "Email: $email"
     echo "Role: $role"
+    echo "Verification status: Verified"
 else
     echo "Failed to create user. Response:"
     echo "$response"

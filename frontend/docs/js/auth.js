@@ -1,22 +1,23 @@
 // Authentication and access control
 // Remove hardcoded base URL and use relative paths
 
+// Public paths that don't require authentication
 const publicPaths = [
-    '/contributors.html',
     '/auth/login.html',
     '/index.html',
-    '/'
+    '/',
+    '/contributors.html',
+    '/graph.html'
 ];
 
-// Pages that require authentication but not admin role
+// Paths that require user authentication
 const userPaths = [
     '/auth/profile.html',
-    '/markdowns/',  // All document pages
-    '/documents/',  // Document API endpoints
-    '/graph/'      // Graph visualization
+    '/markdowns/',
+    '/documents.html'
 ];
 
-// Pages that require admin role
+// Paths that require admin authentication
 const adminPaths = [
     '/admin/index.md',
     '/admin/users.md',
@@ -25,15 +26,25 @@ const adminPaths = [
 ];
 
 function isPublicPath(path) {
-    return publicPaths.some(publicPath => path.includes(publicPath));
+    return publicPaths.some(publicPath => {
+        if (publicPath.endsWith('/')) {
+            return path.startsWith(publicPath);
+        }
+        return path === publicPath;
+    });
 }
 
 function isUserPath(path) {
-    return userPaths.some(userPath => path.includes(userPath));
+    return userPaths.some(userPath => {
+        if (userPath.endsWith('/')) {
+            return path.startsWith(userPath);
+        }
+        return path === userPath;
+    });
 }
 
 function isAdminPath(path) {
-    return adminPaths.some(adminPath => path.includes(adminPath));
+    return adminPaths.some(adminPath => path === adminPath);
 }
 
 // Get auth headers for API requests
@@ -101,45 +112,38 @@ function getLoginPath() {
 
 // Redirect to login page if not authenticated or not admin for admin pages
 async function requireAuth() {
-    hideContent();  // Hide content while checking auth
-    
-    const { authenticated, isAdmin } = await checkAuth();
     const currentPath = window.location.pathname;
-    console.log('Current path:', currentPath);
-    console.log('Auth status:', { authenticated, isAdmin });
-
-    // Check admin access first
-    if (isAdminPath(currentPath)) {
-        console.log('Admin path detected');
-        if (!authenticated || !isAdmin) {
-            console.log('User not authenticated or not admin, redirecting to login');
-            sessionStorage.setItem('redirectAfterLogin', currentPath);
-            window.location.href = getLoginPath();
-            return;
-        }
-        showContent();
-        return;
-    }
-
-    // Check user access for protected paths
-    if (isUserPath(currentPath)) {
-        console.log('User path detected');
-        if (!authenticated) {
-            console.log('User not authenticated, redirecting to login');
-            sessionStorage.setItem('redirectAfterLogin', currentPath);
-            window.location.href = getLoginPath();
-            return;
-        }
-    }
-
-    // Handle public paths
+    
+    // Always allow public paths
     if (isPublicPath(currentPath)) {
-        showContent();
-        return;
+        return true;
     }
 
-    // Show content for authenticated users
-    showContent();
+    const authCheck = await checkAuth();
+    
+    // If not authenticated, redirect to login
+    if (!authCheck.isAuthenticated) {
+        sessionStorage.setItem('redirectAfterLogin', currentPath);
+        window.location.replace('/auth/login.html');
+        return false;
+    }
+
+    // For admin paths, check admin status
+    if (isAdminPath(currentPath)) {
+        if (!authCheck.isAdmin) {
+            window.location.replace('/index.html');
+            return false;
+        }
+        return true;
+    }
+
+    // For user paths, being authenticated is enough
+    if (isUserPath(currentPath)) {
+        return true;
+    }
+
+    // If path is not in any list, treat as requiring authentication
+    return true;
 }
 
 // Handle login form submission
@@ -150,7 +154,7 @@ async function handleLogin(event) {
     const password = document.getElementById('login-password').value;
     
     try {
-        const response = await fetch('http://34.82.192.6:8000/api/auth/token', {
+        const response = await fetch('/api/auth/token', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -182,13 +186,14 @@ async function handleLogin(event) {
             }
             // If in iframe, do nothing - let the parent handle it
         } else {
-            const error = await response.text();
             const errorDiv = document.querySelector('.error-message') || document.createElement('div');
             errorDiv.className = 'error-message';
+            errorDiv.style.color = 'red';
+            errorDiv.style.marginTop = '10px';
             errorDiv.style.display = 'block';
             errorDiv.textContent = 'Invalid email or password';
             const loginForm = document.getElementById('login-form');
-            if (loginForm) {
+            if (loginForm && !loginForm.querySelector('.error-message')) {
                 loginForm.appendChild(errorDiv);
             }
         }
@@ -196,10 +201,12 @@ async function handleLogin(event) {
         console.error('Error during login:', error);
         const errorDiv = document.querySelector('.error-message') || document.createElement('div');
         errorDiv.className = 'error-message';
+        errorDiv.style.color = 'red';
+        errorDiv.style.marginTop = '10px';
         errorDiv.style.display = 'block';
         errorDiv.textContent = 'Network error occurred';
         const loginForm = document.getElementById('login-form');
-        if (loginForm) {
+        if (loginForm && !loginForm.querySelector('.error-message')) {
             loginForm.appendChild(errorDiv);
         }
     }
