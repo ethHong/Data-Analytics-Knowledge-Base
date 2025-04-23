@@ -71,7 +71,12 @@ def update_mkdocs_nav():
     # Generate navigation with fixed tabs
     config["nav"] = [
         {"🏠 Home": "index.md"},
-        {"🔐 Login": "auth/login.html"},
+        {
+            "👤 Account": {
+                "🔐 Login": "auth/login.html",
+                "👋 Profile": "auth/profile.html",
+            }
+        },
         {"🎖️ Contributors": "contributors.md"},
         {
             "⚙️ Admin": {
@@ -102,6 +107,7 @@ def update_mkdocs_nav():
         "js/graph.js",
         "js/contributors.js",
         "js/admin.js",
+        "js/nav.js",
     ]
 
     config["extra_css"] = ["css/custom.css", "css/contributors.css", "css/admin.css"]

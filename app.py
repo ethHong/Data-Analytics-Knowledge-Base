@@ -382,6 +382,8 @@ async def delete_contributor(contributor_id: str):
 
 class UserBase(BaseModel):
     email: str
+    role: Optional[str] = None
+    is_verified: Optional[bool] = None
 
 
 class UserCreate(UserBase):
@@ -390,8 +392,6 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: str
-    is_verified: bool = False
-    role: str = "user"
 
 
 class Token(BaseModel):
@@ -598,6 +598,78 @@ async def logout():
 @app.get("/api/auth/check")
 async def check_auth(current_user: User = Depends(get_current_user)):
     return {"authenticated": True, "user": current_user}
+
+
+# User management endpoints
+@app.get("/api/users")
+async def get_users(current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    return read_users()
+
+
+@app.post("/api/users")
+async def create_user(user: UserCreate, current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    users_data = read_users()
+    if any(u["email"] == user.email for u in users_data.get("users", [])):
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    user_dict = user.dict()
+    user_dict["id"] = str(uuid.uuid4())
+    user_dict["password"] = get_password_hash(user.password)
+    user_dict["is_verified"] = True
+    users_data.setdefault("users", []).append(user_dict)
+
+    if write_users(users_data):
+        return User(**user_dict)
+    raise HTTPException(status_code=500, detail="Failed to create user")
+
+
+@app.put("/api/users/{user_id}")
+async def update_user(
+    user_id: str, user_update: UserBase, current_user: User = Depends(get_current_user)
+):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    users_data = read_users()
+    user_index = next(
+        (i for i, u in enumerate(users_data["users"]) if u["id"] == user_id), -1
+    )
+
+    if user_index == -1:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Only update fields that are provided
+    update_data = {k: v for k, v in user_update.dict().items() if v is not None}
+    users_data["users"][user_index].update(update_data)
+
+    if write_users(users_data):
+        return User(**users_data["users"][user_index])
+    raise HTTPException(status_code=500, detail="Failed to update user")
+
+
+@app.delete("/api/users/{user_id}")
+async def delete_user(user_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    users_data = read_users()
+    user_index = next(
+        (i for i, u in enumerate(users_data["users"]) if u["id"] == user_id), -1
+    )
+
+    if user_index == -1:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    users_data["users"].pop(user_index)
+
+    if write_users(users_data):
+        return {"status": "success"}
+    raise HTTPException(status_code=500, detail="Failed to delete user")
 
 
 # Start the FastAPI server
