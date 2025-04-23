@@ -179,6 +179,10 @@ async def get_all_documents(current_user: User = Depends(get_current_user)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
         )
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized"
+        )
     with driver.session() as session:
         result = session.run("MATCH (d: Document) RETURN d.title AS title")
         return {"documents": [record["title"] for record in result]}
@@ -221,6 +225,10 @@ async def get_content(title: str, current_user: User = Depends(get_current_user)
     if not current_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
+        )
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized"
         )
     with driver.session() as session:
         result = session.run(

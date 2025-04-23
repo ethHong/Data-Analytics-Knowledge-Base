@@ -47,30 +47,39 @@ let selectedContributions = new Set();
 
 async function fetchDocuments() {
     try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.replace('/auth/login.html');
+            return;
+        }
+
         const apiUrl = 'http://34.82.192.6:8000/api/documents';
         console.log('Fetching documents from:', apiUrl);
 
         const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
-                ...getAuthHeaders(),
+                'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
             }
         });
 
         console.log('Response status:', response.status);
 
-        if (response.status === 401 || response.status === 403) {
+        if (response.status === 401) {
+            // Not authenticated
             window.location.replace('/auth/login.html');
             return;
         }
 
+        if (response.status === 403) {
+            // Not authorized (not admin)
+            window.location.replace('/index.html');
+            return;
+        }
+
         if (!response.ok) {
-            if (response.status === 404) {
-                throw new Error('API endpoint not found. Please check if the API server is running.');
-            } else {
-                throw new Error(`Server error: ${response.status}`);
-            }
+            throw new Error(`Server error: ${response.status}`);
         }
 
         const data = await response.json();
@@ -89,6 +98,8 @@ async function fetchDocuments() {
             stack: error.stack
         });
 
+        // If there's an error, hide the content and show error message
+        document.body.style.visibility = 'hidden';
         const documentList = document.getElementById('documentList');
         if (documentList) {
             documentList.innerHTML = `
@@ -97,9 +108,9 @@ async function fetchDocuments() {
                     <p>${error.message}</p>
                     <p>Please ensure:</p>
                     <ul style="text-align: left; margin: 10px auto; display: inline-block;">
+                        <li>You are logged in as an admin</li>
                         <li>The API server is running</li>
                         <li>You have network connectivity</li>
-                        <li>The correct API endpoint is configured</li>
                     </ul>
                     <button class="refresh-button" onclick="handleRefresh()">
                         Try Again
@@ -236,7 +247,7 @@ async function viewDocument(title) {
     try {
         const token = localStorage.getItem('token');
         if (!token) {
-            window.location.href = '/auth/login.html';
+            window.location.replace('/auth/login.html');
             return;
         }
 
@@ -251,14 +262,17 @@ async function viewDocument(title) {
             }
         });
 
+        if (response.status === 401) {
+            window.location.replace('/auth/login.html');
+            return;
+        }
+
+        if (response.status === 403) {
+            window.location.replace('/index.html');
+            return;
+        }
+
         if (!response.ok) {
-            if (response.status === 401) {
-                window.location.href = '/auth/login.html';
-                return;
-            } else if (response.status === 403) {
-                window.location.href = '/index.html';
-                return;
-            }
             throw new Error(`Server error: ${response.status}`);
         }
 

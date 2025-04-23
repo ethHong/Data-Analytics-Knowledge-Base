@@ -143,6 +143,7 @@ async function requireAuth() {
     // For admin paths, check admin status
     if (isAdminPath(currentPath)) {
         if (!authCheck.isAdmin) {
+            // If not admin, redirect to home page
             window.location.replace('/index.html');
             return false;
         }
@@ -249,7 +250,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Check auth for current page
-    requireAuth();
+    requireAuth().then(isAuthorized => {
+        if (!isAuthorized) {
+            // If not authorized, content will remain hidden
+            return;
+        }
+        showContent();
+    });
 });
 
 // Export for use in other files
