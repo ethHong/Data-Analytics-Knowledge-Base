@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // Always hide admin section by default
+    const adminSection = document.querySelector('li.md-nav__item--nested:has(a[href*="admin/"])');
+    if (adminSection) {
+        adminSection.style.display = 'none';
+    }
+
     const token = localStorage.getItem('token');
     if (!token) {
         // Hide profile link if not logged in
@@ -57,10 +63,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             accountLabel.innerHTML = `<span class="md-nav__icon md-icon"></span>👤 ${user.email}`;
         }
 
-        // Show/hide admin section based on user role
-        const adminSection = document.querySelector('li.md-nav__item--nested:has(a[href*="admin/"])');
-        if (adminSection) {
-            adminSection.style.display = user.role === 'admin' ? 'block' : 'none';
+        // Show admin section ONLY if user is admin
+        if (adminSection && user.role === 'admin') {
+            adminSection.style.display = 'block';
         }
 
     } catch (error) {
