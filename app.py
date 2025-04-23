@@ -848,3 +848,71 @@ async def update_contributors_file(
         raise HTTPException(
             status_code=500, detail=f"Failed to update contributors: {str(e)}"
         )
+
+
+# Add specific endpoint for contributions update
+@app.put("/api/contributors/{contributor_id}/contributions")
+async def update_contributor_contributions(
+    contributor_id: str,
+    contributions_data: ContributionUpdate,
+    current_user: User = Depends(get_current_user),
+):
+    """Special endpoint just for updating a contributor's contributions."""
+    if not current_user or current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized"
+        )
+    try:
+        print(f"Updating contributions for contributor: {contributor_id}")
+        print(f"Received contributions data: {contributions_data}")
+
+        data = read_contributors()
+        contributor_index = next(
+            (
+                i
+                for i, c in enumerate(data["contributors"])
+                if c["id"] == contributor_id
+            ),
+            -1,
+        )
+
+        if contributor_index == -1:
+            raise HTTPException(status_code=404, detail="Contributor not found")
+
+        # Update only contributions, preserving all other fields
+        data["contributors"][contributor_index][
+            "contributions"
+        ] = contributions_data.contributions
+        print(f"Updated contributions for {contributor_id}")
+
+        # Write to both locations
+        main_success = write_contributors(data)
+
+        # Also try to write to the alternate location
+        alternate_path = os.path.join(BASE_DIR, "frontend", "data", "contributors.json")
+        alt_success = False
+        try:
+            print(f"Also writing to alternate path: {alternate_path}")
+            os.makedirs(os.path.dirname(alternate_path), exist_ok=True)
+            with open(alternate_path, "w") as f:
+                json.dump(data, f, indent=4)
+                print(f"Successfully wrote data to alternate path")
+            alt_success = True
+        except Exception as e:
+            print(f"Warning: Could not write to alternate path: {str(e)}")
+            # Continue as this is just a backup attempt
+
+        if not main_success and not alt_success:
+            raise HTTPException(
+                status_code=500, detail="Failed to save contributions to any location"
+            )
+
+        # Return the full contributor object with updated contributions
+        return data["contributors"][contributor_index]
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        print(f"Error updating contributions: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to update contributions: {str(e)}"
+        )

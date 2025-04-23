@@ -816,28 +816,26 @@ async function saveContributions() {
     });
 
     try {
-        // Use the direct admin endpoint for most reliable update
-        console.log('Using admin direct file update endpoint');
-        const adminUpdateResponse = await fetch('http://34.82.192.6:8000/api/admin/updateContributors', {
-            method: 'POST',
+        // Use the dedicated endpoint for contribution updates
+        console.log('Using dedicated contributions update endpoint');
+        
+        const updateResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}/contributions`, {
+            method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({
-                contributorId: contributorId,
-                contributions: selectedDocs
-            })
+            body: JSON.stringify({ contributions: selectedDocs })
         });
         
-        if (!adminUpdateResponse.ok) {
-            const errorText = await adminUpdateResponse.text();
-            throw new Error(`Admin update failed: ${adminUpdateResponse.status} - ${errorText}`);
+        if (!updateResponse.ok) {
+            const errorText = await updateResponse.text();
+            throw new Error(`Failed to update contributions: ${updateResponse.status} - ${errorText}`);
         }
         
-        const responseData = await adminUpdateResponse.json();
-        console.log('Admin update response:', responseData);
+        const responseData = await updateResponse.json();
+        console.log('Update response:', responseData);
         
         // Update the UI to reflect the changes
         updateContributorContributions(contributorId, selectedDocs);
