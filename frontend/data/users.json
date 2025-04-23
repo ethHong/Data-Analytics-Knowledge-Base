@@ -1,0 +1,39 @@
+{
+    "users": [
+        {
+            "email": "test@example.com",
+            "password": "$2b$12$w5bo/kuwrQhlMswVPAG7OOicb28ADfxmO30hj4TLCcRM5y7NFCiBi",
+            "id": "5d10093e-8bea-44d1-a09d-4afca72fd99c",
+            "role": "admin",
+            "is_verified": true
+        },
+        {
+            "email": "ethan@anderson.ucla.edu",
+            "password": "$2b$12$RpLl31pipwRxHSKdxv0/NOjBchE0desM9x4flSDTqBL3o3Is0adt.",
+            "id": "c877ab14-9c57-4d3a-89b7-482e572d1157",
+            "role": "user",
+            "is_verified": true
+        },
+        {
+            "email": "newadmin@test.com",
+            "role": "admin",
+            "is_verified": null,
+            "password": "$2b$12$ewvYVkwn/PqDu3ImS4GO1eFGfGt3c3yQm0f.Di8kjnLZoK.sv03Eq",
+            "id": "edcaa086-e176-4416-afc6-b9659f33e42b"
+        },
+        {
+            "email": "masteradmin@test.com",
+            "role": "admin",
+            "is_verified": null,
+            "password": "$2b$12$AG8Zgkr5ZJ.xgBsUbyLq6eJd4aySmGcyksH9VS0xa114Ft0Qq5L3G",
+            "id": "10bc90df-b972-4f9b-8e24-6e2078a81b50"
+        },
+        {
+            "email": "testuser@test.com",
+            "role": "user",
+            "is_verified": null,
+            "password": "$2b$12$sT6.mfh805OKUJgehQco6uQUGOZkjkiCq/kf19DP7PWBgod9TJd5S",
+            "id": "59d08a61-588d-4bfc-8192-83d4cee88384"
+        }
+    ]
+}
