@@ -14,8 +14,9 @@ import uuid
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse, FileResponse
+from fastapi.responses import RedirectResponse, FileResponse, HTMLResponse
 from fastapi import Request
+from fastapi.middleware.base import BaseHTTPMiddleware
 
 app = FastAPI()  # Initialize APP
 
@@ -669,7 +670,35 @@ async def update_user_verification(
     )
 
 
-# Mount specific files and directories, excluding markdowns
+# Authentication middleware
+class AuthMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Check if the path is under /markdowns/
+        if "/markdowns/" in request.url.path:
+            # Get the token from the request headers or cookies
+            token = None
+            auth_header = request.headers.get("Authorization")
+            if auth_header and auth_header.startswith("Bearer "):
+                token = auth_header.split(" ")[1]
+
+            # If no token, redirect to login
+            if not token:
+                return RedirectResponse(url="/auth/login.html", status_code=302)
+
+            # Verify token
+            try:
+                jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            except:
+                return RedirectResponse(url="/auth/login.html", status_code=302)
+
+        response = await call_next(request)
+        return response
+
+
+# Add the middleware
+app.add_middleware(AuthMiddleware)
+
+# Mount specific directories
 app.mount("/js", StaticFiles(directory="frontend/docs/js"), name="js")
 app.mount("/css", StaticFiles(directory="frontend/docs/css"), name="css")
 app.mount("/images", StaticFiles(directory="frontend/docs/images"), name="images")
@@ -678,7 +707,7 @@ app.mount("/admin", StaticFiles(directory="frontend/docs/admin"), name="admin")
 app.mount("/data", StaticFiles(directory="frontend/docs/data"), name="data")
 
 
-# Mount specific HTML files from root
+# Serve specific HTML files
 @app.get("/")
 async def serve_index():
     return FileResponse("frontend/docs/index.html")
@@ -697,6 +726,16 @@ async def serve_graph():
 @app.get("/document-viewer")
 async def serve_document_viewer():
     return FileResponse("frontend/docs/document-viewer.html")
+
+
+# Protected markdown serving
+@app.get("/markdowns/{path:path}")
+async def serve_markdown(path: str, current_user: User = Depends(get_current_user)):
+    """Serve markdown files with authentication"""
+    file_path = os.path.join("frontend/docs/markdowns", path)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="File not found")
+    return FileResponse(file_path)
 
 
 # Start the FastAPI server
