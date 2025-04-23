@@ -13,6 +13,9 @@ from datetime import datetime, timedelta
 import uuid
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
+from fastapi import Request
 
 app = FastAPI()  # Initialize APP
 
@@ -665,6 +668,25 @@ async def update_user_verification(
         status_code=500, detail="Failed to update user verification status"
     )
 
+
+# Catch all markdown access attempts - place this before any static file mounts
+@app.get("/markdowns/{path:path}")
+@app.get("/docs/markdowns/{path:path}")
+async def catch_markdown_access(request: Request, path: str):
+    """Redirect all markdown access attempts to login"""
+    return RedirectResponse(url="/auth/login.html")
+
+
+# Mount specific directories only, avoiding markdowns directory
+app.mount("/js", StaticFiles(directory="frontend/docs/js"), name="js")
+app.mount("/css", StaticFiles(directory="frontend/docs/css"), name="css")
+app.mount("/images", StaticFiles(directory="frontend/docs/images"), name="images")
+app.mount("/auth", StaticFiles(directory="frontend/docs/auth"), name="auth")
+app.mount("/admin", StaticFiles(directory="frontend/docs/admin"), name="admin")
+app.mount("/data", StaticFiles(directory="frontend/docs/data"), name="data")
+
+# Mount HTML files from root directory, but not subdirectories
+app.mount("/", StaticFiles(directory="frontend/docs", html=True), name="root")
 
 # Start the FastAPI server
 if __name__ == "__main__":
