@@ -1,23 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>{{ title }}</title>
-    <script src="/js/auth.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    
+    <!-- Authentication Check -->
+    <script src="/js/auth-check.js"></script>
+    
+    <!-- Styles and other scripts -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css">
 </head>
-<body style="visibility: hidden;">
-    <!-- Content will be loaded here -->
-    {{ content }}
-
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Check auth for markdown pages
-        requireAuth().then(isAuthorized => {
-            if (!isAuthorized) {
-                return;
-            }
-            showContent();
-        });
-    });
-    </script>
+<body class="markdown-body">
+    {{{content}}}
 </body>
 </html> 

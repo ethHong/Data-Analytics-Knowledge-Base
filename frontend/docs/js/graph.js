@@ -238,15 +238,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 function handleNodeClick(event, d) {
     // Prevent default behavior
     event.preventDefault();
+    console.log("Clicked node:", d.id);
     
     // Check if user is authenticated
     const token = localStorage.getItem('token');
     if (!token) {
-        window.location.replace('/auth/login.html');
+        window.top.location.href = '/auth/login.html';
         return;
     }
     
-    // Navigate to document viewer with the document path
-    const docPath = d.path || `markdowns/${d.title}.md`;
-    window.location.href = `/document-viewer.html?path=${encodeURIComponent(docPath)}`;
+    window.parent.postMessage({ type: "openPanel", docId: d.id }, "*");
 }
