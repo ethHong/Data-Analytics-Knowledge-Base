@@ -670,14 +670,37 @@ async def update_user_verification(
     )
 
 
-# Catch markdown access - add this BEFORE any static file mounts
-@app.get("/markdowns/{path:path}")
-async def catch_markdown_access(request: Request, path: str):
-    """Redirect all markdown access attempts to login"""
-    return RedirectResponse(url="/auth/login.html")
+# Add this function to the beginning of your routes, BEFORE any static file mounts
+@app.middleware("http")
+async def check_markdown_access(request: Request, call_next):
+    """Middleware to check for markdown access and require authentication"""
+    # Check if the path contains 'markdowns'
+    if "markdowns" in request.url.path:
+        # Try to get token from headers or cookies
+        token = None
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+
+        # If no token, redirect to login
+        if not token:
+            return RedirectResponse(url="/auth/login.html", status_code=303)
+
+        # Try to validate token
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            email = payload.get("sub")
+            if not email:
+                return RedirectResponse(url="/auth/login.html", status_code=303)
+        except:
+            return RedirectResponse(url="/auth/login.html", status_code=303)
+
+    # Continue processing the request
+    response = await call_next(request)
+    return response
 
 
-# Mount directories that should be publicly accessible
+# Mount specific directories, excluding markdowns
 app.mount("/js", StaticFiles(directory="frontend/docs/js"), name="js")
 app.mount("/css", StaticFiles(directory="frontend/docs/css"), name="css")
 app.mount("/images", StaticFiles(directory="frontend/docs/images"), name="images")
@@ -685,45 +708,8 @@ app.mount("/auth", StaticFiles(directory="frontend/docs/auth"), name="auth")
 app.mount("/admin", StaticFiles(directory="frontend/docs/admin"), name="admin")
 app.mount("/data", StaticFiles(directory="frontend/docs/data"), name="data")
 
-
-# Mount HTML files - DON'T mount the markdowns directory
-# Use a custom mount to avoid direct access to the markdowns directory
-@app.get("/")
-async def get_root():
-    return FileResponse("frontend/docs/index.html")
-
-
-@app.get("/index.html")
-async def get_index():
-    return FileResponse("frontend/docs/index.html")
-
-
-@app.get("/contributors.html")
-async def get_contributors():
-    return FileResponse("frontend/docs/contributors.html")
-
-
-@app.get("/graph.html")
-async def get_graph():
-    return FileResponse("frontend/docs/graph.html")
-
-
-@app.get("/document-viewer.html")
-async def get_document_viewer():
-    return FileResponse("frontend/docs/document-viewer.html")
-
-
-# Finally, add a catch-all route to serve static files but block markdowns
-@app.get("/{path:path}")
-async def catch_all(path: str):
-    if "markdowns" in path:
-        return RedirectResponse(url="/auth/login.html")
-
-    full_path = os.path.join("frontend/docs", path)
-    if os.path.exists(full_path) and os.path.isfile(full_path):
-        return FileResponse(full_path)
-
-    return RedirectResponse(url="/")
+# Mount the root directory - our middleware will catch any markdown access
+app.mount("/", StaticFiles(directory="frontend/docs", html=True), name="root")
 
 
 # Start the FastAPI server
