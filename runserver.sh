@@ -23,6 +23,10 @@ echo -e "${GREEN}[✓] FastAPI started${RESET}"
 pipenv run python generate_mkdocs_nav.py 2>&1 | tee -a $LOG_DIR/mkdocs_nav.log &
 echo -e "${GREEN}[✓] MkDocs navigation generated${RESET}"
 
+# Copy assets
+pipenv run python frontend/copy_assets.py 2>&1 | tee -a $LOG_DIR/assets_copy.log &
+echo -e "${GREEN}[✓] Assets copied to site directory${RESET}"
+
 # Auto-refresh MkDocs
 pipenv run python auto_refresh_mkdocs.py 2>&1 | tee -a $LOG_DIR/mkdocs_refresh.log &
 echo -e "${GREEN}[✓] MkDocs auto-refresh started${RESET}"

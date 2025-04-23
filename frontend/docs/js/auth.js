@@ -260,4 +260,46 @@ window.auth = {
     isUserPath,
     requireAuth,
     getAuthHeaders
-}; 
+};
+
+// Create a new secure admin check function
+function secureAdminPages() {
+    const currentPath = window.location.pathname;
+    
+    // Check if this is an admin page
+    if (isAdminPath(currentPath)) {
+        // Hide content immediately
+        document.write('<style>body { visibility: hidden; }</style>');
+        
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.replace('/auth/login.html');
+            return;
+        }
+        
+        // Check admin role immediately
+        try {
+            // Parse JWT payload
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const payload = JSON.parse(window.atob(base64));
+            
+            // Check if admin role exists in the token
+            if (!payload.role || payload.role !== 'admin') {
+                window.location.replace('/index.html');
+                return;
+            }
+            
+            // If we get here, user is admin, show content when DOM loaded
+            window.addEventListener('DOMContentLoaded', function() {
+                document.body.style.visibility = 'visible';
+            });
+        } catch (e) {
+            // Invalid token
+            window.location.replace('/auth/login.html');
+        }
+    }
+}
+
+// Call secure admin check immediately
+secureAdminPages(); 
