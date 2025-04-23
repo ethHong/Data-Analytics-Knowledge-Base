@@ -34,6 +34,137 @@ NEO4J_PASSWORD = "sh96699669"
 
 driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
 
+# Base directory configuration
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CONTRIBUTORS_FILE = os.path.join(
+    BASE_DIR, "frontend", "docs", "data", "contributors.json"
+)
+USERS_FILE = os.path.join(BASE_DIR, "frontend", "data", "users.json")
+VERIFICATION_CODES_FILE = os.path.join(
+    BASE_DIR, "frontend", "data", "verification_codes.json"
+)
+
+
+# User models and authentication
+class UserBase(BaseModel):
+    email: str
+    role: Optional[str] = None
+    is_verified: Optional[bool] = None
+
+
+class UserCreate(UserBase):
+    password: str
+
+
+class User(UserBase):
+    id: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    email: Optional[str] = None
+
+
+class VerificationCode(BaseModel):
+    email: str
+    code: str
+
+
+class LoginData(BaseModel):
+    email: str
+    password: str
+
+
+# Authentication configuration
+SECRET_KEY = "your-secret-key"  # Replace with your actual secret key
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")
+
+
+# Authentication helper functions
+def write_users(data):
+    with open(USERS_FILE, "w") as f:
+        json.dump(data, f, indent=4)
+
+
+def read_users():
+    if not os.path.exists(USERS_FILE):
+        return []
+    with open(USERS_FILE, "r") as f:
+        return json.load(f)
+
+
+def write_verification_codes(data):
+    with open(VERIFICATION_CODES_FILE, "w") as f:
+        json.dump(data, f, indent=4)
+
+
+def read_verification_codes():
+    if not os.path.exists(VERIFICATION_CODES_FILE):
+        return []
+    with open(VERIFICATION_CODES_FILE, "r") as f:
+        return json.load(f)
+
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+
+def get_user(email: str):
+    users = read_users()
+    return next((user for user in users if user["email"] == email), None)
+
+
+def authenticate_user(email: str, password: str):
+    user = get_user(email)
+    if not user:
+        return False
+    if not verify_password(password, user["password"]):
+        return False
+    return user
+
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+        token_data = TokenData(email=email)
+    except JWTError:
+        raise credentials_exception
+    user = get_user(email=token_data.email)
+    if user is None:
+        raise credentials_exception
+    return User(**user)
+
 
 # Define API endpoint - document list
 @app.get("/documents/")
@@ -188,15 +319,6 @@ class Contributor(ContributorBase):
 
 class ContributionUpdate(BaseModel):
     contributions: List[Document]
-
-
-# Update the path to contributors.json - use absolute path with debug info
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CONTRIBUTORS_FILE = os.path.join(
-    BASE_DIR, "frontend", "docs", "data", "contributors.json"
-)
-print(f"Base directory: {BASE_DIR}")
-print(f"Contributors file path: {CONTRIBUTORS_FILE}")
 
 
 def write_contributors(data):
@@ -378,176 +500,6 @@ async def delete_contributor(contributor_id: str):
         raise he
     except Exception as e:
         raise HTTPException(status_code=500, detail="Failed to delete contributor")
-
-
-class UserBase(BaseModel):
-    email: str
-    role: Optional[str] = None
-    is_verified: Optional[bool] = None
-
-
-class UserCreate(UserBase):
-    password: str
-
-
-class User(UserBase):
-    id: str
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class TokenData(BaseModel):
-    email: Optional[str] = None
-
-
-class VerificationCode(BaseModel):
-    email: str
-    code: str
-
-
-class LoginData(BaseModel):
-    email: str
-    password: str
-
-
-# Update the path to users.json
-USERS_FILE = os.path.join(BASE_DIR, "frontend", "data", "users.json")
-VERIFICATION_CODES_FILE = os.path.join(
-    BASE_DIR, "frontend", "data", "verification_codes.json"
-)
-
-
-def write_users(data):
-    """Helper function to write users data"""
-    try:
-        os.makedirs(os.path.dirname(USERS_FILE), exist_ok=True)
-        with open(USERS_FILE, "w") as f:
-            json.dump(data, f, indent=4)
-        return True
-    except Exception as e:
-        print(f"Error writing users: {str(e)}")
-        return False
-
-
-def read_users():
-    """Helper function to read users data"""
-    try:
-        if not os.path.exists(USERS_FILE):
-            return {"users": []}
-        with open(USERS_FILE, "r") as f:
-            return json.load(f)
-    except Exception as e:
-        print(f"Error reading users: {str(e)}")
-        return {"users": []}
-
-
-def write_verification_codes(data):
-    """Helper function to write verification codes"""
-    try:
-        os.makedirs(os.path.dirname(VERIFICATION_CODES_FILE), exist_ok=True)
-        with open(VERIFICATION_CODES_FILE, "w") as f:
-            json.dump(data, f, indent=4)
-        return True
-    except Exception as e:
-        print(f"Error writing verification codes: {str(e)}")
-        return False
-
-
-def read_verification_codes():
-    """Helper function to read verification codes"""
-    try:
-        if not os.path.exists(VERIFICATION_CODES_FILE):
-            return {"codes": []}
-        with open(VERIFICATION_CODES_FILE, "r") as f:
-            return json.load(f)
-    except Exception as e:
-        print(f"Error reading verification codes: {str(e)}")
-        return {"codes": []}
-
-
-# Read secret key from file
-def get_secret_key():
-    try:
-        with open("key.txt", "r") as f:
-            key = f.read().strip()
-            if not key:
-                raise ValueError("Secret key file is empty")
-            return key
-    except FileNotFoundError:
-        raise RuntimeError(
-            "key.txt file not found. Please create it with a secure secret key."
-        )
-    except Exception as e:
-        raise RuntimeError(f"Error reading secret key: {str(e)}")
-
-
-# Authentication utilities
-SECRET_KEY = get_secret_key()
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")
-
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password):
-    return pwd_context.hash(password)
-
-
-def get_user(email: str):
-    users_data = read_users()
-    for user in users_data.get("users", []):
-        if user["email"] == email:
-            return User(**user)
-    return None
-
-
-def authenticate_user(email: str, password: str):
-    users_data = read_users()
-    for stored_user in users_data.get("users", []):
-        if stored_user["email"] == email and verify_password(
-            password, stored_user["password"]
-        ):
-            return User(**stored_user)
-    return False
-
-
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
-
-
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
-            raise credentials_exception
-        token_data = TokenData(email=email)
-    except JWTError:
-        raise credentials_exception
-    user = get_user(email=token_data.email)
-    if user is None:
-        raise credentials_exception
-    return user
 
 
 # Authentication endpoints
