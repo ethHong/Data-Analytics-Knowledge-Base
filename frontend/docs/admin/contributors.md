@@ -287,6 +287,7 @@
 }
 </style>
 
+<script src="../../js/api-config.js"></script>
 <script>
 // Authentication check - redirect non-admin users to login
 document.addEventListener('DOMContentLoaded', function() {
@@ -297,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Check admin status
-    fetch('http://34.82.192.6:8000/api/auth/me', {
+    fetch(`${API_BASE_URL}/api/auth/me`, {
         headers: {
             'Authorization': `Bearer ${token}`
         }
@@ -333,7 +334,7 @@ let isSyncing = false;
 // Function to fetch and display contributors with fresh data
 async function loadContributors() {
     try {
-        const apiResponse = await fetch('http://34.82.192.6:8000/api/contributors');
+        const apiResponse = await fetch(`${API_BASE_URL}/api/contributors`);
         if (!apiResponse.ok) {
             throw new Error(`Failed to fetch contributors: ${apiResponse.status}`);
         }
@@ -374,7 +375,7 @@ async function syncContributors() {
         console.log('Starting sync of contributors using existing endpoints');
         
         // First get the current server state for comparison
-        const currentResponse = await fetch('http://34.82.192.6:8000/api/contributors');
+        const currentResponse = await fetch(`${API_BASE_URL}/api/contributors`);
         if (!currentResponse.ok) {
             throw new Error(`Failed to get current contributors: ${currentResponse.status}`);
         }
@@ -401,7 +402,7 @@ async function syncContributors() {
             if (!localIds.has(serverId)) {
                 console.log(`Deleting contributor: ${serverId}`);
                 try {
-                    const deleteResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${serverId}`, {
+                    const deleteResponse = await fetch(`${API_BASE_URL}/api/contributors/${serverId}`, {
                         method: 'DELETE',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -431,8 +432,8 @@ async function syncContributors() {
                 
                 // Prepare the request
                 const url = isNew 
-                    ? 'http://34.82.192.6:8000/api/contributors' 
-                    : `http://34.82.192.6:8000/api/contributors/${contributor.id}`;
+                    ? `${API_BASE_URL}/api/contributors` 
+                    : `${API_BASE_URL}/api/contributors/${contributor.id}`;
                     
                 const method = isNew ? 'POST' : 'PUT';
                 
@@ -657,7 +658,7 @@ async function loadContributorContributions(contributorId) {
             return;
         }
         
-        const response = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'

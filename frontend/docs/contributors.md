@@ -4,6 +4,7 @@
   <!-- Contributors will be loaded dynamically -->
 </div>
 
+<script src="../js/api-config.js"></script>
 <script>
 // Function to fetch and display contributors
 async function loadContributors() {
@@ -62,7 +63,7 @@ function displayContributors(contributors) {
 // Function to load contributor contributions
 async function loadContributorContributions(contributorId) {
     try {
-        const response = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`);
+        const response = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`);
         if (!response.ok) {
             throw new Error('Failed to fetch contributor data');
         }
