@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch(API_BASE_URL + '/api/auth/me', {
         headers: {
             'Authorization': `Bearer ${token}`
-        }
+        },
+        credentials: 'include'
     }).then(response => {
         if (!response.ok) {
             throw new Error('Authentication failed');
