@@ -12,6 +12,19 @@ echo -e "${BLUE}Starting server...${RESET}"
 echo -e "${YELLOW}Log directory: $LOG_DIR${RESET}"
 
 # Start Neo4j
+
+# --- Step 1: Fix Neo4j permissions ---
+echo -e "${BLUE}Fixing Neo4j permissions...${RESET}"
+sudo chown -R neo4j:neo4j /var/log/neo4j /var/lib/neo4j /etc/neo4j
+sudo chmod 755 /var/log/neo4j
+
+# Create log files if not exist and set permissions
+for file in debug.log http.log query.log security.log; do
+    sudo touch /var/log/neo4j/$file
+    sudo chown neo4j:neo4j /var/log/neo4j/$file
+done
+
+# --- Step 2: Start Neo4j ---
 neo4j start 2>&1 | tee -a $LOG_DIR/neo4j.log &
 echo -e "${GREEN}[✓] Neo4j started${RESET}"
 
