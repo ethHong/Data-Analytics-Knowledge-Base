@@ -1,11 +1,15 @@
 document.addEventListener("DOMContentLoaded", async () => {
   //const response = await fetch("http://localhost:8000/graph/");
-  const response = await fetch("http://34.82.192.6:8000/graph/");
-  const graphData = await response.json();
+  const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  const baseURL = isLocal ? "http://localhost:8000" : "https://zelkova.dev";
+  
+  try {
+    const response = await fetch(`${baseURL}/graph/`);
+    const graphData = await response.json();
 
-  // Get the full viewport dimensions
-  const width = window.innerWidth;
-  const height = window.innerHeight;
+  } catch (error) {
+    console.error("Graph fetch failed:", error);
+  }
 
   // Create a container for the graph that fills the available space
   const graphContainer = document.getElementById("knowledge-graph");
