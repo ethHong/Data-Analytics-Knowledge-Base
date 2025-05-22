@@ -7,7 +7,7 @@
 const isProd = location.protocol === "https:" && location.hostname.includes("zelkova.dev");
 const isStaging = location.hostname.includes("34.82.192.6");
 const API_BASE_URL = isProd 
-              ? "http://34.82.192.6:8000" // Use direct IP for API when on domain
+              ? "" // Use relative URLs on domain (everything will go through Nginx)
               : isStaging 
                 ? "http://34.82.192.6:8000" // Staging server
                 : "http://localhost:8000";  // Local development
