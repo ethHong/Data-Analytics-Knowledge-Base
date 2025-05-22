@@ -739,47 +739,34 @@ async def update_user_verification(
     )
 
 
-# Mount specific directories, but DO NOT mount markdowns
-app.mount("/js", StaticFiles(directory="frontend/docs/js"), name="js")
-app.mount("/css", StaticFiles(directory="frontend/docs/css"), name="css")
-app.mount("/images", StaticFiles(directory="frontend/docs/images"), name="images")
-app.mount("/auth", StaticFiles(directory="frontend/docs/auth"), name="auth")
-app.mount("/admin", StaticFiles(directory="frontend/docs/admin"), name="admin")
-app.mount("/data", StaticFiles(directory="frontend/docs/data"), name="data")
-
-
 # Create a custom static files handler that blocks markdown access
 class CustomStaticFiles(StaticFiles):
     async def __call__(self, scope, receive, send):
         path = scope["path"]
-        # No longer redirect markdowns to login - allow direct access
+        # Check if this is a markdown path - if so, we'll handle it separately
+        if path.startswith("/markdowns/"):
+            # Return a 404 response to let the dedicated endpoint handle it
+            from starlette.responses import PlainTextResponse
+
+            response = PlainTextResponse("Not Found", status_code=404)
+            await response(scope, receive, send)
+            return
         return await super().__call__(scope, receive, send)
 
 
-# Mount the root directory using the custom handler
-app.mount("/", CustomStaticFiles(directory="frontend/docs", html=True), name="root")
-
-
-# Start the FastAPI server
-if __name__ == "__main__":
-    import uvicorn
-
-    # Start the markdown file watcher in the background
-    try:
-        from watch_markdown_changes import start_watcher
-
-        observer = start_watcher()
-        print("📁 Started markdown file watcher in the background")
-    except Exception as e:
-        print(f"⚠️ Warning: Could not start markdown file watcher: {str(e)}")
-
-    uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
+# Public markdown serving (no authentication required)
+@app.get("/markdowns/{path:path}")
+async def serve_markdown(path: str):
+    """Serve markdown files without authentication"""
+    file_path = os.path.join("frontend/docs/markdowns", path)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="File not found")
+    return FileResponse(file_path)
 
 
 # Authentication middleware
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # Previously checked for /markdowns/ paths, but now we allow public access
         # Only admin paths need authentication now
         if "/admin/" in request.url.path:
             # Get the token from the request headers or cookies
@@ -802,10 +789,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
         return response
 
 
-# Add the middleware
+# Add the middleware (only once)
 app.add_middleware(AuthMiddleware)
 
-# Mount specific directories
+# Mount static directories (only once for each)
 app.mount("/js", StaticFiles(directory="frontend/docs/js"), name="js")
 app.mount("/css", StaticFiles(directory="frontend/docs/css"), name="css")
 app.mount("/images", StaticFiles(directory="frontend/docs/images"), name="images")
@@ -835,19 +822,23 @@ async def serve_document_viewer():
     return FileResponse("frontend/docs/document-viewer.html")
 
 
-# Public markdown serving (no authentication required)
-@app.get("/markdowns/{path:path}")
-async def serve_markdown(path: str):
-    """Serve markdown files without authentication"""
-    file_path = os.path.join("frontend/docs/markdowns", path)
-    if not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail="File not found")
-    return FileResponse(file_path)
+# Mount the root directory AFTER all specific routes
+# This ensures the specific routes take precedence
+app.mount("/", CustomStaticFiles(directory="frontend/docs", html=True), name="root")
 
 
 # Start the FastAPI server
 if __name__ == "__main__":
     import uvicorn
+
+    # Start the markdown file watcher in the background
+    try:
+        from watch_markdown_changes import start_watcher
+
+        observer = start_watcher()
+        print("📁 Started markdown file watcher in the background")
+    except Exception as e:
+        print(f"⚠️ Warning: Could not start markdown file watcher: {str(e)}")
 
     uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
 
