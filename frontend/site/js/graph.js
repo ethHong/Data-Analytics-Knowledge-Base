@@ -1,15 +1,8 @@
 document.addEventListener("DOMContentLoaded", async () => {
   //const response = await fetch("http://localhost:8000/graph/");
-  const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-  const baseURL = isLocal ? "http://localhost:8000" : "https://zelkova.dev";
-  
-  try {
-    const response = await fetch(`${baseURL}/graph/`);
-    const graphData = await response.json();
+  const response = await fetch("/graph/");
+  const graphData = await response.json();
 
-  } catch (error) {
-    console.error("Graph fetch failed:", error);
-  }
 
   // Create a container for the graph that fills the available space
   const graphContainer = document.getElementById("knowledge-graph");
