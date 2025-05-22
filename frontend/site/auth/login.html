@@ -296,8 +296,7 @@
                     body: new URLSearchParams({
                         username: email,
                         password: password
-                    }),
-                    credentials: 'include'
+                    })
                 });
 
                 if (!response.ok) {
@@ -323,8 +322,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ email }),
-                    credentials: 'include'
+                    body: JSON.stringify({ email })
                 });
                 
                 if (response.ok) {
@@ -356,8 +354,7 @@
                     body: JSON.stringify({
                         verification_id: verificationId,
                         code: code
-                    }),
-                    credentials: 'include'
+                    })
                 });
                 
                 if (response.ok) {
@@ -393,8 +390,7 @@
                         email: currentEmail,
                         password: password,
                         verification_id: verificationId
-                    }),
-                    credentials: 'include'
+                    })
                 });
                 
                 if (response.ok) {
@@ -438,8 +434,7 @@
                     },
                     body: JSON.stringify({
                         email: currentEmail
-                    }),
-                    credentials: 'include'
+                    })
                 });
                 
                 if (response.ok) {

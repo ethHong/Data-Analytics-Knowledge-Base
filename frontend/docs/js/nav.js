@@ -22,8 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
-            },
-            credentials: 'include'
+            }
         });
 
         if (!response.ok) {

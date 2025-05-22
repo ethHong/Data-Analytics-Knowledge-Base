@@ -24,14 +24,8 @@ app = FastAPI()  # Initialize APP
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://zelkova.dev",
-        "http://zelkova.dev",
-        "http://34.82.192.6",
-        "http://34.82.192.6:8000",
-        "http://34.82.192.6:8080",
-        "http://localhost:8000",
-        "http://localhost:8080",
-    ],  # Explicitly list allowed origins
+        "*"
+    ],  # Allow requests from any domain (use specific URLs for production)
     allow_credentials=True,  # Allow cookies, authorization headers
     allow_methods=["*"],  # Allow all HTTP methods (GET, POST, PUT, DELETE, etc.)
     allow_headers=["*"],  # Allow all headers

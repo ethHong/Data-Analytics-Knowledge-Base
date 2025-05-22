@@ -81,8 +81,7 @@ async function checkAuth() {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
-            },
-            credentials: 'include'
+            }
         });
         
         if (response.status === 200) {
@@ -176,8 +175,7 @@ async function handleLogin(event) {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`,
-            credentials: 'include'
+            body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
         });
         
         if (response.status === 200) {

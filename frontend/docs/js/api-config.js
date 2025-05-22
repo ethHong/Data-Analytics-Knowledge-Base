@@ -3,5 +3,14 @@
  * Determines the base URL for API calls based on the current environment
  */
 
-// Use relative paths for API calls to ensure they work in all environments
-const API_BASE_URL = ''; // Empty string means use the same origin as the current page 
+// Determine environment and set base URL
+const isProd = location.protocol === "https:" && location.hostname.includes("zelkova.dev");
+const isStaging = location.hostname.includes("34.82.192.6");
+const API_BASE_URL = isProd 
+              ? "http://34.82.192.6:8000" // Use direct IP for API when on domain
+              : isStaging 
+                ? "http://34.82.192.6:8000" // Staging server
+                : "http://localhost:8000";  // Local development
+
+// For debugging
+console.log(`API Base URL: ${API_BASE_URL}, Environment: ${isProd ? 'Production' : isStaging ? 'Staging' : 'Development'}`); 
