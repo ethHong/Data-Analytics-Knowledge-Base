@@ -1200,65 +1200,60 @@
 </style>
 
 <script>
-// Define API_BASE_URL if not already defined
-const API_BASE_URL = ''; // Empty string for relative URLs
+// Authentication check - redirect non-admin users to login
+document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.replace('/auth/login.html');
+        return;
+    }
 
-// Add these variables at the top of the script section
+    // Check admin status
+    fetch('http://34.82.192.6:8000/api/auth/me', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => {
+        if (response.status === 401) {
+            window.location.replace('/auth/login.html');
+            return null;
+        }
+        if (!response.ok) {
+            throw new Error('Failed to verify user');
+        }
+        return response.json();
+    })
+    .then(userData => {
+        if (!userData) return;
+        if (userData.role !== 'admin') {
+            window.location.replace('/index.html');
+        }
+    })
+    .catch(error => {
+        console.error('Authentication error:', error);
+        window.location.replace('/auth/login.html');
+    });
+});
+
+// Add these variables at the top of the script section for managing contributors
+let allContributors = [];
 let allDocuments = [];
 let selectedContributions = new Set();
+let isSyncing = false;
 
-// Function to fetch and display contributors
+// Function to fetch and display contributors with fresh data
 async function loadContributors() {
     try {
-        console.log('Loading contributors...');
-        const token = localStorage.getItem('token');
-        if (!token) {
-            console.error('No token found when loading contributors');
-            window.location.replace('/auth/login.html');
-            return;
+        const apiResponse = await fetch('http://34.82.192.6:8000/api/contributors');
+        if (!apiResponse.ok) {
+            throw new Error(`Failed to fetch contributors: ${apiResponse.status}`);
         }
 
-        // Log the API URL for debugging
-        const apiUrl = `${API_BASE_URL}/api/contributors`;
-        console.log('Fetching contributors from:', apiUrl);
-
-        const response = await fetch(apiUrl, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json'
-            }
-        });
-
-        console.log('Contributors response status:', response.status);
-
-        if (response.status === 401) {
-            console.error('Authentication failed when loading contributors');
-            window.location.replace('/auth/login.html');
-            return;
-        }
-
-        if (response.status === 403) {
-            console.error('Authorization failed when loading contributors');
-            window.location.replace('/index.html');
-            return;
-        }
-
-        if (!response.ok) {
-            throw new Error(`Server error ${response.status}: ${response.statusText}`);
-        }
-
-        // Try to parse the response
-        let data;
-        try {
-            data = await response.json();
-            console.log('Contributors data received:', data.contributors?.length || 0, 'items');
-        } catch (parseError) {
-            console.error('Error parsing JSON response:', parseError);
-            throw new Error('Failed to parse server response');
-        }
-
-        // Display the contributors
-        displayContributors(data.contributors || []);
+        const data = await apiResponse.json();
+        // Store contributors globally for easier access
+        allContributors = data.contributors || [];
+        displayContributors(allContributors);
     } catch (error) {
         console.error('Error loading contributors:', error);
         const grid = document.querySelector('.contributors-grid');
@@ -1270,6 +1265,224 @@ async function loadContributors() {
                 </div>
             `;
         }
+    }
+}
+
+// Function to sync all contributors data to the server using existing endpoints
+async function syncContributors() {
+    if (isSyncing) {
+        console.log('Already syncing, please wait...');
+        return;
+    }
+
+    try {
+        isSyncing = true;
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('Authentication token not found. Please log in again.');
+        }
+
+        console.log('Starting sync of contributors using existing endpoints');
+
+        // First get the current server state for comparison
+        const currentResponse = await fetch('http://34.82.192.6:8000/api/contributors');
+        if (!currentResponse.ok) {
+            throw new Error(`Failed to get current contributors: ${currentResponse.status}`);
+        }
+
+        const currentData = await currentResponse.json();
+        const serverContributors = currentData.contributors || [];
+
+        console.log(`Server has ${serverContributors.length} contributors, local has ${allContributors.length}`);
+
+        // Track operations for reporting
+        const operations = {
+            created: 0,
+            updated: 0,
+            deleted: 0,
+            failed: 0
+        };
+
+        // Find contributors to delete (in server but not in local)
+        const serverIds = new Set(serverContributors.map(c => c.id));
+        const localIds = new Set(allContributors.map(c => c.id));
+
+        // Handle deletions
+        for (const serverId of serverIds) {
+            if (!localIds.has(serverId)) {
+                console.log(`Deleting contributor: ${serverId}`);
+                try {
+                    const deleteResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${serverId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (deleteResponse.ok) {
+                        operations.deleted++;
+                    } else {
+                        console.error(`Failed to delete contributor ${serverId}: ${deleteResponse.status}`);
+                        operations.failed++;
+                    }
+                } catch (error) {
+                    console.error(`Error deleting contributor ${serverId}:`, error);
+                    operations.failed++;
+                }
+            }
+        }
+
+        // Handle creates and updates
+        for (const contributor of allContributors) {
+            const isNew = !serverIds.has(contributor.id);
+
+            try {
+                // Prepare contributor data (copy to avoid modifying original)
+                const contributorToSend = { ...contributor };
+
+                // Prepare the request
+                const url = isNew 
+                    ? 'http://34.82.192.6:8000/api/contributors' 
+                    : `http://34.82.192.6:8000/api/contributors/${contributor.id}`;
+
+                const method = isNew ? 'POST' : 'PUT';
+
+                console.log(`${method} contributor: ${contributor.id}`);
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(contributorToSend)
+                });
+
+                if (response.ok) {
+                    if (isNew) {
+                        operations.created++;
+                    } else {
+                        operations.updated++;
+                    }
+                } else {
+                    console.error(`Failed to ${isNew ? 'create' : 'update'} contributor ${contributor.id}: ${response.status}`);
+                    operations.failed++;
+                }
+            } catch (error) {
+                console.error(`Error ${isNew ? 'creating' : 'updating'} contributor ${contributor.id}:`, error);
+                operations.failed++;
+            }
+        }
+
+        console.log('Sync operations completed:', operations);
+
+        // Reload contributors after all operations
+        if (operations.created > 0 || operations.updated > 0 || operations.deleted > 0) {
+            await loadContributors();
+        }
+
+        return operations.failed === 0;
+    } catch (error) {
+        console.error('Error syncing contributors:', error);
+        alert(`Failed to sync contributors: ${error.message}`);
+        return false;
+    } finally {
+        isSyncing = false;
+    }
+}
+
+// Function to save contributor - creates or updates
+async function saveContributor(event) {
+    event.preventDefault();
+    const form = event.target;
+    const contributorId = form.dataset.contributorId;
+    const isNewContributor = !contributorId;
+
+    const name = form.elements.name.value;
+    const organization = form.elements.organization.value;
+
+    // Create a new/updated contributor object
+    const contributorData = {
+        name: name,
+        organization: organization,
+        linkedin: form.elements.linkedin.value || '',
+        image: form.elements.image.value || ''
+    };
+
+    // For new contributors, generate ID from name
+    const id = isNewContributor 
+        ? name.toLowerCase().replace(/\s+/g, '-') 
+        : contributorId;
+
+    contributorData.id = id;
+
+    // For existing contributors, preserve their contributions
+    if (!isNewContributor) {
+        const existingContributor = allContributors.find(c => c.id === id);
+        if (existingContributor && existingContributor.contributions) {
+            contributorData.contributions = existingContributor.contributions;
+        } else {
+            contributorData.contributions = [];
+        }
+    } else {
+        contributorData.contributions = [];
+    }
+
+    try {
+        // Update local data
+        if (isNewContributor) {
+            // Add new contributor
+            allContributors.push(contributorData);
+        } else {
+            // Update existing contributor
+            const index = allContributors.findIndex(c => c.id === id);
+            if (index >= 0) {
+                allContributors[index] = contributorData;
+            } else {
+                throw new Error(`Contributor with ID ${id} not found`);
+            }
+        }
+
+        // Sync changes to server
+        const syncSuccess = await syncContributors();
+
+        if (syncSuccess) {
+            // Close modal after successful update
+            closeModal('contributorModal');
+            alert(isNewContributor ? 'Contributor added successfully!' : 'Contributor updated successfully!');
+        }
+    } catch (error) {
+        console.error('Error saving contributor:', error);
+        alert(`Failed to save contributor: ${error.message}`);
+    }
+}
+
+// Function to delete contributor
+async function deleteContributor(contributorId) {
+    if (!confirm('Are you sure you want to delete this contributor? This action cannot be undone.')) {
+        return;
+    }
+
+    try {
+        // Find and remove the contributor from our local data
+        const index = allContributors.findIndex(c => c.id === contributorId);
+        if (index === -1) {
+            throw new Error(`Contributor with ID ${contributorId} not found`);
+        }
+
+        // Remove from local array
+        allContributors.splice(index, 1);
+
+        // Sync to server
+        const syncSuccess = await syncContributors();
+
+        if (syncSuccess) {
+            alert('Contributor deleted successfully!');
+        }
+    } catch (error) {
+        console.error('Error deleting contributor:', error);
+        alert(`Failed to delete contributor: ${error.message}`);
     }
 }
 
@@ -1350,10 +1563,28 @@ function displayContributors(contributors) {
 // Function to load contributor contributions
 async function loadContributorContributions(contributorId) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`);
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('No authentication token found');
+            return;
+        }
+
+        const response = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            }
+        });
+
+        if (response.status === 401) {
+            console.error('Authentication expired');
+            return;
+        }
+
         if (!response.ok) {
             throw new Error('Failed to fetch contributor data');
         }
+
         const data = await response.json();
         updateContributorContributions(contributorId, data.contributions || []);
     } catch (error) {
@@ -1363,8 +1594,13 @@ async function loadContributorContributions(contributorId) {
 
 // Function to update contributor contributions display
 function updateContributorContributions(contributorId, contributions) {
+    console.log(`Updating UI for contributor ${contributorId} with contributions:`, contributions);
+
     const contributionsEl = document.querySelector(`[data-contributor-id="${contributorId}"] .contributions-list`);
-    if (!contributionsEl) return;
+    if (!contributionsEl) {
+        console.error(`Cannot find contributions list element for contributor ${contributorId}`);
+        return;
+    }
 
     if (!contributions || contributions.length === 0) {
         contributionsEl.innerHTML = '<li>No contributions yet</li>';
@@ -1372,10 +1608,11 @@ function updateContributorContributions(contributorId, contributions) {
     }
 
     const contributionsList = contributions.map(doc => {
-        return `<li><a href="/document-viewer.html?path=${encodeURIComponent(doc.path)}">${doc.title}</a></li>`;
+        return `<li><a href="../../markdowns/${encodeURIComponent(doc.title)}/">${doc.title}</a></li>`;
     }).join('');
 
     contributionsEl.innerHTML = contributionsList;
+    console.log('UI updated with contributions');
 }
 
 // Function to toggle contributions visibility
@@ -1411,22 +1648,24 @@ function openContributorModal(contributorId = null) {
     form.reset();
 
     if (contributorId) {
+        // Edit existing contributor
         title.textContent = 'Edit Contributor';
-        // Fetch current contributor data
-        fetch(`${API_BASE_URL}/api/contributors/${contributorId}`)
-            .then(response => response.json())
-            .then(data => {
-                form.elements.name.value = data.name;
-                form.elements.organization.value = data.organization;
-                form.elements.linkedin.value = data.linkedin || '';
-                form.elements.image.value = data.image || '';
-                form.dataset.contributorId = contributorId;
-            })
-            .catch(error => {
-                console.error('Error loading contributor:', error);
-                alert('Failed to load contributor data');
-            });
+
+        // Find contributor in our local data
+        const contributor = allContributors.find(c => c.id === contributorId);
+        if (contributor) {
+            form.elements.name.value = contributor.name;
+            form.elements.organization.value = contributor.organization;
+            form.elements.linkedin.value = contributor.linkedin || '';
+            form.elements.image.value = contributor.image || '';
+            form.dataset.contributorId = contributorId;
+        } else {
+            console.error(`Contributor with ID ${contributorId} not found`);
+            alert('Failed to load contributor data');
+            return;
+        }
     } else {
+        // Add new contributor
         title.textContent = 'Add New Contributor';
         delete form.dataset.contributorId;
     }
@@ -1434,152 +1673,31 @@ function openContributorModal(contributorId = null) {
     modal.style.display = 'block';
 }
 
-// Function to save contributor
-async function saveContributor(event) {
-    event.preventDefault();
-    const form = event.target;
-    const contributorId = form.dataset.contributorId;
-    const isNewContributor = !contributorId;
-
-    const contributorData = {
-        name: form.elements.name.value,
-        organization: form.elements.organization.value,
-        linkedin: form.elements.linkedin.value,
-        image: form.elements.image.value
-    };
-
-    if (isNewContributor) {
-        // Generate ID from name (lowercase, replace spaces with hyphens)
-        contributorData.id = contributorData.name.toLowerCase().replace(/\s+/g, '-');
-    }
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/contributors${isNewContributor ? '' : '/' + contributorId}`, {
-            method: isNewContributor ? 'POST' : 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(contributorData)
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to save contributor');
-        }
-
-        // Close modal and refresh list
-        closeModal('contributorModal');
-        loadContributors();
-
-        // Show success message
-        alert(isNewContributor ? 'Contributor added successfully!' : 'Contributor updated successfully!');
-    } catch (error) {
-        console.error('Error saving contributor:', error);
-        alert('Failed to save contributor. Please try again.');
-    }
-}
-
-// Function to delete contributor
-async function deleteContributor(contributorId) {
-    if (!confirm('Are you sure you want to delete this contributor? This action cannot be undone.')) {
-        return;
-    }
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`, {
-            method: 'DELETE'
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to delete contributor');
-        }
-
-        // Refresh list
-        loadContributors();
-
-        // Show success message
-        alert('Contributor deleted successfully!');
-    } catch (error) {
-        console.error('Error deleting contributor:', error);
-        alert('Failed to delete contributor. Please try again.');
-    }
-}
-
-// Add these functions before the openContributionModal function
-function filterContributionDocuments() {
-    const searchInput = document.getElementById('contributionSearch');
-    if (!searchInput) return;
-
-    const searchTerm = searchInput.value.toLowerCase();
-    const filteredDocs = allDocuments.filter(doc => 
-        doc.title.toLowerCase().includes(searchTerm)
-    );
-
-    displayContributionDocuments(filteredDocs);
-}
-
-function handleContributionSelection(event) {
-    const title = event.target.value;
-    if (event.target.checked) {
-        selectedContributions.add(title);
-    } else {
-        selectedContributions.delete(title);
-    }
-}
-
-// Update the openContributionModal function
+// Function to open contribution modal
 async function openContributionModal(contributorId) {
     const modal = document.getElementById('contributionModal');
     modal.dataset.contributorId = contributorId;
 
     try {
-        // Fetch documents
-        const apiUrl = `${API_BASE_URL}/api/documents`;
-        console.log('Fetching documents from:', apiUrl);
+        // Get authentication token
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('Authentication token not found. Please log in again.');
+        }
 
-        const response = await fetch(apiUrl, {
-            method: 'GET',
-            headers: {
-                ...getAuthHeaders(),
-                'Accept': 'application/json'
+        // Fetch documents if we don't have them yet
+        if (allDocuments.length === 0) {
+            const docs = await fetchDocuments();
+            if (docs) {
+                allDocuments = docs;
             }
-        });
-
-        console.log('Documents response status:', response.status);
-
-        if (response.status === 401 || response.status === 403) {
-            window.location.replace('/auth/login.html');
-            return;
         }
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch documents');
+        // Find contributor in our local data
+        const contributor = allContributors.find(c => c.id === contributorId);
+        if (!contributor) {
+            throw new Error(`Contributor with ID ${contributorId} not found`);
         }
-
-        const data = await response.json();
-        console.log('Documents data:', data);
-
-        if (!data || !Array.isArray(data.documents)) {
-            throw new Error('Invalid data format received from API');
-        }
-
-        // Store all documents globally
-        allDocuments = data.documents;
-
-        // Get current contributor data to know which documents are selected
-        const contributorResponse = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`, {
-            headers: getAuthHeaders()
-        });
-
-        if (contributorResponse.status === 401 || contributorResponse.status === 403) {
-            window.location.replace('/auth/login.html');
-            return;
-        }
-
-        if (!contributorResponse.ok) {
-            throw new Error('Failed to fetch contributor data');
-        }
-
-        const contributor = await contributorResponse.json();
 
         // Reset and set selected documents
         selectedContributions.clear();
@@ -1594,11 +1712,11 @@ async function openContributionModal(contributorId) {
         modal.style.display = 'block';
     } catch (error) {
         console.error('Error opening contribution modal:', error);
-        alert('Failed to load documents. Please try again.');
+        alert('Failed to load documents. Please try again. Error: ' + error.message);
     }
 }
 
-// Update the displayContributionDocuments function
+// Function to display contribution documents
 function displayContributionDocuments(documents) {
     const documentList = document.getElementById('contributionDocumentList');
     if (!documentList) {
@@ -1631,6 +1749,39 @@ function displayContributionDocuments(documents) {
     console.log('Documents displayed:', documents.length);
 }
 
+// Helper function to fetch documents
+async function fetchDocuments() {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('No authentication token found');
+            return [];
+        }
+
+        const response = await fetch('http://34.82.192.6:8000/api/documents', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            }
+        });
+
+        if (response.status === 401) {
+            console.error('Authentication expired');
+            return [];
+        }
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch documents');
+        }
+
+        const data = await response.json();
+        return data.documents || [];
+    } catch (error) {
+        console.error('Error fetching documents:', error);
+        return [];
+    }
+}
+
 // Function to save contributions
 async function saveContributions() {
     const modal = document.getElementById('contributionModal');
@@ -1639,6 +1790,14 @@ async function saveContributions() {
     if (!contributorId) {
         console.error('No contributor ID found');
         alert('Error: Could not identify the contributor');
+        return;
+    }
+
+    // Get authentication token
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert('Authentication token not found. Please log in again.');
+        window.location.replace('/auth/login.html');
         return;
     }
 
@@ -1651,169 +1810,106 @@ async function saveContributions() {
 
     console.log('Saving contributions:', {
         contributorId,
+        selectedDocsCount: selectedDocs.length,
         selectedDocs
     });
 
     try {
-        // First, save to API
-        const apiResponse = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}/contributions`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                contributions: selectedDocs
-            })
-        });
-
-        if (!apiResponse.ok) {
-            const errorData = await apiResponse.text();
-            console.error('API error response:', errorData);
-            throw new Error(`Failed to save contributions to API: ${errorData}`);
-        }
-
-        // Then, update local JSON file
-        const jsonResponse = await fetch('../../data/contributors.json');
-        if (!jsonResponse.ok) {
-            throw new Error('Failed to fetch local contributors.json');
-        }
-        const jsonData = await jsonResponse.json();
-
-        // Find and update the contributor's contributions
-        const contributorIndex = jsonData.contributors.findIndex(c => c.id === contributorId);
+        // Find the contributor in our local data
+        const contributorIndex = allContributors.findIndex(c => c.id === contributorId);
         if (contributorIndex === -1) {
-            throw new Error('Contributor not found in local JSON file');
+            throw new Error(`Contributor with ID ${contributorId} not found`);
         }
 
-        jsonData.contributors[contributorIndex].contributions = selectedDocs;
+        // Get the contributor data and make a copy
+        const contributor = { ...allContributors[contributorIndex] };
 
-        // Save updated JSON back to file
-        const saveResponse = await fetch('../../data/contributors.json', {
+        // Update the contributions
+        contributor.contributions = selectedDocs;
+
+        // Also update in local array
+        allContributors[contributorIndex].contributions = selectedDocs;
+
+        // Instead of using sync, directly update this specific contributor
+        console.log('Directly updating contributor with contributions:', contributor);
+
+        // Create data to send - only include the required fields for PUT
+        const updateData = {
+            name: contributor.name,
+            organization: contributor.organization,
+            linkedin: contributor.linkedin || '',
+            image: contributor.image || '',
+            contributions: selectedDocs
+        };
+
+        // Send the update
+        const updateResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(jsonData, null, 2)
-        });
-
-        if (!saveResponse.ok) {
-            throw new Error('Failed to save to local JSON file');
-        }
-
-        // Close modal and refresh contributions
-        closeModal('contributionModal');
-        await loadContributorContributions(contributorId);
-
-        // Show success message
-        alert('Contributions updated successfully in both API and local file!');
-    } catch (error) {
-        console.error('Error saving contributions:', error);
-        alert(error.message);
-    }
-}
-
-// Function to fetch documents
-async function fetchDocuments() {
-    try {
-        console.log('Fetching documents...');
-        const token = localStorage.getItem('token');
-        if (!token) {
-            console.error('No token found');
-            return null;
-        }
-
-        const response = await fetch(`${API_BASE_URL}/api/documents`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json'
-            }
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
         });
 
-        console.log('Documents response status:', response.status);
-
-        if (response.status === 401) {
-            console.error('Authentication error');
-            return null;
+        if (!updateResponse.ok) {
+            const errorText = await updateResponse.text();
+            throw new Error(`Update failed: ${updateResponse.status} - ${errorText}`);
         }
 
-        if (!response.ok) {
-            console.error('Failed to fetch documents:', response.statusText);
-            return null;
-        }
+        console.log('Contributions updated successfully on server');
 
-        const data = await response.json();
-        console.log('Documents data received:', data.documents?.length || 0, 'items');
-        return data.documents || [];
+        // Update the UI to show changes - no need to reload everything
+        updateContributorContributions(contributorId, selectedDocs);
+
+        // Close the modal
+        closeModal('contributionModal');
+        alert('Contributions updated successfully!');
     } catch (error) {
-        console.error('Error fetching documents:', error);
-        return null;
+        console.error('Error saving contributions:', error);
+        alert(`Failed to update contributions: ${error.message}`);
+
+        // Still update the UI anyway so the user sees their changes
+        updateContributorContributions(contributorId, selectedDocs);
+        closeModal('contributionModal');
     }
 }
 
-// Function to refresh contributors
-async function handleRefresh() {
-    try {
-        await loadContributors();
-        console.log('Contributors refreshed');
-    } catch (error) {
-        console.error('Error refreshing contributors:', error);
-        alert('Failed to refresh contributors: ' + error.message);
-    }
-}
-
-// Initialize document loading
+// Initialize page
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Contributor management page loaded');
 
-    // Display a loading message
-    const grid = document.querySelector('.contributors-grid');
-    if (grid) {
-        grid.innerHTML = `
-            <div style="text-align: center; padding: 20px;">
-                <p>Loading contributors...</p>
-            </div>
-        `;
-    }
+    // Initial contributors fetch
+    await loadContributors();
 
-    // Check if token exists
-    const token = localStorage.getItem('token');
-    if (!token) {
-        console.error('No token found');
-        window.location.replace('/auth/login.html');
-        return;
-    }
-
-    try {
-        // First load contributors - this will verify authentication
-        await loadContributors();
-
-        // Try to fetch documents but don't block on errors
-        try {
-            const documents = await fetchDocuments();
-            if (documents) {
-                allDocuments = documents;
-                console.log('Documents loaded:', documents.length);
-            }
-        } catch (docError) {
-            console.error('Error fetching documents:', docError);
-            // Continue without documents - they'll be fetched when needed
-        }
-
-    } catch (error) {
-        console.error('Error loading page:', error);
-        // Show error message instead of redirecting
-        if (grid) {
-            grid.innerHTML = `
-                <div class="error-message" style="text-align: center; padding: 20px; color: red;">
-                    <h3>Error Loading Contributors</h3>
-                    <p>${error.message}</p>
-                    <button class="button primary" onclick="window.location.reload()">Try Again</button>
-                </div>
-            `;
-        }
+    // Initial documents fetch
+    const documents = await fetchDocuments();
+    if (documents) {
+        allDocuments = documents;
     }
 });
+
+// Add these helper functions for document management
+function filterContributionDocuments() {
+    const searchInput = document.getElementById('contributionSearch');
+    if (!searchInput) return;
+
+    const searchTerm = searchInput.value.toLowerCase();
+    const filteredDocs = allDocuments.filter(doc => 
+        doc.title.toLowerCase().includes(searchTerm)
+    );
+
+    displayContributionDocuments(filteredDocs);
+}
+
+function handleContributionSelection(event) {
+    const title = event.target.value;
+    if (event.target.checked) {
+        selectedContributions.add(title);
+    } else {
+        selectedContributions.delete(title);
+    }
+}
 </script>
 
 <!-- Contribution Modal -->
@@ -1936,8 +2032,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         <script src="../../js/auth-utils.js"></script>
       
         <script src="../../js/admin-auth.js"></script>
-      
-        <script src="../../js/admin-check.js"></script>
       
         <script src="../../js/markdown-auth.js"></script>
       

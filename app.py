@@ -728,11 +728,7 @@ app.mount("/data", StaticFiles(directory="frontend/docs/data"), name="data")
 class CustomStaticFiles(StaticFiles):
     async def __call__(self, scope, receive, send):
         path = scope["path"]
-        if "markdowns" in path:
-            # Create a redirect response
-            return await RedirectResponse(url="/auth/login.html").__call__(
-                scope, receive, send
-            )
+        # No longer redirect markdowns to login - allow direct access
         return await super().__call__(scope, receive, send)
 
 
@@ -750,8 +746,9 @@ if __name__ == "__main__":
 # Authentication middleware
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # Check if the path is under /markdowns/
-        if "/markdowns/" in request.url.path:
+        # Previously checked for /markdowns/ paths, but now we allow public access
+        # Only admin paths need authentication now
+        if "/admin/" in request.url.path:
             # Get the token from the request headers or cookies
             token = None
             auth_header = request.headers.get("Authorization")
@@ -805,10 +802,10 @@ async def serve_document_viewer():
     return FileResponse("frontend/docs/document-viewer.html")
 
 
-# Protected markdown serving
+# Public markdown serving (no authentication required)
 @app.get("/markdowns/{path:path}")
-async def serve_markdown(path: str, current_user: User = Depends(get_current_user)):
-    """Serve markdown files with authentication"""
+async def serve_markdown(path: str):
+    """Serve markdown files without authentication"""
     file_path = os.path.join("frontend/docs/markdowns", path)
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")
