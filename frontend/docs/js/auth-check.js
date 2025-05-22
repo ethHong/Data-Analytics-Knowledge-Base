@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Verify token with backend
-    fetch('http://34.82.192.6:8000/api/auth/me', {
+    fetch(API_BASE_URL + '/api/auth/me', {
         headers: {
             'Authorization': `Bearer ${token}`
         }

@@ -77,7 +77,7 @@ async function checkAuth() {
     }
 
     try {
-        const response = await fetch('http://34.82.192.6:8000/api/auth/me', {
+        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
