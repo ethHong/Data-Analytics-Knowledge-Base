@@ -118,6 +118,12 @@ def update_mkdocs_nav():
 
     config["markdown_extensions"] = [{"pymdownx.arithmatex": {"generic": True}}]
 
+    # Set site name
+    config["site_name"] = "Zelkova"
+
+    # Set theme
+    config["theme"] = {"name": "material"}
+
     with open(MKDOCS_CONFIG_PATH, "w") as f:
         yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
 

@@ -3,8 +3,11 @@ hide:
   - toc
 ---
 
-# Welcome to the MSBA Knowledge Base
+# Welcome to Zelkova
+## Disclaimer - Network based Wiki for data analytics
+Knoweldge become only useful when they are shared, and connected to eachother. We aim to make a graph-based open knowledge base, in which we can easily look up how they are connected to eachother, and how should they be applied. We collect markdown documents and link them.
 
+If you want to make any contribution on markdown document, please contact: sukhyun.hong.2025@ucla.anderson.edu
 
 <div style="margin-bottom: 10px;">
     <iframe id="graph-frame" src="graph.html" width="100%" height="400px" frameborder="0"></iframe>
@@ -246,5 +249,3 @@ document.addEventListener("DOMContentLoaded", () => {
   src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script type="text/javascript" async
   id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-## Network based Wiki for Business Analytics, and Data professionals

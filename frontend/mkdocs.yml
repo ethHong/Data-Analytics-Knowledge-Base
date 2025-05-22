@@ -47,6 +47,6 @@ nav:
   - 📄 Linear Regression and Coefficient: markdowns/Linear Regression and Coefficient.md
   - 📄 Standard Error: markdowns/Standard Error.md
   - 📄 Statistical Bias: markdowns/Statistical Bias.md
-site_name: MSBA Knowledge Base
+site_name: Zelkova
 theme:
   name: material
