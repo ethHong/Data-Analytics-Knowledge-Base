@@ -886,18 +886,20 @@ if __name__ == "__main__":
     ssl_certfile = "/etc/letsencrypt/live/zelkova.dev/fullchain.pem"
 
     if os.path.exists(ssl_keyfile) and os.path.exists(ssl_certfile):
-        print("🔒 Starting server with HTTPS")
+        print("🔒 Starting FastAPI server with HTTPS on port 8000")
         uvicorn.run(
             "app:app",
             host="0.0.0.0",
-            port=8080,
+            port=8000,  # FastAPI runs on port 8000
             ssl_keyfile=ssl_keyfile,
             ssl_certfile=ssl_certfile,
             reload=True,
         )
     else:
-        print("⚠️ SSL certificates not found, starting with HTTP")
-        uvicorn.run("app:app", host="0.0.0.0", port=8080, reload=True)
+        print("⚠️ SSL certificates not found, starting FastAPI with HTTP on port 8000")
+        uvicorn.run(
+            "app:app", host="0.0.0.0", port=8000, reload=True
+        )  # FastAPI on port 8000
 
 
 # Add admin API endpoint for direct file update
