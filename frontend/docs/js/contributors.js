@@ -5,12 +5,9 @@ let allDocuments = [];
 let currentContributor = null;
 let selectedDocuments = new Set();
 
-// Use dynamic API base URL that works with any domain
-const API_BASE_URL = window.location.hostname === 'localhost' 
-  ? 'http://localhost:8000'
-  : window.location.hostname === '34.82.192.6' || window.location.hostname.includes('34.82.192.6')
-    ? 'http://34.82.192.6:8000' 
-    : `${window.location.protocol}//${window.location.hostname}:8000`;
+// API configuration
+//const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'http://34.82.192.6:8000';
 
 // Function to fetch documents from the API endpoint
 async function fetchDocuments() {

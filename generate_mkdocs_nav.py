@@ -102,7 +102,6 @@ def update_mkdocs_nav():
         "https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js",
         "https://polyfill.io/v3/polyfill.min.js?features=es6",
         "https://d3js.org/d3.v7.min.js",
-        "js/api-config.js",
         "js/auth-utils.js",
         "js/admin-auth.js",
         "js/markdown-auth.js",
