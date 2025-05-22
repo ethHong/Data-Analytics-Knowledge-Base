@@ -24,8 +24,13 @@ app = FastAPI()  # Initialize APP
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "*"
-    ],  # Allow requests from any domain (use specific URLs for production)
+        "https://zelkova.dev",
+        "http://34.82.192.6:8080",
+        "https://34.82.192.6:8080",
+        "http://localhost:8080",
+        "https://localhost:8080",
+        "*",  # Keep for development, remove in production
+    ],
     allow_credentials=True,  # Allow cookies, authorization headers
     allow_methods=["*"],  # Allow all HTTP methods (GET, POST, PUT, DELETE, etc.)
     allow_headers=["*"],  # Allow all headers
@@ -758,10 +763,44 @@ class CustomStaticFiles(StaticFiles):
 @app.get("/markdowns/{path:path}")
 async def serve_markdown(path: str):
     """Serve markdown files without authentication"""
-    file_path = os.path.join("frontend/docs/markdowns", path)
-    if not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail="File not found")
-    return FileResponse(file_path)
+    # Handle both with and without trailing slash
+    if path.endswith("/"):
+        path = path[:-1]
+
+    # Replace %20 with spaces if present in the URL
+    path = path.replace("%20", " ")
+
+    # Try with various extensions or no extension
+    possible_paths = [
+        os.path.join("frontend/docs/markdowns", path),
+        os.path.join("frontend/docs/markdowns", path + ".md"),
+        os.path.join("frontend/docs/markdowns", f"{path}.md"),
+        os.path.join("frontend/docs/markdowns", path, "index.md"),
+    ]
+
+    # Debug: List all available files
+    print(f"Looking for markdown: {path}")
+    all_files = os.listdir("frontend/docs/markdowns")
+    print(f"Available markdown files: {all_files}")
+
+    # Try each possible path
+    for file_path in possible_paths:
+        print(f"Trying path: {file_path}")
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            print(f"Serving markdown file from: {file_path}")
+            return FileResponse(file_path)
+
+    # Try direct matching with the files we have
+    for file in all_files:
+        if file.lower() == f"{path.lower()}.md" or file.lower() == path.lower():
+            file_path = os.path.join("frontend/docs/markdowns", file)
+            print(f"Found by direct matching: {file_path}")
+            return FileResponse(file_path)
+
+    # If we got here, no file was found
+    print(f"Markdown file not found for path: {path}")
+    print(f"Tried paths: {possible_paths}")
+    raise HTTPException(status_code=404, detail="Markdown file not found")
 
 
 # Authentication middleware
@@ -840,7 +879,25 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"⚠️ Warning: Could not start markdown file watcher: {str(e)}")
 
-    uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
+    # Run with HTTPS if SSL certificates are available
+    import os
+
+    ssl_keyfile = "/etc/letsencrypt/live/zelkova.dev/privkey.pem"
+    ssl_certfile = "/etc/letsencrypt/live/zelkova.dev/fullchain.pem"
+
+    if os.path.exists(ssl_keyfile) and os.path.exists(ssl_certfile):
+        print("🔒 Starting server with HTTPS")
+        uvicorn.run(
+            "app:app",
+            host="0.0.0.0",
+            port=8080,
+            ssl_keyfile=ssl_keyfile,
+            ssl_certfile=ssl_certfile,
+            reload=True,
+        )
+    else:
+        print("⚠️ SSL certificates not found, starting with HTTP")
+        uvicorn.run("app:app", host="0.0.0.0", port=8080, reload=True)
 
 
 # Add admin API endpoint for direct file update
