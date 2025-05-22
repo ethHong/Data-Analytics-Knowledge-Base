@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", async () => {
   //const response = await fetch("http://localhost:8000/graph/");
-  const response = await fetch("http://34.82.192.6:8000/graph/");
+  // Add timestamp to prevent caching
+  const timestamp = new Date().getTime();
+  const response = await fetch(`http://34.82.192.6:8000/graph/?t=${timestamp}`);
   const graphData = await response.json();
 
   // Get the full viewport dimensions

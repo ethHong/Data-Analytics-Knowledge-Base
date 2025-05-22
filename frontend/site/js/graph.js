@@ -1,10 +1,13 @@
 document.addEventListener("DOMContentLoaded", async () => {
   //const response = await fetch("http://localhost:8000/graph/");
-  const isProd = location.hostname.includes("zelkova.dev");
-  const baseURL = isProd ? "https://zelkova.dev" : "http://localhost:8000";
+  // Add timestamp to prevent caching
+  const timestamp = new Date().getTime();
+  const response = await fetch(`http://34.82.192.6:8000/graph/?t=${timestamp}`);
+  const graphData = await response.json();
 
-  const response = await fetch(`${baseURL}/graph/`);
-
+  // Get the full viewport dimensions
+  const width = window.innerWidth;
+  const height = window.innerHeight;
 
   // Create a container for the graph that fills the available space
   const graphContainer = document.getElementById("knowledge-graph");

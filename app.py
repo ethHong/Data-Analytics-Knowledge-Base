@@ -265,7 +265,7 @@ async def get_related_documents(
 
 
 # Add upload feature
-UPLOAD_DIR = "docs/markdowns/"
+UPLOAD_DIR = "frontend/docs/markdowns/"
 
 
 # API endpoint for uploading markdown files
@@ -284,6 +284,30 @@ async def upload_markdown(file: UploadFile = File(...)):
             "message": "File uploaded and updated DB successfully",
             "filename": file.filename,
         }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# API endpoint for deleting markdown files
+@app.delete("/delete_markdown/{filename}")
+async def delete_markdown(filename: str):
+    file_path = os.path.join("frontend/docs/markdowns", filename)
+    try:
+        if not os.path.exists(file_path):
+            raise HTTPException(status_code=404, detail="File not found")
+
+        # Delete the file
+        os.remove(file_path)
+
+        # Run refresh script to update the graph
+        os.system("pipenv run python refresh_data.py")
+
+        return {
+            "message": "File deleted and graph updated successfully",
+            "filename": filename,
+        }
+    except HTTPException as he:
+        raise he
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -739,6 +763,15 @@ app.mount("/", CustomStaticFiles(directory="frontend/docs", html=True), name="ro
 # Start the FastAPI server
 if __name__ == "__main__":
     import uvicorn
+
+    # Start the markdown file watcher in the background
+    try:
+        from watch_markdown_changes import start_watcher
+
+        observer = start_watcher()
+        print("📁 Started markdown file watcher in the background")
+    except Exception as e:
+        print(f"⚠️ Warning: Could not start markdown file watcher: {str(e)}")
 
     uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
 

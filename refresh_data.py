@@ -2,6 +2,16 @@ from neo4j import GraphDatabase
 import os
 import re
 import threading
+import argparse
+
+# Add command line arguments
+parser = argparse.ArgumentParser(
+    description="Refresh the Neo4j database with markdown files"
+)
+parser.add_argument(
+    "--verbose", "-v", action="store_true", help="Enable verbose output"
+)
+args = parser.parse_args()
 
 # Connect to Neo4j
 NEO4J_URI = "bolt://localhost:7687"
@@ -51,11 +61,25 @@ def full_sync():
             print("🗑️ All documents deleted as directory is empty.")
         else:
             titles_to_delete = db_titles - set(existing_files.keys())
+            if args.verbose:
+                print(f"🔍 Files to delete: {titles_to_delete}")
+
             for title in titles_to_delete:
-                session.run(
+                if args.verbose:
+                    print(f"🗑️ Attempting to delete node with title: {title}")
+                delete_result = session.run(
                     "MATCH (d:Document {title: $title}) DETACH DELETE d", title=title
                 )
-                print(f"❌ Deleted node for title: {title}")
+                if args.verbose:
+                    summary = delete_result.consume()
+                    if summary.counters.nodes_deleted > 0:
+                        print(
+                            f"❌ Successfully deleted node for title: {title} (Deleted {summary.counters.nodes_deleted} nodes)"
+                        )
+                    else:
+                        print(f"⚠️ No nodes found to delete for title: {title}")
+                else:
+                    print(f"❌ Deleted node for title: {title}")
 
             for title, filepath in existing_files.items():
                 with open(filepath, "r", encoding="utf-8") as file:

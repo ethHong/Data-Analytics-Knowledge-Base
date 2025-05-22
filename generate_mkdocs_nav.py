@@ -1,6 +1,7 @@
 import os
 import yaml
 import re
+import subprocess
 
 MKDOCS_CONFIG_PATH = "frontend/mkdocs.yml"
 MARKDOWN_DIR = "frontend/docs/markdowns/"  # Stay consistent with backend
@@ -133,6 +134,14 @@ def update_mkdocs_nav():
         yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
 
     print("✅ Updated mkdocs.yml with latest documents!")
+
+    # Run the refresh_data.py script to update the graph database
+    print("🔄 Refreshing graph database...")
+    try:
+        subprocess.run(["pipenv", "run", "python", "refresh_data.py"], check=True)
+        print("✅ Graph database updated successfully!")
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Failed to update graph database: {e}")
 
 
 if __name__ == "__main__":
