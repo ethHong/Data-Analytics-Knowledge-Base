@@ -7,7 +7,7 @@ extra_javascript:
 - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js
 - https://polyfill.io/v3/polyfill.min.js?features=es6
 - https://d3js.org/d3.v7.min.js
-# - js/token-debugger.js  # Removed the debug token button
+- js/api-config.js
 - js/auth-utils.js
 - js/admin-auth.js
 - js/markdown-auth.js
@@ -49,10 +49,10 @@ nav:
   - 📄 Statistical Bias: markdowns/Statistical Bias.md
 site_name: Zelkova
 theme:
-  name: material
-  logo: assets/images/logo.png
   favicon: assets/images/favicon.png
+  features:
+  - navigation.instant
   icon:
     logo: material/book
-  features:
-    - navigation.instant
+  logo: assets/images/logo.png
+  name: material

@@ -1,6 +1,14 @@
 // Authentication and access control
 // Remove hardcoded base URL and use relative paths
 
+// Add a dynamic API base URL determination at the top of the file
+// This will use the current domain for API calls
+const API_BASE_URL = window.location.hostname === 'localhost' 
+  ? 'http://localhost:8000'
+  : window.location.hostname === '34.82.192.6' || window.location.hostname.includes('34.82.192.6')
+    ? 'http://34.82.192.6:8000' 
+    : `${window.location.protocol}//${window.location.hostname}:8000`;
+
 // TEMPORARILY DISABLED FOR DEBUGGING
 // Public paths that don't require authentication
 const publicPaths = [
@@ -77,7 +85,7 @@ async function checkAuth() {
     }
 
     try {
-        const response = await fetch('http://34.82.192.6:8000/api/auth/me', {
+        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`

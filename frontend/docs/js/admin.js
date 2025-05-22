@@ -8,8 +8,12 @@ let contributorsData = [];
 let currentContributor = null;
 let selectedDocuments = new Set();
 
-// API configuration
-const API_BASE_URL = 'http://34.82.192.6:8000';
+// Use dynamic API base URL that works with any domain
+const API_BASE_URL = window.location.hostname === 'localhost' 
+  ? 'http://localhost:8000'
+  : window.location.hostname === '34.82.192.6' || window.location.hostname.includes('34.82.192.6')
+    ? 'http://34.82.192.6:8000' 
+    : `${window.location.protocol}//${window.location.hostname}:8000`;
 
 // Helper function to get auth headers
 function getAuthHeaders() {
