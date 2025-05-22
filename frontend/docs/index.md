@@ -3,6 +3,12 @@ hide:
   - toc
 ---
 
+<head>
+  <link rel="icon" type="image/png" href="assets/images/favicon.png">
+  <link rel="shortcut icon" type="image/png" href="assets/images/favicon.png">
+  <link rel="apple-touch-icon" href="assets/images/favicon.png">
+</head>
+
 # Welcome to Zelkova
 ## Disclaimer - Network based Wiki for data analytics
 Knoweldge become only useful when they are shared, and connected to eachother. We aim to make a graph-based open knowledge base, in which we can easily look up how they are connected to eachother, and how should they be applied. We collect markdown documents and link them.

@@ -1,3 +1,103 @@
+/* Custom header color */
+.md-header {
+  background-color: #000000 !important;
+}
+
+.md-tabs {
+  background-color: #000000 !important;
+}
+
+/* Black theme for buttons */
+.md-button, 
+.md-typeset .md-button,
+button.md-button,
+.refresh-btn,
+.save-btn,
+.edit-contributions,
+.md-icon-button,
+.md-header__button,
+.md-nav__toggle,
+.centerButton {
+  background-color: #000000 !important;
+  color: white !important;
+  border-color: #333333 !important;
+}
+
+.md-button:hover, 
+.md-typeset .md-button:hover,
+button.md-button:hover,
+.refresh-btn:hover,
+.save-btn:hover,
+.edit-contributions:hover,
+.md-icon-button:hover,
+.md-header__button:hover,
+.centerButton:hover {
+  background-color: #333333 !important;
+  border-color: #000000 !important;
+}
+
+/* Black theme for main action buttons */
+.save-btn {
+  background-color: #000000 !important;
+  color: white !important;
+  border: 1px solid #333333 !important;
+}
+
+.save-btn:hover {
+  background-color: #333333 !important;
+}
+
+/* Style cancel buttons with inverted colors but still in theme */
+.cancel-btn {
+  background-color: white !important;
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
+}
+
+.cancel-btn:hover {
+  background-color: #f0f0f0 !important;
+}
+
+/* Graph UI elements */
+#knowledge-graph button {
+  background-color: #000000 !important;
+  color: white !important;
+}
+
+/* Black theme for links */
+.md-nav__link:hover,
+.md-nav__link:focus,
+.md-nav__link--active,
+.md-nav__item--active > .md-nav__link {
+  color: #000000 !important;
+}
+
+/* Black theme for active nav items */
+.md-nav__item--active {
+  color: #000000 !important;
+}
+
+/* Black theme for selected items */
+.document-item.selected {
+  background-color: #f0f0f0 !important;
+  border-color: #000000 !important;
+}
+
+/* Style input focus states */
+.search-container input:focus {
+  outline: none;
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Override any Material theme primary colors */
+:root {
+  --md-primary-fg-color: #000000 !important;
+  --md-primary-fg-color--light: #333333 !important;
+  --md-primary-fg-color--dark: #000000 !important;
+  --md-accent-fg-color: #333333 !important;
+}
+
 #knowledge-graph {
   width: 100%;
   height: 90vh;
@@ -97,7 +197,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: #0077b5;
+  color: #000000 !important;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
@@ -105,7 +205,7 @@
 }
 
 .linkedin-link:hover {
-  color: #005582;
+  color: #333333 !important;
 }
 
 .linkedin-link svg {
@@ -143,13 +243,13 @@
 }
 
 .contributions ul li a {
-  color: #2196f3;
+  color: #000000 !important;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .contributions ul li a:hover {
-  color: #1976d2;
+  color: #333333 !important;
   text-decoration: underline;
 }
 
@@ -302,27 +402,6 @@
   transition: all 0.2s ease;
 }
 
-.save-btn {
-  background-color: #2196f3;
-  color: white;
-  border: none;
-}
-
-.save-btn:hover {
-  background-color: #1976d2;
-}
-
-.cancel-btn {
-  background-color: white;
-  color: #666;
-  border: 1px solid #e0e0e0;
-}
-
-.cancel-btn:hover {
-  background-color: #f5f5f5;
-  border-color: #ccc;
-}
-
 .search-row {
   display: flex;
   gap: 0.5rem;
@@ -350,6 +429,7 @@
 
 .refresh-btn svg {
   transition: transform 0.3s ease;
+  fill: white !important;
 }
 
 .refresh-btn:hover {
@@ -371,4 +451,43 @@
   padding: 2rem;
   color: #666;
   font-style: italic;
+}
+
+/* Style refresh button icon rotation */
+.refresh-btn svg {
+  transition: transform 0.3s ease;
+  fill: white !important;
+}
+
+/* Customize graph nodes color scheme */
+circle.node {
+  fill: #000000 !important;
+  stroke: #333333 !important;
+}
+
+circle.node:hover {
+  fill: #333333 !important;
+}
+
+.node-label {
+  fill: white !important;
+}
+
+/* Make graph lines black */
+line.link {
+  stroke: #000000 !important;
+}
+
+/* Override any blue focus indicators */
+*:focus {
+  outline-color: #000000 !important;
+}
+
+/* Override any primary colored elements */
+.md-typeset a {
+  color: #000000 !important;
+}
+
+.md-typeset a:hover {
+  color: #333333 !important;
 }

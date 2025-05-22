@@ -48,11 +48,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const svgGroup = svg.append("g");
   
-  // 🎨 Assign unique colors by category using a more visually pleasing palette
+  // 🎨 Assign unique colors by category using a darker palette to match the black theme
   const categories = Array.from(new Set(graphData.nodes.map(node => node.category)));
   const color = d3.scaleOrdinal()
     .domain(categories)
-    .range(d3.schemeObservable10);
+    .range(d3.schemeDark2);
 
   // Adjust force simulation parameters for mobile
   const isMobile = window.innerWidth < 768;
@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function highlightConnections(nodeData, highlight) {
     link.attr("stroke", (d) => {
-      return d.source.id === nodeData.id || d.target.id === nodeData.id ? (highlight ? "#007bff" : "#aaa") : "#aaa";
+      return d.source.id === nodeData.id || d.target.id === nodeData.id ? (highlight ? "#000000" : "#aaa") : "#aaa";
     }).attr("stroke-width", (d) => {
       return d.source.id === nodeData.id || d.target.id === nodeData.id ? (highlight ? (isMobile ? 3 : 4) : (isMobile ? 1.5 : 2)) : (isMobile ? 1.5 : 2);
     });
@@ -193,7 +193,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   centerButton.style.top = "10px";
   centerButton.style.right = "10px";
   centerButton.style.padding = isMobile ? "8px" : "10px";
-  centerButton.style.backgroundColor = "#007bff";
+  centerButton.style.backgroundColor = "#000000";
   centerButton.style.color = "white";
   centerButton.style.border = "none";
   centerButton.style.borderRadius = "5px";

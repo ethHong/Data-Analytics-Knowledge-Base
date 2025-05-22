@@ -66,4 +66,3 @@ function displayError(message) {
         </div>
     `;
 } 
- 

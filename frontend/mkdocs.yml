@@ -50,3 +50,9 @@ nav:
 site_name: Zelkova
 theme:
   name: material
+  logo: assets/images/logo.png
+  favicon: assets/images/favicon.png
+  icon:
+    logo: material/book
+  features:
+    - navigation.instant

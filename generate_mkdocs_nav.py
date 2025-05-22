@@ -121,8 +121,14 @@ def update_mkdocs_nav():
     # Set site name
     config["site_name"] = "Zelkova"
 
-    # Set theme
-    config["theme"] = {"name": "material"}
+    # Set theme with logo and favicon
+    config["theme"] = {
+        "name": "material",
+        "logo": "assets/images/logo.png",
+        "favicon": "assets/images/favicon.png",
+        "icon": {"logo": "material/book"},
+        "features": ["navigation.instant"],
+    }
 
     with open(MKDOCS_CONFIG_PATH, "w") as f:
         yaml.dump(config, f, default_flow_style=False, allow_unicode=True)

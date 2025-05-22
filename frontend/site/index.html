@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en" class="no-js">
   <head>
@@ -83,8 +84,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="." title="Zelkova" class="md-header__button md-logo" aria-label="Zelkova" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+  <img src="assets/images/logo.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -180,8 +180,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="." title="Zelkova" class="md-nav__button md-logo" aria-label="Zelkova" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+  <img src="assets/images/logo.png" alt="logo">
 
     </a>
     Zelkova
@@ -244,9 +243,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#network-based-wiki-for-business-analytics-and-data-professionals" class="md-nav__link">
+  <a href="#disclaimer-network-based-wiki-for-data-analytics" class="md-nav__link">
     <span class="md-ellipsis">
-      Network based Wiki for data analytics
+      Disclaimer - Network based Wiki for data analytics
     </span>
   </a>
   
@@ -943,9 +942,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#network-based-wiki-for-business-analytics-and-data-professionals" class="md-nav__link">
+  <a href="#disclaimer-network-based-wiki-for-data-analytics" class="md-nav__link">
     <span class="md-ellipsis">
-      Network based Wiki for Business Analytics, and Data professionals
+      Disclaimer - Network based Wiki for data analytics
     </span>
   </a>
   
@@ -970,6 +969,9 @@
 
 
 <h1 id="welcome-to-zelkova">Welcome to Zelkova</h1>
+<h2 id="disclaimer-network-based-wiki-for-data-analytics">Disclaimer - Network based Wiki for data analytics</h2>
+<p>Knoweldge become only useful when they are shared, and connected to eachother. We aim to make a graph-based open knowledge base, in which we can easily look up how they are connected to eachother, and how should they be applied. We collect markdown documents and link them.</p>
+<p>If you want to make any contribution on markdown document, please contact: sukhyun.hong.2025@ucla.anderson.edu</p>
 <div style="margin-bottom: 10px;">
     <iframe id="graph-frame" src="graph.html" width="100%" height="400px" frameborder="0"></iframe>
 </div>
@@ -1071,7 +1073,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const graphPanel = document.getElementById("graph-panel"); // ✅ Define graph panel
 
         async function openDocumentPanel(docId, pushState = true) {
-            // Document panels are now public (no authentication required)
+            // No longer check for authentication - documents are now public
+            // Just proceed with loading the document
             const docUrl = `/markdowns/${encodeURIComponent(docId)}/`;
 
             try {
@@ -1209,8 +1212,6 @@ document.addEventListener("DOMContentLoaded", () => {
   src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script type="text/javascript" async
   id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-<h2 id="network-based-wiki-for-business-analytics-and-data-professionals">Network based Wiki for Business Analytics, and Data professionals</h2>
 
 
 
