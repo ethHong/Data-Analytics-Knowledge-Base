@@ -288,7 +288,7 @@
             const password = document.getElementById('login-password').value;
             
             try {
-                const response = await fetch(API_BASE_URL + '/api/auth/token', {
+                const response = await fetch('/api/auth/token', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -318,7 +318,7 @@
             const email = document.getElementById('email').value;
             
             try {
-                const response = await fetch(API_BASE_URL + '/api/auth/send-verification', {
+                const response = await fetch('/api/auth/send-verification', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -348,7 +348,7 @@
             const code = document.getElementById('verification-code').value;
             
             try {
-                const response = await fetch(API_BASE_URL + '/api/auth/verify-code', {
+                const response = await fetch('/api/auth/verify-code', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -384,7 +384,7 @@
             }
             
             try {
-                const response = await fetch(API_BASE_URL + '/api/auth/complete-setup', {
+                const response = await fetch('/api/auth/complete-setup', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -399,7 +399,7 @@
                 
                 if (response.ok) {
                     // Log in automatically
-                    const loginResponse = await fetch(API_BASE_URL + '/api/auth/login', {
+                    const loginResponse = await fetch('/api/auth/login', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -431,7 +431,7 @@
         // Function to resend verification code
         async function resendCode() {
             try {
-                const response = await fetch(API_BASE_URL + '/api/auth/resend-verification', {
+                const response = await fetch('/api/auth/resend-verification', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
