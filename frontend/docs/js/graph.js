@@ -240,13 +240,7 @@ function handleNodeClick(event, d) {
     event.preventDefault();
     console.log("Clicked node:", d.id);
     
-    // Check if user is authenticated
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.top.location.href = '/auth/login.html';
-        return;
-    }
-    
+    // Graph nodes are now public (no authentication required)
     // Post message to parent window to open panel
     window.parent.postMessage({ type: "openPanel", docId: d.id }, "*");
 }

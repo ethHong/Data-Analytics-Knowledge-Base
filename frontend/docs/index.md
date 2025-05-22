@@ -107,17 +107,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const graphPanel = document.getElementById("graph-panel"); // ✅ Define graph panel
 
         async function openDocumentPanel(docId, pushState = true) {
-            // Check if user is authenticated
-            const token = localStorage.getItem('token');
-            if (!token) {
-                // Store the docId for after login
-                sessionStorage.setItem('redirectAfterLogin', `/index.html?doc=${encodeURIComponent(docId)}`);
-                // Redirect to login page
-                window.location.href = '/auth/login.html';
-                return;
-            }
-
-            // If authenticated, proceed with loading the document
+            // No longer check for authentication - documents are now public
+            // Just proceed with loading the document
             const docUrl = `/markdowns/${encodeURIComponent(docId)}/`;
             
             try {
