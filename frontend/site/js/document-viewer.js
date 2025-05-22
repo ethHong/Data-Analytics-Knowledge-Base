@@ -1,7 +1,7 @@
 // Document Viewer Script
 document.addEventListener('DOMContentLoaded', async () => {
     // Document viewing is now public (no authentication required)
-    
+
     // Get document path from URL
     const urlParams = new URLSearchParams(window.location.search);
     const docPath = urlParams.get('path');

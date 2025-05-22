@@ -1,7 +1,9 @@
 document.addEventListener("DOMContentLoaded", async () => {
   //const response = await fetch("http://localhost:8000/graph/");
-  const response = await fetch("/graph/");
-  const graphData = await response.json();
+  const isProd = location.hostname.includes("zelkova.dev");
+  const baseURL = isProd ? "https://zelkova.dev" : "http://localhost:8000";
+
+  const response = await fetch(`${baseURL}/graph/`);
 
 
   // Create a container for the graph that fills the available space

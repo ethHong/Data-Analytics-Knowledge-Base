@@ -1,7 +1,7 @@
 ---
 title: User Management
 ---
-
+category_specifier : "admin"
 <!-- User Management -->
 <div class="admin-container">
     <h1>User Management</h1>
