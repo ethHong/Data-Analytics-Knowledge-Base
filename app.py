@@ -24,13 +24,8 @@ app = FastAPI()  # Initialize APP
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://zelkova.dev",
-        "http://34.82.192.6:8080",
-        "https://34.82.192.6:8080",
-        "http://localhost:8080",
-        "https://localhost:8080",
-        "*",  # Keep for development, remove in production
-    ],
+        "*"
+    ],  # Allow requests from any domain (use specific URLs for production)
     allow_credentials=True,  # Allow cookies, authorization headers
     allow_methods=["*"],  # Allow all HTTP methods (GET, POST, PUT, DELETE, etc.)
     allow_headers=["*"],  # Allow all headers
@@ -879,27 +874,7 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"⚠️ Warning: Could not start markdown file watcher: {str(e)}")
 
-    # Run with HTTPS if SSL certificates are available
-    import os
-
-    ssl_keyfile = "/etc/letsencrypt/live/zelkova.dev/privkey.pem"
-    ssl_certfile = "/etc/letsencrypt/live/zelkova.dev/fullchain.pem"
-
-    if os.path.exists(ssl_keyfile) and os.path.exists(ssl_certfile):
-        print("🔒 Starting FastAPI server with HTTPS on port 8000")
-        uvicorn.run(
-            "app:app",
-            host="0.0.0.0",
-            port=8000,  # FastAPI runs on port 8000
-            ssl_keyfile=ssl_keyfile,
-            ssl_certfile=ssl_certfile,
-            reload=True,
-        )
-    else:
-        print("⚠️ SSL certificates not found, starting FastAPI with HTTP on port 8000")
-        uvicorn.run(
-            "app:app", host="0.0.0.0", port=8000, reload=True
-        )  # FastAPI on port 8000
+    uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
 
 
 # Add admin API endpoint for direct file update
