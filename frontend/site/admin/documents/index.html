@@ -963,7 +963,9 @@ async function fetchDocuments() {
             return;
         }
 
-        const apiUrl = `${API_BASE_URL}/api/documents`;
+        const apiUrl = window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+            ? '/api/documents' // Use relative URL for HTTPS domain
+            : 'http://34.82.192.6:8000/api/documents'; // Use absolute URL for development/staging
         console.log('Fetching documents from:', apiUrl);
 
         const response = await fetch(apiUrl, {
@@ -1165,7 +1167,9 @@ async function viewDocument(title) {
         const url = `../../markdowns/${encodedName}/`;
         
         // First check if user has access
-        const documentApiUrl = `${API_BASE_URL}/documents/${encodedName}`;
+        const documentApiUrl = window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+            ? `/documents/${encodedName}` // Use relative URL for HTTPS domain
+            : `http://34.82.192.6:8000/documents/${encodedName}`; // Use absolute URL for development/staging
             
         const response = await fetch(documentApiUrl, {
             method: 'GET',

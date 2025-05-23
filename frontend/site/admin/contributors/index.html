@@ -1216,7 +1216,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Check admin status
-    fetch(`${API_BASE_URL}/api/auth/me`, {
+    fetch(window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+        ? '/api/auth/me' // Use relative URL for HTTPS domain
+        : 'http://34.82.192.6:8000/api/auth/me', { // Use absolute URL for development/staging
         headers: {
             'Authorization': `Bearer ${token}`
         }
@@ -1252,7 +1254,9 @@ let isSyncing = false;
 // Function to fetch and display contributors with fresh data
 async function loadContributors() {
     try {
-        const apiResponse = await fetch(`${API_BASE_URL}/api/contributors`);
+        const apiResponse = await fetch(window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+            ? '/api/contributors' // Use relative URL for HTTPS domain
+            : 'http://34.82.192.6:8000/api/contributors'); // Use absolute URL for development/staging
         if (!apiResponse.ok) {
             throw new Error(`Failed to fetch contributors: ${apiResponse.status}`);
         }
@@ -1293,7 +1297,9 @@ async function syncContributors() {
         console.log('Starting sync of contributors using existing endpoints');
 
         // First get the current server state for comparison
-        const currentResponse = await fetch(`${API_BASE_URL}/api/contributors`);
+        const currentResponse = await fetch(window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+            ? '/api/contributors' // Use relative URL for HTTPS domain
+            : 'http://34.82.192.6:8000/api/contributors'); // Use absolute URL for development/staging
         if (!currentResponse.ok) {
             throw new Error(`Failed to get current contributors: ${currentResponse.status}`);
         }
@@ -1320,7 +1326,10 @@ async function syncContributors() {
             if (!localIds.has(serverId)) {
                 console.log(`Deleting contributor: ${serverId}`);
                 try {
-                    const deleteResponse = await fetch(`${API_BASE_URL}/api/contributors/${serverId}`, {
+                    const deleteUrl = window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+                        ? `/api/contributors/${serverId}` // Use relative URL for HTTPS domain
+                        : `http://34.82.192.6:8000/api/contributors/${serverId}`; // Use absolute URL for development/staging
+                    const deleteResponse = await fetch(deleteUrl, {
                         method: 'DELETE',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -1350,8 +1359,12 @@ async function syncContributors() {
 
                 // Prepare the request
                 const url = isNew 
-                    ? `${API_BASE_URL}/api/contributors` 
-                    : `${API_BASE_URL}/api/contributors/${contributor.id}`;
+                    ? (window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+                        ? '/api/contributors' // Use relative URL for HTTPS domain
+                        : 'http://34.82.192.6:8000/api/contributors') // Use absolute URL for development/staging
+                    : (window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+                        ? `/api/contributors/${contributor.id}` // Use relative URL for HTTPS domain
+                        : `http://34.82.192.6:8000/api/contributors/${contributor.id}`); // Use absolute URL for development/staging
 
                 const method = isNew ? 'POST' : 'PUT';
 
@@ -1576,7 +1589,9 @@ async function loadContributorContributions(contributorId) {
             return;
         }
 
-        const response = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`, {
+        const response = await fetch(window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+            ? `/api/contributors/${contributorId}` // Use relative URL for HTTPS domain
+            : `http://34.82.192.6:8000/api/contributors/${contributorId}`, { // Use absolute URL for development/staging
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
@@ -1765,7 +1780,9 @@ async function fetchDocuments() {
             return [];
         }
 
-        const apiUrl = `${API_BASE_URL}/api/documents`;
+        const apiUrl = window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+            ? '/api/documents' // Use relative URL for HTTPS domain
+            : 'http://34.82.192.6:8000/api/documents'; // Use absolute URL for development/staging
             
         const response = await fetch(apiUrl, {
             headers: {
@@ -1852,7 +1869,9 @@ async function saveContributions() {
         };
 
         // Send the update
-        const contributorApiUrl = `${API_BASE_URL}/api/contributors/${contributorId}`;
+        const contributorApiUrl = window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+            ? `/api/contributors/${contributorId}` // Use relative URL for HTTPS domain
+            : `http://34.82.192.6:8000/api/contributors/${contributorId}`; // Use absolute URL for development/staging
             
         const updateResponse = await fetch(contributorApiUrl, {
             method: 'PUT',
