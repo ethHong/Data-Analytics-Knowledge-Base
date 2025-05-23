@@ -1,7 +1,12 @@
 // Initialize superuser if not exists
 async function initializeSuperuser() {
     try {
-        const response = await fetch('http://34.82.192.6:8000/api/auth/init-superuser', {
+        // Use relative URL for domain compatibility
+        const apiUrl = window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+            ? '/api/auth/init-superuser' // Use relative URL for HTTPS domain
+            : 'http://34.82.192.6:8000/api/auth/init-superuser'; // Use absolute URL for development/staging
+            
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
