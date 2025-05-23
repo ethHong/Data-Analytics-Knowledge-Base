@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en" class="no-js">
   <head>
@@ -1757,7 +1756,11 @@ async function fetchDocuments() {
             return [];
         }
 
-        const response = await fetch('http://34.82.192.6:8000/api/documents', {
+        const apiUrl = window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+            ? '/api/documents' // Use relative URL for HTTPS domain
+            : 'http://34.82.192.6:8000/api/documents'; // Use absolute URL for development/staging
+            
+        const response = await fetch(apiUrl, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
@@ -1842,7 +1845,11 @@ async function saveContributions() {
         };
 
         // Send the update
-        const updateResponse = await fetch(`http://34.82.192.6:8000/api/contributors/${contributorId}`, {
+        const contributorApiUrl = window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+            ? `/api/contributors/${contributorId}` // Use relative URL for HTTPS domain
+            : `http://34.82.192.6:8000/api/contributors/${contributorId}`; // Use absolute URL for development/staging
+            
+        const updateResponse = await fetch(contributorApiUrl, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,

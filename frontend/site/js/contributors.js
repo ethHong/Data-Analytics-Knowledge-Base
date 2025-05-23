@@ -5,9 +5,10 @@ let allDocuments = [];
 let currentContributor = null;
 let selectedDocuments = new Set();
 
-// API configuration
-//const API_BASE_URL = 'http://localhost:8000';
-const API_BASE_URL = 'http://34.82.192.6:8000';
+// API configuration - Use relative URLs for domain compatibility
+const API_BASE_URL = window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+    ? '' // Use relative URLs for HTTPS domain
+    : 'http://34.82.192.6:8000'; // Use absolute URL for development/staging
 
 // Function to fetch documents from the API endpoint
 async function fetchDocuments() {
