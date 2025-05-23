@@ -8,11 +8,6 @@ let contributorsData = [];
 let currentContributor = null;
 let selectedDocuments = new Set();
 
-// API configuration - Use relative URLs for domain compatibility
-const API_BASE_URL = window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
-    ? '' // Use relative URLs for HTTPS domain
-    : 'http://34.82.192.6:8000'; // Use absolute URL for development/staging
-
 // Helper function to get auth headers
 function getAuthHeaders() {
     const token = localStorage.getItem('token');
@@ -34,7 +29,10 @@ function handleUnauthorizedResponse() {
 async function fetchDocuments() {
     console.log('Fetching documents...');
     try {
-        const response = await fetch(`${API_BASE_URL}/api/documents`, {
+        const apiUrl = window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+            ? '/api/documents' // Use relative URL for HTTPS domain
+            : 'http://34.82.192.6:8000/api/documents'; // Use absolute URL for development/staging
+        const response = await fetch(apiUrl, {
             headers: getAuthHeaders()
         });
         
@@ -59,7 +57,10 @@ async function fetchDocuments() {
 // Contributor Management Functions
 async function fetchContributors() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/contributors`, {
+        const apiUrl = window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+            ? '/api/contributors' // Use relative URL for HTTPS domain
+            : 'http://34.82.192.6:8000/api/contributors'; // Use absolute URL for development/staging
+        const response = await fetch(apiUrl, {
             headers: getAuthHeaders()
         });
         if (!response.ok) {
@@ -76,8 +77,12 @@ async function fetchContributors() {
 async function saveContributor(contributorData, contributorId = null) {
     const method = contributorId ? 'PUT' : 'POST';
     const url = contributorId 
-        ? `${API_BASE_URL}/api/contributors/${contributorId}`
-        : `${API_BASE_URL}/api/contributors`;
+        ? (window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+            ? `/api/contributors/${contributorId}` // Use relative URL for HTTPS domain
+            : `http://34.82.192.6:8000/api/contributors/${contributorId}`) // Use absolute URL for development/staging
+        : (window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+            ? '/api/contributors' // Use relative URL for HTTPS domain
+            : 'http://34.82.192.6:8000/api/contributors'); // Use absolute URL for development/staging
 
     try {
         const response = await fetch(url, {
@@ -99,7 +104,10 @@ async function saveContributor(contributorData, contributorId = null) {
 
 async function deleteContributor(contributorId) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/contributors/${contributorId}`, {
+        const apiUrl = window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
+            ? `/api/contributors/${contributorId}` // Use relative URL for HTTPS domain
+            : `http://34.82.192.6:8000/api/contributors/${contributorId}`; // Use absolute URL for development/staging
+        const response = await fetch(apiUrl, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
