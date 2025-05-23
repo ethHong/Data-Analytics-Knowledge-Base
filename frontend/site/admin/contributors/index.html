@@ -1196,7 +1196,18 @@
 }
 </style>
 
+<script src="../../assets/javascripts/bundle.f1b6f286.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
 <script src="../../js/api-config.js"></script>
+
+<script src="../../js/auth-utils.js"></script>
+
 <script>
 // Authentication check - redirect non-admin users to login
 document.addEventListener('DOMContentLoaded', function() {
@@ -1756,9 +1767,7 @@ async function fetchDocuments() {
             return [];
         }
 
-        const apiUrl = window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
-            ? '/api/documents' // Use relative URL for HTTPS domain
-            : 'http://34.82.192.6:8000/api/documents'; // Use absolute URL for development/staging
+        const apiUrl = `${API_BASE_URL}/api/documents`;
             
         const response = await fetch(apiUrl, {
             headers: {
@@ -1845,9 +1854,7 @@ async function saveContributions() {
         };
 
         // Send the update
-        const contributorApiUrl = window.location.protocol === 'https:' && window.location.hostname.includes('zelkova.dev') 
-            ? `/api/contributors/${contributorId}` // Use relative URL for HTTPS domain
-            : `http://34.82.192.6:8000/api/contributors/${contributorId}`; // Use absolute URL for development/staging
+        const contributorApiUrl = `${API_BASE_URL}/api/contributors/${contributorId}`;
             
         const updateResponse = await fetch(contributorApiUrl, {
             method: 'PUT',
@@ -1975,24 +1982,6 @@ function handleContributionSelection(event) {
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@babel/polyfill@7.12.1/dist/polyfill.min.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-                
-              </article>
-            </div>
-          
-          
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
@@ -2032,6 +2021,8 @@ function handleContributionSelection(event) {
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
         <script src="https://d3js.org/d3.v7.min.js"></script>
+      
+        <script src="../../js/api-config.js"></script>
       
         <script src="../../js/auth-utils.js"></script>
       
