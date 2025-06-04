@@ -1,5 +1,5 @@
-# Data-Analytics-Knowledge-Base
-Data Analytics Knowledge Base for MSBA and Data Expert candidates
+# ZELKOVA
+* Link: 🔗 https://zelkova.dev
 
 <img width="1403" alt="Image" src="https://github.com/user-attachments/assets/ac37e044-1e93-43f9-9fd5-6e9a1584ed14" />
 
@@ -8,12 +8,7 @@ Data Analytics Knowledge Base for MSBA and Data Expert candidates
 # Product Plans
 
 ## Summary
-
-- Objective: Build a Knowledge Base useful for MSBA 2025 candidates for career
-- Requirements:
-  - Easily search and access key concepts.
-  - Link / reference related concepts with graph structure.
-  - (Later) Let users leave comments, and update later wiki-based.
+Knoweldge become only useful when they are shared, and connected to eachother. We aim to make a graph-based open knowledge base, in which we can easily look up how they are connected to eachother, and how should they be applied. We collect markdown documents and link them.
 
 ---
 
